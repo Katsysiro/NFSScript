@@ -1,6 +1,6 @@
 ﻿using System;
-using System.Text;
 using System.Globalization;
+using System.Text;
 using NFSScript.Math;
 
 namespace NFSScript
@@ -33,123 +33,57 @@ namespace NFSScript
         /// <summary>
         /// The color black.
         /// </summary>
-        public static Color black
-        {
-            get
-            {
-                return new Color(0.0f, 0.0f, 0.0f, 1f);
-            }
-        }
+        public static Color black => new Color(0.0f, 0.0f, 0.0f, 1f);
 
         /// <summary>
         /// The color blue.
         /// </summary>
-        public static Color blue
-        {
-            get
-            {
-                return new Color(0.0f, 0.0f, 1f, 1f);
-            }
-        }
+        public static Color blue => new Color(0.0f, 0.0f, 1f, 1f);
 
         /// <summary>
         /// Transparent.
         /// </summary>
-        public static Color clear
-        {
-            get
-            {
-                return new Color(0.0f, 0.0f, 0.0f, 0.0f);
-            }
-        }
+        public static Color clear => new Color(0.0f, 0.0f, 0.0f, 0.0f);
 
         /// <summary>
         /// The color cyan.
         /// </summary>
-        public static Color cyan
-        {
-            get
-            {
-                return new Color(0.0f, 1f, 1f, 1f);
-            }
-        }
+        public static Color cyan => new Color(0.0f, 1f, 1f, 1f);
 
         /// <summary>
         /// The color gray for the Americans.
         /// </summary>
-        public static Color gray
-        {
-            get
-            {
-                return new Color(0.5f, 0.5f, 0.5f, 1f);
-            }
-        }
+        public static Color gray => new Color(0.5f, 0.5f, 0.5f, 1f);
 
         /// <summary>
         /// The color green.
         /// </summary>
-        public static Color green
-        {
-            get
-            {
-                return new Color(0.0f, 1f, 0.0f, 1f);
-            }
-        }
+        public static Color green => new Color(0.0f, 1f, 0.0f, 1f);
 
         /// <summary>
         /// The color grey for the Englishmen.
         /// </summary>
-        public static Color grey
-        {
-            get
-            {
-                return new Color(0.5f, 0.5f, 0.5f, 1f);
-            }
-        }
+        public static Color grey => new Color(0.5f, 0.5f, 0.5f, 1f);
 
         /// <summary>
         /// The color magenta.
         /// </summary>
-        public static Color magenta
-        {
-            get
-            {
-                return new Color(1f, 0.0f, 1f, 1f);
-            }
-        }
+        public static Color magenta => new Color(1f, 0.0f, 1f, 1f);
 
         /// <summary>
         /// The color red.
         /// </summary>
-        public static Color red
-        {
-            get
-            {
-                return new Color(1f, 0.0f, 0.0f, 1f);
-            }
-        }
+        public static Color red => new Color(1f, 0.0f, 0.0f, 1f);
 
         /// <summary>
         /// The color white.
         /// </summary>
-        public static Color white
-        {
-            get
-            {
-                return new Color(1f, 1f, 1f, 1f);
-            }
-        }
+        public static Color white => new Color(1f, 1f, 1f, 1f);
 
         /// <summary>
         /// The color yellow.
         /// </summary>
-        public static Color yellow
-        {
-            get
-            {
-                return new Color(1f, 0.92f, 0.016f, 1f);
-            }
-        }
+        public static Color yellow => new Color(1f, 0.92f, 0.016f, 1f);
 
         /// <summary>
         /// Constructs a new Color with given RGB values.
@@ -183,9 +117,9 @@ namespace NFSScript
         /// <returns></returns>
         public static Color Lerp(Color start, Color end, float factor)
         {
-            float r = start.r + ((end.r - start.r) * factor);
-            float g = start.g + ((end.g - start.g) * factor);
-            float b = start.b + ((end.b - start.b) * factor);
+            var r = start.r + ((end.r - start.r) * factor);
+            var g = start.g + ((end.g - start.g) * factor);
+            var b = start.b + ((end.b - start.b) * factor);
 
             return new Color(r, g, b);
         }
@@ -209,7 +143,7 @@ namespace NFSScript
         /// <returns></returns>
         public override string ToString()
         {
-            StringBuilder sb = new StringBuilder();
+            var sb = new StringBuilder();
 
             sb.Append("R: ");
             sb.Append(r);
@@ -230,7 +164,7 @@ namespace NFSScript
         {
             try
             {
-                int argb = int.Parse(hex.Replace("#", "").Replace("0x", ""), NumberStyles.HexNumber);
+                var argb = int.Parse(hex.Replace("#", "").Replace("0x", ""), NumberStyles.HexNumber);
                 return new Color32((byte)((argb & -16777216) >> 0x18),
                                       (byte)((argb & 0xff0000) >> 0x10),
                                       (byte)((argb & 0xff00) >> 8),
@@ -238,7 +172,7 @@ namespace NFSScript
             }
             catch
             {
-                throw new Exception(string.Format("{0} {1}", hex, "is not a valid color"));
+                throw new Exception($"{hex} {"is not a valid color"}");
             }
         }
     }

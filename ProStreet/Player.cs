@@ -1,8 +1,8 @@
 ﻿using System;
+using NFSScript.Math;
 using static NFSScript.Core.GameMemory;
 using Addrs = NFSScript.Core.ProStreetAddresses;
 using Funcs = NFSScript.ProStreetFunctions;
-using NFSScript.Math;
 
 namespace NFSScript.ProStreet
 {
@@ -18,8 +18,8 @@ namespace NFSScript.ProStreet
         {
             get
             {
-                int addr = memory.ReadInt32((IntPtr)memory.getBaseAddress + Addrs.PlayerAddrs.NON_STATIC_PLAYER_CASH);
-                return memory.ReadInt32((IntPtr)addr + Addrs.PlayerAddrs.POINTER_NON_STATIC_PLAYER_CASH);
+                var addr = Memory.ReadInt32((IntPtr)Memory.getBaseAddress + Addrs.PlayerAddrs.NON_STATIC_PLAYER_CASH);
+                return Memory.ReadInt32((IntPtr)addr + Addrs.PlayerAddrs.POINTER_NON_STATIC_PLAYER_CASH);
             }
         }
 
@@ -29,8 +29,8 @@ namespace NFSScript.ProStreet
         /// <param name="value">The amount of cash to award.</param>
         public static void AwardCash(int value)
         {
-            int addr = memory.ReadInt32((IntPtr)memory.getBaseAddress + Addrs.PlayerAddrs.NON_STATIC_PLAYER_CASH);
-            memory.WriteInt32((IntPtr)addr + Addrs.PlayerAddrs.POINTER_NON_STATIC_PLAYER_CASH, Cash + value);
+            var addr = Memory.ReadInt32((IntPtr)Memory.getBaseAddress + Addrs.PlayerAddrs.NON_STATIC_PLAYER_CASH);
+            Memory.WriteInt32((IntPtr)addr + Addrs.PlayerAddrs.POINTER_NON_STATIC_PLAYER_CASH, Cash + value);
         }
 
         /// <summary>
@@ -61,17 +61,17 @@ namespace NFSScript.ProStreet
             {
                 get
                 {
-                    float x = memory.ReadFloat((IntPtr)Addrs.PlayerAddrs.STATIC_PLAYER_POS_X);
-                    float y = memory.ReadFloat((IntPtr)Addrs.PlayerAddrs.STATIC_PLAYER_POS_Y);
-                    float z = memory.ReadFloat((IntPtr)Addrs.PlayerAddrs.STATIC_PLAYER_POS_Z);
+                    var x = Memory.ReadFloat((IntPtr)Addrs.PlayerAddrs.STATIC_PLAYER_POS_X);
+                    var y = Memory.ReadFloat((IntPtr)Addrs.PlayerAddrs.STATIC_PLAYER_POS_Y);
+                    var z = Memory.ReadFloat((IntPtr)Addrs.PlayerAddrs.STATIC_PLAYER_POS_Z);
 
                     return new Vector3(x, y, z);
                 }
                 set
                 {
-                    memory.WriteFloat((IntPtr)Addrs.PlayerAddrs.STATIC_PLAYER_POS_X, value.X);
-                    memory.WriteFloat((IntPtr)Addrs.PlayerAddrs.STATIC_PLAYER_POS_Y, value.Y);
-                    memory.WriteFloat((IntPtr)Addrs.PlayerAddrs.STATIC_PLAYER_POS_Z, value.Z);
+                    Memory.WriteFloat((IntPtr)Addrs.PlayerAddrs.STATIC_PLAYER_POS_X, value.X);
+                    Memory.WriteFloat((IntPtr)Addrs.PlayerAddrs.STATIC_PLAYER_POS_Y, value.Y);
+                    Memory.WriteFloat((IntPtr)Addrs.PlayerAddrs.STATIC_PLAYER_POS_Z, value.Z);
                 }
             }
 
@@ -79,13 +79,7 @@ namespace NFSScript.ProStreet
             /// Returns the <see cref="Player"/>'s car current speed in MPH.
             /// </summary>
             /// <returns></returns>
-            public static float Speed
-            {
-                get
-                {
-                    return memory.ReadFloat((IntPtr)Addrs.PlayerAddrs.STATIC_PLAYER_SPEED);
-                }
-            }
+            public static float Speed => Memory.ReadFloat((IntPtr)Addrs.PlayerAddrs.STATIC_PLAYER_SPEED);
         }
     }
 }

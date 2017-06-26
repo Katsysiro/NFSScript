@@ -34,8 +34,8 @@ namespace NFSScript.Math
         /// <param name="y"></param>
         public Point(int x, int y)
         {
-            this.X = x;
-            this.Y = y;
+            X = x;
+            Y = y;
         }
 
         /// <summary>
@@ -45,8 +45,8 @@ namespace NFSScript.Math
         /// <param name="y"></param>
         public void Set(int x, int y)
         {
-            this.X = x;
-            this.Y = x;
+            X = x;
+            Y = x;
         }
 
         /// <summary>
@@ -88,6 +88,7 @@ namespace NFSScript.Math
         /// <returns></returns>
         public override int GetHashCode()
         {
+            // TODO see https://www.jetbrains.com/help/resharper/2017.1/NonReadonlyMemberInGetHashCode.html
             return X.GetHashCode() ^ Y.GetHashCode() << 2;
         }
 
@@ -98,9 +99,7 @@ namespace NFSScript.Math
         /// <returns></returns>
         public override bool Equals(object obj)
         {
-            if (obj.GetType() != typeof(Point) || obj == null)
-                return false;
-            else return Equals(this, (Point)obj);
+            return obj is Point && Equals(this, (Point) obj);
         }
 
         /// <summary>
@@ -120,7 +119,7 @@ namespace NFSScript.Math
         /// <returns></returns>
         public override string ToString()
         {
-            return string.Format("X = {0} Y = {1}", X, Y);
+            return $"X = {X} Y = {Y}";
         }
 
         /// <summary>
@@ -129,7 +128,7 @@ namespace NFSScript.Math
         /// <returns></returns>
         public string ToString(string numberFormat)
         {
-            return string.Format("X = {0} Y = {1}", X.ToString(numberFormat), Y.ToString(numberFormat));
+            return $"X = {X.ToString(numberFormat)} Y = {Y.ToString(numberFormat)}";
         }
     }
 }

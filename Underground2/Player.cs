@@ -1,7 +1,7 @@
 ﻿using System;
+using NFSScript.Math;
 using static NFSScript.Core.GameMemory;
 using Addrs = NFSScript.Core.UG2Addresses;
-using NFSScript.Math;
 
 
 namespace NFSScript.Underground2
@@ -14,13 +14,7 @@ namespace NFSScript.Underground2
         /// <summary>
         /// <see cref="Player"/>'s cash (Read only).
         /// </summary>
-        public static int Cash
-        {
-            get
-            {
-                return memory.ReadInt32((IntPtr)Addrs.PlayerAddrs.STATIC_PLAYER_CASH);
-            }
-        }
+        public static int Cash => Memory.ReadInt32((IntPtr)Addrs.PlayerAddrs.STATIC_PLAYER_CASH);
 
         /// <summary>
         /// Award the <see cref="Player"/> with cash.
@@ -28,7 +22,7 @@ namespace NFSScript.Underground2
         /// <param name="value"></param>
         public static void AwardCash(int value)
         {
-            memory.WriteInt32((IntPtr)Addrs.PlayerAddrs.STATIC_PLAYER_CASH, Cash + value);
+            Memory.WriteInt32((IntPtr)Addrs.PlayerAddrs.STATIC_PLAYER_CASH, Cash + value);
         }
 
         /// <summary>
@@ -43,9 +37,9 @@ namespace NFSScript.Underground2
             {
                 get
                 {
-                    float x = memory.ReadFloat((IntPtr)Addrs.PlayerAddrs.STATIC_PLAYER_POSITION_READONLY_X);
-                    float y = memory.ReadFloat((IntPtr)Addrs.PlayerAddrs.STATIC_PLAYER_POSITION_READONLY_Y);
-                    float z = memory.ReadFloat((IntPtr)Addrs.PlayerAddrs.STATIC_PLAYER_POSITION_READONLY_Z);
+                    var x = Memory.ReadFloat((IntPtr)Addrs.PlayerAddrs.STATIC_PLAYER_POSITION_READONLY_X);
+                    var y = Memory.ReadFloat((IntPtr)Addrs.PlayerAddrs.STATIC_PLAYER_POSITION_READONLY_Y);
+                    var z = Memory.ReadFloat((IntPtr)Addrs.PlayerAddrs.STATIC_PLAYER_POSITION_READONLY_Z);
 
                     return new Vector3(x, y, z);
                 }
@@ -54,25 +48,13 @@ namespace NFSScript.Underground2
             /// <summary>
             /// Returns the <see cref="Player"/>'s current car star rating
             /// </summary>
-            public static float StarRating
-            {
-                get
-                {
-                    return memory.ReadFloat((IntPtr)Addrs.PlayerAddrs.STATIC_PLAYER_CURRENT_CAR_STAR_RATING);
-                }
-            }
+            public static float StarRating => Memory.ReadFloat((IntPtr)Addrs.PlayerAddrs.STATIC_PLAYER_CURRENT_CAR_STAR_RATING);
 
             /// <summary>
             /// Returns the <see cref="Player"/>'s car current speed in MPH
             /// </summary>
             /// <returns></returns>
-            public static float Speed
-            {
-                get
-                {
-                    return memory.ReadFloat((IntPtr)Addrs.PlayerAddrs.STATIC_PLAYER_CAR_SPEED_MPH);
-                }
-            }
+            public static float Speed => Memory.ReadFloat((IntPtr)Addrs.PlayerAddrs.STATIC_PLAYER_CAR_SPEED_MPH);
         }
     }
 }

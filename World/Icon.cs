@@ -9,16 +9,17 @@ namespace NFSScript.World
     /// </summary>
     public class Icon : ExposedBase
     {
-        private bool exists = false;
+        private bool exists;
         /// <summary>
         /// Creates a new <see cref="Icon"/> instance.
         /// </summary>
         /// <param name="position"></param>
         /// <param name="type"></param>
         /// <param name="rotation"></param>
+        // TODO: ReSharper suggest that EAVector3 be ExposedBase. I'm wary that this could fuck up something else. Opinions?
         public Icon(EAVector3 position, uint type, float rotation)
         {
-            uint addr = (uint)CallBinding<uint>(_EASharpBinding_109, position.mSelf, type, rotation);
+            var addr = (uint)CallBinding<uint>(_EASharpBinding_109, position.mSelf, type, rotation);
             mSelf = new IntPtr(addr);
 
             exists = true;
@@ -31,7 +32,7 @@ namespace NFSScript.World
         {
             if (!exists)
             {
-                throw new DoesNotExistException(string.Format("An attempt was made to destroy an instance that does not exist inside the game."));
+                throw new DoesNotExistException("An attempt was made to destroy an instance that does not exist inside the game.");
             }
 
             CallBinding(_EASharpBinding_110, mSelf);
@@ -45,7 +46,7 @@ namespace NFSScript.World
         public void Enable()
         {
             if (!exists)
-                throw new DoesNotExistException(string.Format("The Icon instance does not exist inside the game."));
+                throw new DoesNotExistException("The Icon instance does not exist inside the game.");
 
             CallBinding(_EASharpBinding_111, mSelf);
         }
@@ -56,7 +57,7 @@ namespace NFSScript.World
         public void Disable()
         {
             if (!exists)
-                throw new DoesNotExistException(string.Format("The Icon instance does not exist inside the game."));
+                throw new DoesNotExistException("The Icon instance does not exist inside the game.");
 
             CallBinding(_EASharpBinding_112, mSelf);
         }

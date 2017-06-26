@@ -1,10 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
 using NFSScript.Core;
+using NFSScript.Math;
 using static NFSScript.Core.GameMemory;
 using Addrs = NFSScript.Core.CarbonAddresses;
 using static NFSScript.CarbonFunctions;
-using NFSScript.Math;
 
 namespace NFSScript.Carbon
 {
@@ -20,15 +19,15 @@ namespace NFSScript.Carbon
         {
             get
             {
-                float x = memory.ReadFloat((IntPtr)Addrs.UIAddrs.STATIC_UI_SCALE_X);
-                float y = memory.ReadFloat((IntPtr)Addrs.UIAddrs.STATIC_UI_SCALE_Y);
+                var x = Memory.ReadFloat((IntPtr)Addrs.UIAddrs.STATIC_UI_SCALE_X);
+                var y = Memory.ReadFloat((IntPtr)Addrs.UIAddrs.STATIC_UI_SCALE_Y);
 
                 return new Vector2(x, y);
             }
             set
             {
-                memory.WriteFloat((IntPtr)Addrs.UIAddrs.STATIC_UI_SCALE_X, value.X);
-                memory.WriteFloat((IntPtr)Addrs.UIAddrs.STATIC_UI_SCALE_Y, value.Y);
+                Memory.WriteFloat((IntPtr)Addrs.UIAddrs.STATIC_UI_SCALE_X, value.X);
+                Memory.WriteFloat((IntPtr)Addrs.UIAddrs.STATIC_UI_SCALE_Y, value.Y);
             }
         }
 
@@ -39,8 +38,8 @@ namespace NFSScript.Carbon
         {
             get
             {
-                ushort x = memory.ReadUShort((IntPtr)Addrs.UIAddrs.STATIC_CURSOR_POS_X);
-                ushort y = memory.ReadUShort((IntPtr)Addrs.UIAddrs.STATIC_CURSOR_POS_Y);
+                var x = Memory.ReadUShort((IntPtr)Addrs.UIAddrs.STATIC_CURSOR_POS_X);
+                var y = Memory.ReadUShort((IntPtr)Addrs.UIAddrs.STATIC_CURSOR_POS_Y);
 
                 return new Point(x, y);
             }
@@ -87,9 +86,9 @@ namespace NFSScript.Carbon
         {
             _setErrorMsgString(message);
             if (eventAddress == IntPtr.Zero)
-                eventAddress = _ASM.InjectForAddress(new byte[] { 0x24 }, memory.ProcessHandle);
+                eventAddress = _ASM.InjectForAddress(new byte[] { 0x24 }, Memory.ProcessHandle);
 
-            ASMBuilder asm = new ASMBuilder();
+            var asm = new ASMBuilder();
 
             asm.MovECX((uint)eventAddress.ToInt32());
             asm.Push(priority); // priority
@@ -97,24 +96,24 @@ namespace NFSScript.Carbon
             asm.Push((int)textMode); // mode
             asm.Push((uint)textType); // type
             asm.Push(0x0); // unknown
-            asm.Push(Addrs.UIAddrs.STATIC_ERROR_ALLOCATED_MSG); // mesage
+            asm.Push(CarbonAddresses.UIAddrs.STATIC_ERROR_ALLOCATED_MSG); // mesage
             asm.Push(0x0); // unknown
             asm.MovEAX(EFLASHER_GENERIC); // sub_67C290
             asm.CallEAX();
 
             asm.Return();
-            _ASM.Call(asm.ToArray(), memory.ProcessHandle);
+            _ASM.Call(asm.ToArray(), Memory.ProcessHandle);
         }
 
         private const int ERROR_MSG_MAX_LENGTH = 44;
         internal static void _setErrorMsgString(string s)
         {
-            IntPtr address = (IntPtr)Addrs.UIAddrs.STATIC_ERROR_ALLOCATED_MSG;
+            var address = (IntPtr)CarbonAddresses.UIAddrs.STATIC_ERROR_ALLOCATED_MSG;
             ASM.Abolish(address, ERROR_MSG_MAX_LENGTH);
-            string newString = s;
+            var newString = s;
             if (newString.Length > ERROR_MSG_MAX_LENGTH)
                 newString = newString.Substring(0, ERROR_MSG_MAX_LENGTH);
-            memory.WriteStringASCII(address, newString);
+            Memory.WriteStringASCII(address, newString);
         }
 
         /// <summary>
@@ -158,17 +157,17 @@ namespace NFSScript.Carbon
             /// <param name="w"></param>
             internal static void _setMinimapRouteColourEdge(float x, float y, float z, float w)
             {
-                int address = memory.ReadInt32((IntPtr)memory.getBaseAddress + Addrs.UIAddrs.PNON_STATIC_MINIMAP_ROUTE_COLOR_EDGE_X);
-                address = memory.ReadInt32((IntPtr)address + Addrs.UIAddrs.POINTER_MINIMAP_ROUTE_COLOR_EDGE_X_1);
-                address = memory.ReadInt32((IntPtr)address + Addrs.UIAddrs.POINTER_MINIMAP_ROUTE_COLOR_EDGE_X_2);
-                address = memory.ReadInt32((IntPtr)address + Addrs.UIAddrs.POINTER_MINIMAP_ROUTE_COLOR_EDGE_X_3);
-                address = memory.ReadInt32((IntPtr)address + Addrs.UIAddrs.POINTER_MINIMAP_ROUTE_COLOR_EDGE_X_4);
+                var address = Memory.ReadInt32((IntPtr)Memory.getBaseAddress + CarbonAddresses.UIAddrs.PNON_STATIC_MINIMAP_ROUTE_COLOR_EDGE_X);
+                address = Memory.ReadInt32((IntPtr)address + CarbonAddresses.UIAddrs.POINTER_MINIMAP_ROUTE_COLOR_EDGE_X_1);
+                address = Memory.ReadInt32((IntPtr)address + CarbonAddresses.UIAddrs.POINTER_MINIMAP_ROUTE_COLOR_EDGE_X_2);
+                address = Memory.ReadInt32((IntPtr)address + CarbonAddresses.UIAddrs.POINTER_MINIMAP_ROUTE_COLOR_EDGE_X_3);
+                address = Memory.ReadInt32((IntPtr)address + CarbonAddresses.UIAddrs.POINTER_MINIMAP_ROUTE_COLOR_EDGE_X_4);
 
-                memory.WriteFloat((IntPtr)(address + Addrs.UIAddrs.POINTER_MINIMAP_ROUTE_COLOR_EDGE_X_5), x);
-                memory.WriteFloat((IntPtr)(address + Addrs.UIAddrs.POINTER_MINIMAP_ROUTE_COLOR_EDGE_X_5 + Addrs.UIAddrs.OFFSET_MINIMAP_ROUTE_COLOR_CENTER), y);
-                memory.WriteFloat((IntPtr)(address + Addrs.UIAddrs.POINTER_MINIMAP_ROUTE_COLOR_EDGE_X_5 + (Addrs.UIAddrs.OFFSET_MINIMAP_ROUTE_COLOR_CENTER + Addrs.UIAddrs.OFFSET_MINIMAP_ROUTE_COLOR_CENTER)), z);
-                memory.WriteFloat((IntPtr)(address + Addrs.UIAddrs.POINTER_MINIMAP_ROUTE_COLOR_EDGE_X_5 + (Addrs.UIAddrs.OFFSET_MINIMAP_ROUTE_COLOR_CENTER + Addrs.UIAddrs.OFFSET_MINIMAP_ROUTE_COLOR_CENTER 
-                    + Addrs.UIAddrs.OFFSET_MINIMAP_ROUTE_COLOR_CENTER)), w);
+                Memory.WriteFloat((IntPtr)(address + CarbonAddresses.UIAddrs.POINTER_MINIMAP_ROUTE_COLOR_EDGE_X_5), x);
+                Memory.WriteFloat((IntPtr)(address + CarbonAddresses.UIAddrs.POINTER_MINIMAP_ROUTE_COLOR_EDGE_X_5 + CarbonAddresses.UIAddrs.OFFSET_MINIMAP_ROUTE_COLOR_CENTER), y);
+                Memory.WriteFloat((IntPtr)(address + CarbonAddresses.UIAddrs.POINTER_MINIMAP_ROUTE_COLOR_EDGE_X_5 + (CarbonAddresses.UIAddrs.OFFSET_MINIMAP_ROUTE_COLOR_CENTER + CarbonAddresses.UIAddrs.OFFSET_MINIMAP_ROUTE_COLOR_CENTER)), z);
+                Memory.WriteFloat((IntPtr)(address + CarbonAddresses.UIAddrs.POINTER_MINIMAP_ROUTE_COLOR_EDGE_X_5 + (CarbonAddresses.UIAddrs.OFFSET_MINIMAP_ROUTE_COLOR_CENTER + CarbonAddresses.UIAddrs.OFFSET_MINIMAP_ROUTE_COLOR_CENTER 
+                    + CarbonAddresses.UIAddrs.OFFSET_MINIMAP_ROUTE_COLOR_CENTER)), w);
             }
 
             /// <summary>
@@ -180,17 +179,17 @@ namespace NFSScript.Carbon
             /// <param name="w"></param>
             internal static void _setMinimapRouteColorCenter(float x, float y, float z, float w)
             {
-                int address = memory.ReadInt32((IntPtr)memory.getBaseAddress + Addrs.UIAddrs.PNON_STATIC_MINIMAP_ROUTE_COLOR_CENTER_X);
-                address = memory.ReadInt32((IntPtr)address + Addrs.UIAddrs.POINTER_MINIMAP_ROUTE_COLOR_CENTER_X_1);
-                address = memory.ReadInt32((IntPtr)address + Addrs.UIAddrs.POINTER_MINIMAP_ROUTE_COLOR_CENTER_X_2);
-                address = memory.ReadInt32((IntPtr)address + Addrs.UIAddrs.POINTER_MINIMAP_ROUTE_COLOR_CENTER_X_3);
-                address = memory.ReadInt32((IntPtr)address + Addrs.UIAddrs.POINTER_MINIMAP_ROUTE_COLOR_CENTER_X_4);
+                var address = Memory.ReadInt32((IntPtr)Memory.getBaseAddress + CarbonAddresses.UIAddrs.PNON_STATIC_MINIMAP_ROUTE_COLOR_CENTER_X);
+                address = Memory.ReadInt32((IntPtr)address + CarbonAddresses.UIAddrs.POINTER_MINIMAP_ROUTE_COLOR_CENTER_X_1);
+                address = Memory.ReadInt32((IntPtr)address + CarbonAddresses.UIAddrs.POINTER_MINIMAP_ROUTE_COLOR_CENTER_X_2);
+                address = Memory.ReadInt32((IntPtr)address + CarbonAddresses.UIAddrs.POINTER_MINIMAP_ROUTE_COLOR_CENTER_X_3);
+                address = Memory.ReadInt32((IntPtr)address + CarbonAddresses.UIAddrs.POINTER_MINIMAP_ROUTE_COLOR_CENTER_X_4);
 
-                memory.WriteFloat((IntPtr)(address + Addrs.UIAddrs.POINTER_MINIMAP_ROUTE_COLOR_CENTER_X_5), x);
-                memory.WriteFloat((IntPtr)(address + Addrs.UIAddrs.POINTER_MINIMAP_ROUTE_COLOR_CENTER_X_5 + Addrs.UIAddrs.OFFSET_MINIMAP_ROUTE_COLOR_CENTER), y);
-                memory.WriteFloat((IntPtr)(address + Addrs.UIAddrs.POINTER_MINIMAP_ROUTE_COLOR_CENTER_X_5 + (Addrs.UIAddrs.OFFSET_MINIMAP_ROUTE_COLOR_CENTER + Addrs.UIAddrs.OFFSET_MINIMAP_ROUTE_COLOR_CENTER)), z);
-                memory.WriteFloat((IntPtr)(address + Addrs.UIAddrs.POINTER_MINIMAP_ROUTE_COLOR_CENTER_X_5 + (Addrs.UIAddrs.OFFSET_MINIMAP_ROUTE_COLOR_CENTER 
-                    + Addrs.UIAddrs.OFFSET_MINIMAP_ROUTE_COLOR_CENTER + Addrs.UIAddrs.OFFSET_MINIMAP_ROUTE_COLOR_CENTER)), w);
+                Memory.WriteFloat((IntPtr)(address + CarbonAddresses.UIAddrs.POINTER_MINIMAP_ROUTE_COLOR_CENTER_X_5), x);
+                Memory.WriteFloat((IntPtr)(address + CarbonAddresses.UIAddrs.POINTER_MINIMAP_ROUTE_COLOR_CENTER_X_5 + CarbonAddresses.UIAddrs.OFFSET_MINIMAP_ROUTE_COLOR_CENTER), y);
+                Memory.WriteFloat((IntPtr)(address + CarbonAddresses.UIAddrs.POINTER_MINIMAP_ROUTE_COLOR_CENTER_X_5 + (CarbonAddresses.UIAddrs.OFFSET_MINIMAP_ROUTE_COLOR_CENTER + CarbonAddresses.UIAddrs.OFFSET_MINIMAP_ROUTE_COLOR_CENTER)), z);
+                Memory.WriteFloat((IntPtr)(address + CarbonAddresses.UIAddrs.POINTER_MINIMAP_ROUTE_COLOR_CENTER_X_5 + (CarbonAddresses.UIAddrs.OFFSET_MINIMAP_ROUTE_COLOR_CENTER 
+                    + CarbonAddresses.UIAddrs.OFFSET_MINIMAP_ROUTE_COLOR_CENTER + CarbonAddresses.UIAddrs.OFFSET_MINIMAP_ROUTE_COLOR_CENTER)), w);
             }
 
             /// <summary>
@@ -199,13 +198,13 @@ namespace NFSScript.Carbon
             /// <param name="value"></param>
             internal static void _setMinimapRouteWidth(float value)
             {
-                int address = memory.ReadInt32((IntPtr)memory.getBaseAddress + Addrs.UIAddrs.PNON_STATIC_MINIMAP_ROUTE_WIDTH);
-                address = memory.ReadInt32((IntPtr)address + Addrs.UIAddrs.POINTER_MINIMAP_ROUTE_WIDTH_1);
-                address = memory.ReadInt32((IntPtr)address + Addrs.UIAddrs.POINTER_MINIMAP_ROUTE_WIDTH_2);
-                address = memory.ReadInt32((IntPtr)address + Addrs.UIAddrs.POINTER_MINIMAP_ROUTE_WIDTH_3);
-                address = memory.ReadInt32((IntPtr)address + Addrs.UIAddrs.POINTER_MINIMAP_ROUTE_WIDTH_4);
+                var address = Memory.ReadInt32((IntPtr)Memory.getBaseAddress + CarbonAddresses.UIAddrs.PNON_STATIC_MINIMAP_ROUTE_WIDTH);
+                address = Memory.ReadInt32((IntPtr)address + CarbonAddresses.UIAddrs.POINTER_MINIMAP_ROUTE_WIDTH_1);
+                address = Memory.ReadInt32((IntPtr)address + CarbonAddresses.UIAddrs.POINTER_MINIMAP_ROUTE_WIDTH_2);
+                address = Memory.ReadInt32((IntPtr)address + CarbonAddresses.UIAddrs.POINTER_MINIMAP_ROUTE_WIDTH_3);
+                address = Memory.ReadInt32((IntPtr)address + CarbonAddresses.UIAddrs.POINTER_MINIMAP_ROUTE_WIDTH_4);
 
-                memory.WriteFloat((IntPtr)(address + Addrs.UIAddrs.POINTER_MINIMAP_ROUTE_WIDTH_5), value);
+                Memory.WriteFloat((IntPtr)(address + CarbonAddresses.UIAddrs.POINTER_MINIMAP_ROUTE_WIDTH_5), value);
             }
         }
     }
@@ -213,7 +212,7 @@ namespace NFSScript.Carbon
     /// <summary>
     /// An enum for the text mode.
     /// </summary>
-    public enum TextMode : int
+    public enum TextMode
     {
         /// <summary>
         /// Show the text once.
@@ -228,7 +227,7 @@ namespace NFSScript.Carbon
     /// <summary>
     /// An enum for the text location.
     /// </summary>
-    public enum TextLocation : int
+    public enum TextLocation
     {
         /// <summary>
         /// Show the text at the center of the screen.

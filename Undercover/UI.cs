@@ -1,8 +1,8 @@
 ﻿using System;
 using NFSScript.Core;
+using NFSScript.Math;
 using static NFSScript.Core.GameMemory;
 using Addrs = NFSScript.Core.UndercoverAddresses;
-using NFSScript.Math;
 
 namespace NFSScript.Undercover
 {
@@ -19,9 +19,9 @@ namespace NFSScript.Undercover
         /// <param name="msg"></param>
         public static void SetSecretCodeEntryMessage(string msg)
         {
-            IntPtr address = (IntPtr)Addrs.UIAddrs.STATIC_UI_INVALID_SECRET_CODE_ENTRY_TEXT;
+            var address = (IntPtr)Addrs.UIAddrs.STATIC_UI_INVALID_SECRET_CODE_ENTRY_TEXT;
             ASM.Abolish(address, INVALID_SECRET_CODE_ENTRY_TEXT_MAX_LENGTH);
-            memory.WriteStringASCII(address, msg.Substring(0, INVALID_SECRET_CODE_ENTRY_TEXT_MAX_LENGTH));
+            Memory.WriteStringASCII(address, msg.Substring(0, INVALID_SECRET_CODE_ENTRY_TEXT_MAX_LENGTH));
         }
 
         /// <summary>
@@ -31,8 +31,8 @@ namespace NFSScript.Undercover
         {
             get
             {
-                ushort x = memory.ReadUShort((IntPtr)Addrs.UIAddrs.STATIC_CURSOR_POS_X);
-                ushort y = memory.ReadUShort((IntPtr)Addrs.UIAddrs.STATIC_CURSOR_POS_Y);
+                var x = Memory.ReadUShort((IntPtr)UndercoverAddresses.UIAddrs.STATIC_CURSOR_POS_X);
+                var y = Memory.ReadUShort((IntPtr)UndercoverAddresses.UIAddrs.STATIC_CURSOR_POS_Y);
 
                 return new Point(x, y);
             }
@@ -45,8 +45,8 @@ namespace NFSScript.Undercover
         {
             get
             {
-                ushort x = memory.ReadUShort((IntPtr)Addrs.UIAddrs.STATIC_UI_WORLD_MAP_CUSROR_POS_X);
-                ushort y = memory.ReadUShort((IntPtr)Addrs.UIAddrs.STATIC_UI_WORLD_MAP_CUSROR_POS_Y);
+                var x = Memory.ReadUShort((IntPtr)UndercoverAddresses.UIAddrs.STATIC_UI_WORLD_MAP_CUSROR_POS_X);
+                var y = Memory.ReadUShort((IntPtr)UndercoverAddresses.UIAddrs.STATIC_UI_WORLD_MAP_CUSROR_POS_Y);
 
                 return new Point(x, y);
             }
@@ -61,8 +61,8 @@ namespace NFSScript.Undercover
             /// 
             /// </summary>
             public static bool ShowNonPursuitCops {
-                get { return memory.ReadByte((IntPtr)Addrs.UIAddrs.STATIC_MINIMAP_SHOW_NON_PURSUIT_COPS) == 1; }
-                set { memory.WriteBoolean((IntPtr)Addrs.UIAddrs.STATIC_MINIMAP_SHOW_NON_PURSUIT_COPS, value); }
+                get => Memory.ReadByte((IntPtr)Addrs.UIAddrs.STATIC_MINIMAP_SHOW_NON_PURSUIT_COPS) == 1;
+                set => Memory.WriteBoolean((IntPtr)Addrs.UIAddrs.STATIC_MINIMAP_SHOW_NON_PURSUIT_COPS, value);
             }
         }
     }

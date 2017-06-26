@@ -77,37 +77,37 @@ namespace NFSScript.Underground
                     return DirectXKeys.None;
 
                 case MAIN_THROTTLE_INPUT_ID:
-                    return (DirectXKeys)memory.ReadUShort((IntPtr)Addrs.GenericAddrs.STATIC_THROTTLE_MAIN_INPUT);
+                    return (DirectXKeys)Memory.ReadUShort((IntPtr)Addrs.GenericAddrs.STATIC_THROTTLE_MAIN_INPUT);
 
                 case MAIN_REVERSE_INPUT_ID:
-                    return (DirectXKeys)memory.ReadUShort((IntPtr)Addrs.GenericAddrs.STATIC_REVERSE_MAIN_INPUT);
+                    return (DirectXKeys)Memory.ReadUShort((IntPtr)Addrs.GenericAddrs.STATIC_REVERSE_MAIN_INPUT);
 
                 case MAIN_STEERING_LEFT_INPUT_ID:
-                    return (DirectXKeys)memory.ReadUShort((IntPtr)Addrs.GenericAddrs.STATIC_STEERING_LEFT_MAIN_INPUT);
+                    return (DirectXKeys)Memory.ReadUShort((IntPtr)Addrs.GenericAddrs.STATIC_STEERING_LEFT_MAIN_INPUT);
 
                 case MAIN_STEERING_RIGHT_INPUT_ID:
-                    return (DirectXKeys)memory.ReadUShort((IntPtr)Addrs.GenericAddrs.STATIC_STEERING_RIGHT_MAIN_INPUT);
+                    return (DirectXKeys)Memory.ReadUShort((IntPtr)Addrs.GenericAddrs.STATIC_STEERING_RIGHT_MAIN_INPUT);
 
                 case MAIN_EBRAKE_INPUT_ID:
-                    return (DirectXKeys)memory.ReadUShort((IntPtr)Addrs.GenericAddrs.STATIC_EBRAKE_MAIN_INPUT);
+                    return (DirectXKeys)Memory.ReadUShort((IntPtr)Addrs.GenericAddrs.STATIC_EBRAKE_MAIN_INPUT);
 
                 case MAIN_NITROUS_BOOST_INPUT_ID:
-                    return (DirectXKeys)memory.ReadUShort((IntPtr)Addrs.GenericAddrs.STATIC_NITROUS_BOOST_MAIN_INPUT);
+                    return (DirectXKeys)Memory.ReadUShort((IntPtr)Addrs.GenericAddrs.STATIC_NITROUS_BOOST_MAIN_INPUT);
 
                 case MAIN_SHIFT_UP_INPUT_ID:
-                    return (DirectXKeys)memory.ReadUShort((IntPtr)Addrs.GenericAddrs.STATIC_SHIFT_UP_MAIN_INPUT);
+                    return (DirectXKeys)Memory.ReadUShort((IntPtr)Addrs.GenericAddrs.STATIC_SHIFT_UP_MAIN_INPUT);
 
                 case MAIN_SHIFT_DOWN_INPUT_ID:
-                    return (DirectXKeys)memory.ReadUShort((IntPtr)Addrs.GenericAddrs.STATIC_SHIFT_DOWN_MAIN_INPUT);
+                    return (DirectXKeys)Memory.ReadUShort((IntPtr)Addrs.GenericAddrs.STATIC_SHIFT_DOWN_MAIN_INPUT);
 
                 case MAIN_LOOK_BACK_INPUT_ID:
-                    return (DirectXKeys)memory.ReadUShort((IntPtr)Addrs.GenericAddrs.STATIC_LOOK_BACK_MAIN_INPUT);
+                    return (DirectXKeys)Memory.ReadUShort((IntPtr)Addrs.GenericAddrs.STATIC_LOOK_BACK_MAIN_INPUT);
 
                 case MAIN_CAMERA_CHANGE_INPUT_ID:
-                    return (DirectXKeys)memory.ReadUShort((IntPtr)Addrs.GenericAddrs.STATIC_CAMERA_CHANGE_MAIN_INPUT);
+                    return (DirectXKeys)Memory.ReadUShort((IntPtr)Addrs.GenericAddrs.STATIC_CAMERA_CHANGE_MAIN_INPUT);
 
                 case MAIN_RESET_CAR_INPUT_ID:
-                    return (DirectXKeys)memory.ReadUShort((IntPtr)Addrs.GenericAddrs.STATIC_RESET_CAR_MAIN_INPUT);
+                    return (DirectXKeys)Memory.ReadUShort((IntPtr)Addrs.GenericAddrs.STATIC_RESET_CAR_MAIN_INPUT);
             }
         }
     }

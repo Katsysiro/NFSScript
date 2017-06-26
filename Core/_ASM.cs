@@ -3,12 +3,15 @@
 // So yeah welcome to the file where madness lies.
 // 
 // [----------------------------------------------------------------------------------------------------------------------------------------------]
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.InteropServices;
-
 using static NFSScript.Core.NativeMethods;
+// ReSharper disable All
+// ReSharper please go away
+// ReSharper I don't want this
 
 namespace NFSScript.Core
 {
@@ -112,7 +115,7 @@ namespace NFSScript.Core
             }
             else
             {
-                byte[] bytes = BitConverter.GetBytes(value);
+                var bytes = BitConverter.GetBytes(value);
                 b.Add(0x68);
                 b.AddRange(bytes);
             }
@@ -124,7 +127,7 @@ namespace NFSScript.Core
         /// <param name="value"></param>
         public void Push(float value)
         {
-            byte[] bytes = BitConverter.GetBytes(value);
+            var bytes = BitConverter.GetBytes(value);
             b.Add(0x68);
             b.AddRange(bytes);
         }
@@ -135,7 +138,7 @@ namespace NFSScript.Core
         /// <param name="value"></param>
         public void Push(double value)
         {
-            byte[] bytes = BitConverter.GetBytes(value);
+            var bytes = BitConverter.GetBytes(value);
             b.Add(0x68);
             b.AddRange(bytes);
         }
@@ -277,7 +280,7 @@ namespace NFSScript.Core
         /// <param name="address"></param>
         public static void MakeNopAt(int address)
         {
-            GameMemory.memory.WriteByte((IntPtr)address, 0x90);
+            GameMemory.Memory.WriteByte((IntPtr)address, 0x90);
         }
 
         /// <summary>
@@ -287,10 +290,10 @@ namespace NFSScript.Core
         /// <param name="toAddress"></param>
         public static void MakeJMPAt(int address, int toAddress)
         {
-            List<byte> b = new List<byte>();
+            var b = new List<byte>();
             b.Add(0xE9);
             b.AddRange(BitConverter.GetBytes(toAddress));
-            GameMemory.memory.WriteByteArray((IntPtr)address, b.ToArray());
+            GameMemory.Memory.WriteByteArray((IntPtr)address, b.ToArray());
         }
 
         /// <summary>
@@ -300,14 +303,14 @@ namespace NFSScript.Core
         /// <param name="count"></param>
         public static void MakeNopAt(int address, int count)
         {
-            int addr = address;
-            List<byte> b = new List<byte>();
-            for (int i = 1; i <= count; i++)
+            var addr = address;
+            var b = new List<byte>();
+            for (var i = 1; i <= count; i++)
             {
                 b.Add(0x90);
             }
 
-            GameMemory.memory.WriteByteArray((IntPtr)addr, b.ToArray());
+            GameMemory.Memory.WriteByteArray((IntPtr)addr, b.ToArray());
         }
 
         /// <summary>
@@ -317,14 +320,14 @@ namespace NFSScript.Core
         /// <param name="length"></param>
         public static void Abolish(IntPtr address, int length)
         {
-            byte[] arr = new byte[length];
+            var arr = new byte[length];
 
-            for (int i = 0; i < arr.Length; i++)
+            for (var i = 0; i < arr.Length; i++)
             {
                 arr[i] = 0x00;
             }
 
-            GameMemory.memory.WriteByteArray(address, arr);
+            GameMemory.Memory.WriteByteArray(address, arr);
         }
 
         /// <summary>
@@ -334,7 +337,7 @@ namespace NFSScript.Core
         /// <returns></returns>
         public static ASMResult CallAssembly(byte[] asm)
         {
-            return _ASM.Call(asm, GameMemory.memory.ProcessHandle);
+            return _ASM.Call(asm, GameMemory.Memory.ProcessHandle);
         }
 
         /// <summary>
@@ -344,7 +347,7 @@ namespace NFSScript.Core
         /// <returns></returns>
         public static IntPtr CallAssemblyForAddress(byte[] asm)
         {
-            return _ASM.CallForAddress(asm, GameMemory.memory.ProcessHandle);
+            return _ASM.CallForAddress(asm, GameMemory.Memory.ProcessHandle);
         }
     }
 
@@ -365,19 +368,19 @@ namespace NFSScript.Core
         /// <returns></returns>
         public static IntPtr CallForAddress(byte[] asm, IntPtr handle)
         {
-            IntPtr hAlloc = VirtualAllocEx(handle, IntPtr.Zero, (uint)asm.Length, AllocationType.Commit, MemoryProtection.ExecuteReadWrite);
+            var hAlloc = VirtualAllocEx(handle, IntPtr.Zero, (uint)asm.Length, AllocationType.Commit, MemoryProtection.ExecuteReadWrite);
 
             if (hAlloc == IntPtr.Zero)
             {
-                Log.Print(ASM_ERROR, string.Format("Failed to allocate memory! {0}", Marshal.GetLastWin32Error()));
+                Log.Print(ASM_ERROR, $"Failed to allocate memory! {Marshal.GetLastWin32Error()}");
                 return IntPtr.Zero;
             }
 
-            UIntPtr bytesWritten = UIntPtr.Zero;
+            var bytesWritten = UIntPtr.Zero;
 
             if (!WriteProcessMemory(handle, hAlloc, asm, (uint)asm.Length, out bytesWritten))
             {
-                Log.Print(ASM_ERROR, string.Format("Could not write process memory! {0}", Marshal.GetLastWin32Error()));
+                Log.Print(ASM_ERROR, $"Could not write process memory! {Marshal.GetLastWin32Error()}");
                 return IntPtr.Zero;
             }
 
@@ -388,7 +391,7 @@ namespace NFSScript.Core
             }
 
             uint iThreadId = 0;
-            IntPtr hThread = CreateRemoteThread(handle, IntPtr.Zero, 0, hAlloc, IntPtr.Zero, 0, out iThreadId);
+            var hThread = CreateRemoteThread(handle, IntPtr.Zero, 0, hAlloc, IntPtr.Zero, 0, out iThreadId);
 
             if (hThread == IntPtr.Zero)
             {
@@ -397,7 +400,7 @@ namespace NFSScript.Core
             }
 
             if (!CloseHandle(hThread))
-                Log.Print(ASM_ERROR, string.Format("Could not close handle! {0}", Marshal.GetLastWin32Error()));
+                Log.Print(ASM_ERROR, $"Could not close handle! {Marshal.GetLastWin32Error()}");
 
             return hAlloc;
         }
@@ -409,19 +412,19 @@ namespace NFSScript.Core
         /// <returns></returns>
         public static IntPtr InjectForAddress(byte[] asm, IntPtr handle)
         {
-            IntPtr hAlloc = VirtualAllocEx(handle, IntPtr.Zero, (uint)asm.Length, AllocationType.Commit, MemoryProtection.ExecuteReadWrite);
+            var hAlloc = VirtualAllocEx(handle, IntPtr.Zero, (uint)asm.Length, AllocationType.Commit, MemoryProtection.ExecuteReadWrite);
 
             if (hAlloc == IntPtr.Zero)
             {
-                Log.Print(ASM_ERROR, string.Format("Failed to allocate memory! {0}", Marshal.GetLastWin32Error()));
+                Log.Print(ASM_ERROR, $"Failed to allocate memory! {Marshal.GetLastWin32Error()}");
                 return IntPtr.Zero;
             }
 
-            UIntPtr bytesWritten = UIntPtr.Zero;
+            var bytesWritten = UIntPtr.Zero;
 
             if (!WriteProcessMemory(handle, hAlloc, asm, (uint)asm.Length, out bytesWritten))
             {
-                Log.Print(ASM_ERROR, string.Format("Could not write process memory! {0}", Marshal.GetLastWin32Error()));
+                Log.Print(ASM_ERROR, $"Could not write process memory! {Marshal.GetLastWin32Error()}");
                 return IntPtr.Zero;
             }
 
@@ -442,9 +445,9 @@ namespace NFSScript.Core
         /// <returns></returns>
         public static ASMResult Call(byte[] asm, IntPtr handle)
         {
-            ASMResult result = ASMResult.Success;
+            var result = ASMResult.Success;
 
-            IntPtr addr = IntPtr.Zero;
+            var addr = IntPtr.Zero;
 
             if (memoryPointersCache.ContainsValue(asm))
             {
@@ -456,15 +459,15 @@ namespace NFSScript.Core
 
                 if (addr == IntPtr.Zero)
                 {
-                    Log.Print(ASM_ERROR, string.Format("Failed to allocate memory! {0}", Marshal.GetLastWin32Error()));
+                    Log.Print(ASM_ERROR, $"Failed to allocate memory! {Marshal.GetLastWin32Error()}");
                     result = ASMResult.AllocationFaliure;
                 }
 
-                UIntPtr bytesWritten = UIntPtr.Zero;
+                var bytesWritten = UIntPtr.Zero;
 
                 if (!WriteProcessMemory(handle, addr, asm, (uint)asm.Length, out bytesWritten))
                 {
-                    Log.Print(ASM_ERROR, string.Format("Could not close write process memory! {0}", Marshal.GetLastWin32Error()));
+                    Log.Print(ASM_ERROR, $"Could not close write process memory! {Marshal.GetLastWin32Error()}");
                     result = ASMResult.WritingFailed;
                 }
                 else memoryPointersCache.Add(addr, asm);
@@ -478,7 +481,7 @@ namespace NFSScript.Core
 
             uint iThreadId = 0;
 
-            IntPtr hThread = CreateRemoteThread(handle, IntPtr.Zero, 0, addr, IntPtr.Zero, 0, out iThreadId);
+            var hThread = CreateRemoteThread(handle, IntPtr.Zero, 0, addr, IntPtr.Zero, 0, out iThreadId);
 
             if (hThread == IntPtr.Zero)
             {
@@ -487,7 +490,7 @@ namespace NFSScript.Core
             }
 
             if (!CloseHandle(hThread))
-                Log.Print(ASM_ERROR, string.Format("Could not close handle! {0}", Marshal.GetLastWin32Error()));
+                Log.Print(ASM_ERROR, $"Could not close handle! {Marshal.GetLastWin32Error()}");
 
             return result;
         }
@@ -799,7 +802,7 @@ namespace NFSScript.Core
     /// 
     /// </summary>
     [Flags]
-    public enum ThreadAccessFlags : int
+    public enum ThreadAccessFlags
     {
         /// <summary>
         /// 

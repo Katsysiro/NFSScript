@@ -44,9 +44,9 @@ namespace NFSScript.Core
         /// <returns></returns>
         public static unsafe bool operator ==(ExposedBase a, ExposedBase b)
         {
-            if (object.ReferenceEquals((object)a, (object)null) && object.ReferenceEquals((object)b, (object)null))
+            if (ReferenceEquals(a, null) && ReferenceEquals(b, null))
                 return true;
-            if (!object.ReferenceEquals((object)a, (object)null) && !object.ReferenceEquals((object)b, (object)null))
+            if (!ReferenceEquals(a, null) && !ReferenceEquals(b, null))
                 return a._GetRaw() == b._GetRaw();
             return false;
         }
@@ -66,7 +66,7 @@ namespace NFSScript.Core
         /// 
         /// </summary>
         /// <returns></returns>
-        public override unsafe int GetHashCode()
+        public override int GetHashCode()
         {
             return (int)mSelf;
         }

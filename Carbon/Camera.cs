@@ -1,8 +1,8 @@
 ﻿using System;
+using NFSScript.Math;
 using static NFSScript.Core.GameMemory;
 using static NFSScript.Core.CarbonAddresses;
 using static NFSScript.CarbonFunctions;
-using NFSScript.Math;
 
 namespace NFSScript.Carbon
 {
@@ -55,8 +55,8 @@ namespace NFSScript.Carbon
         /// </summary>
         public Vector3 Position
         {
-            get { return _readPos(); }
-            set { _setPos(value.X, value.Y, value.Z); }
+            get => _readPos();
+            set => _setPos(value.X, value.Y, value.Z);
         }
 
         /// <summary>
@@ -85,18 +85,18 @@ namespace NFSScript.Carbon
 
         internal Vector3 _readPos()
         {
-            float x = memory.ReadFloat((IntPtr)CameraAddrs.STATIC_DEBUG_CAMERA_POS_X);
-            float y = memory.ReadFloat((IntPtr)CameraAddrs.STATIC_DEBUG_CAMERA_POS_Y);
-            float z = memory.ReadFloat((IntPtr)CameraAddrs.STATIC_DEBUG_CAMERA_POS_Z);
+            var x = Memory.ReadFloat((IntPtr)CameraAddrs.STATIC_DEBUG_CAMERA_POS_X);
+            var y = Memory.ReadFloat((IntPtr)CameraAddrs.STATIC_DEBUG_CAMERA_POS_Y);
+            var z = Memory.ReadFloat((IntPtr)CameraAddrs.STATIC_DEBUG_CAMERA_POS_Z);
 
             return new Vector3(x, y, z);
         }
 
         internal void _setPos(float x, float y, float z)
         {
-            memory.WriteFloat((IntPtr)CameraAddrs.STATIC_DEBUG_CAMERA_POS_X, x);
-            memory.WriteFloat((IntPtr)CameraAddrs.STATIC_DEBUG_CAMERA_POS_Y, y);
-            memory.WriteFloat((IntPtr)CameraAddrs.STATIC_DEBUG_CAMERA_POS_Z, z);
+            Memory.WriteFloat((IntPtr)CameraAddrs.STATIC_DEBUG_CAMERA_POS_X, x);
+            Memory.WriteFloat((IntPtr)CameraAddrs.STATIC_DEBUG_CAMERA_POS_Y, y);
+            Memory.WriteFloat((IntPtr)CameraAddrs.STATIC_DEBUG_CAMERA_POS_Z, z);
         }
 
         /* //Not for this class atm..

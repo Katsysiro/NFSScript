@@ -24,6 +24,6 @@
         /// <summary>
         /// 
         /// </summary>
-        TREASURE_HUNT_ICON_PICKUP,
+        TREASURE_HUNT_ICON_PICKUP
     }
 }

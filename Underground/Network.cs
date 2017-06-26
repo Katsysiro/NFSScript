@@ -14,25 +14,25 @@ namespace NFSScript.Underground
 
         internal static ushort _readNetworkLobbyPort()
         {
-            return memory.ReadUShort((IntPtr)Addrs.NetworkAddrs.STATIC_NETWORK_LOBBY_PORT);
+            return Memory.ReadUShort((IntPtr)Addrs.NetworkAddrs.STATIC_NETWORK_LOBBY_PORT);
         }
 
         internal static void _setNetworkLobbyPort(ushort port)
         {
-            memory.WriteUShort((IntPtr)Addrs.NetworkAddrs.STATIC_NETWORK_LOBBY_PORT, port);
+            Memory.WriteUShort((IntPtr)Addrs.NetworkAddrs.STATIC_NETWORK_LOBBY_PORT, port);
         }
 
         internal static string _readNetworkLobbyIP()
         {
-            IntPtr address = (IntPtr)Addrs.NetworkAddrs.STATIC_NETWORK_LOBBY_IP;
-            return memory.ReadStringASCII(address, NETWORK_LOBBY_IP_LENGTH);
+            var address = (IntPtr)Addrs.NetworkAddrs.STATIC_NETWORK_LOBBY_IP;
+            return Memory.ReadStringASCII(address, NETWORK_LOBBY_IP_LENGTH);
         }
 
         internal static void _setNetworkLobbyIP(string ip)
         {
-            IntPtr address = (IntPtr)Addrs.NetworkAddrs.STATIC_NETWORK_LOBBY_IP;
+            var address = (IntPtr)Addrs.NetworkAddrs.STATIC_NETWORK_LOBBY_IP;
             ASM.Abolish(address, NETWORK_LOBBY_IP_LENGTH);
-            memory.WriteStringASCII(address, ip.Substring(0, NETWORK_LOBBY_IP_LENGTH));
+            Memory.WriteStringASCII(address, ip.Substring(0, NETWORK_LOBBY_IP_LENGTH));
         }
     }
 }

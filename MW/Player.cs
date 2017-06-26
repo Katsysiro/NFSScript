@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using NFSScript.Math;
 using static NFSScript.Core.GameMemory;
 using Addrs = NFSScript.Core.MWAddresses;
-using NFSScript.Math;
 
 namespace NFSScript.MW
 {
@@ -14,20 +14,14 @@ namespace NFSScript.MW
         /// <summary>
         /// Sets a value indicating whether the AI controls the <see cref="Player"/>'s car.
         /// </summary>
-        public static bool IsControlledByAi
-        {
-            get
-            {
-                return memory.ReadByte((IntPtr)Addrs.PlayerAddrs.STATIC_PLAYER_AI_CONTROL) == 1;
-            }
-        }
+        public static bool IsControlledByAi => Memory.ReadByte((IntPtr)Addrs.PlayerAddrs.STATIC_PLAYER_AI_CONTROL) == 1;
 
         /// <summary>
         /// Force the AI to control the <see cref="Player"/>'s car.
         /// </summary>
         public static void ForceAIControl()
         {
-            memory.WriteByte((IntPtr)Addrs.PlayerAddrs.STATIC_PLAYER_AI_CONTROL, 1);
+            Memory.WriteByte((IntPtr)Addrs.PlayerAddrs.STATIC_PLAYER_AI_CONTROL, 1);
         }
 
         /// <summary>
@@ -35,7 +29,7 @@ namespace NFSScript.MW
         /// </summary>
         public static void ClearAIControl()
         {
-            memory.WriteByte((IntPtr)Addrs.PlayerAddrs.STATIC_PLAYER_AI_CONTROL, 0);
+            Memory.WriteByte((IntPtr)Addrs.PlayerAddrs.STATIC_PLAYER_AI_CONTROL, 0);
         }
 
         /// <summary>
@@ -44,7 +38,7 @@ namespace NFSScript.MW
         /// <param name="b">Valid range is 1-5</param>
         public static void SaveCurrentPositionToHOT(byte b)
         {
-            memory.WriteByte((IntPtr)Addrs.PlayerAddrs.STATIC_PLAYER_HOT_SAVE_POSITION, b);
+            Memory.WriteByte((IntPtr)Addrs.PlayerAddrs.STATIC_PLAYER_HOT_SAVE_POSITION, b);
         }
 
         /// <summary>
@@ -53,7 +47,7 @@ namespace NFSScript.MW
         /// <param name="b">Valid range is 1-5</param>
         public static void WarpToSavedPositionFromHOT(byte b)
         {
-            memory.WriteByte((IntPtr)Addrs.PlayerAddrs.STATIC_PLAYER_HOT_WARP_TO_SAVED_POSITION, b);
+            Memory.WriteByte((IntPtr)Addrs.PlayerAddrs.STATIC_PLAYER_HOT_WARP_TO_SAVED_POSITION, b);
         }
 
         /// <summary>
@@ -68,17 +62,17 @@ namespace NFSScript.MW
             {
                 get
                 {
-                    float x = memory.ReadFloat((IntPtr)Addrs.PlayerAddrs.STATIC_PLAYER_POS_X);
-                    float y = memory.ReadFloat((IntPtr)Addrs.PlayerAddrs.STATIC_PLAYER_POS_Y);
-                    float z = memory.ReadFloat((IntPtr)Addrs.PlayerAddrs.STATIC_PLAYER_POS_Z);
+                    var x = Memory.ReadFloat((IntPtr)Addrs.PlayerAddrs.STATIC_PLAYER_POS_X);
+                    var y = Memory.ReadFloat((IntPtr)Addrs.PlayerAddrs.STATIC_PLAYER_POS_Y);
+                    var z = Memory.ReadFloat((IntPtr)Addrs.PlayerAddrs.STATIC_PLAYER_POS_Z);
 
                     return new Vector3(x, y, z);
                 }
                 set
                 {
-                    memory.WriteFloat((IntPtr)Addrs.PlayerAddrs.STATIC_PLAYER_POS_X, value.X);
-                    memory.WriteFloat((IntPtr)Addrs.PlayerAddrs.STATIC_PLAYER_POS_Y, value.Y);
-                    memory.WriteFloat((IntPtr)Addrs.PlayerAddrs.STATIC_PLAYER_POS_Z, value.Z);
+                    Memory.WriteFloat((IntPtr)Addrs.PlayerAddrs.STATIC_PLAYER_POS_X, value.X);
+                    Memory.WriteFloat((IntPtr)Addrs.PlayerAddrs.STATIC_PLAYER_POS_Y, value.Y);
+                    Memory.WriteFloat((IntPtr)Addrs.PlayerAddrs.STATIC_PLAYER_POS_Z, value.Z);
                 }
             }
 
@@ -89,32 +83,26 @@ namespace NFSScript.MW
             {
                 get
                 {
-                    float x = memory.ReadFloat((IntPtr)Addrs.PlayerAddrs.STATIC_PLAYER_X_ROT);
-                    float y = memory.ReadFloat((IntPtr)Addrs.PlayerAddrs.STATIC_PLAYER_Y_ROT);
-                    float z = memory.ReadFloat((IntPtr)Addrs.PlayerAddrs.STATIC_PLAYER_Z_ROT);
-                    float w = memory.ReadFloat((IntPtr)Addrs.PlayerAddrs.STATIC_PLAYER_W_ROT);
+                    var x = Memory.ReadFloat((IntPtr)Addrs.PlayerAddrs.STATIC_PLAYER_X_ROT);
+                    var y = Memory.ReadFloat((IntPtr)Addrs.PlayerAddrs.STATIC_PLAYER_Y_ROT);
+                    var z = Memory.ReadFloat((IntPtr)Addrs.PlayerAddrs.STATIC_PLAYER_Z_ROT);
+                    var w = Memory.ReadFloat((IntPtr)Addrs.PlayerAddrs.STATIC_PLAYER_W_ROT);
 
                     return new Quaternion(x, y, z, w);
                 }
                 set
                 {
-                    memory.WriteFloat((IntPtr)Addrs.PlayerAddrs.STATIC_PLAYER_X_ROT, value.x);
-                    memory.WriteFloat((IntPtr)Addrs.PlayerAddrs.STATIC_PLAYER_Y_ROT, value.y);
-                    memory.WriteFloat((IntPtr)Addrs.PlayerAddrs.STATIC_PLAYER_Z_ROT, value.z);
-                    memory.WriteFloat((IntPtr)Addrs.PlayerAddrs.STATIC_PLAYER_W_ROT, value.w);
+                    Memory.WriteFloat((IntPtr)Addrs.PlayerAddrs.STATIC_PLAYER_X_ROT, value.X);
+                    Memory.WriteFloat((IntPtr)Addrs.PlayerAddrs.STATIC_PLAYER_Y_ROT, value.Y);
+                    Memory.WriteFloat((IntPtr)Addrs.PlayerAddrs.STATIC_PLAYER_Z_ROT, value.Z);
+                    Memory.WriteFloat((IntPtr)Addrs.PlayerAddrs.STATIC_PLAYER_W_ROT, value.W);
                 }
             }
 
             /// <summary>
             /// Returns the <see cref="Player"/>'s car speed.
             /// </summary>
-            public static float Speed
-            {
-                get
-                {
-                    return memory.ReadFloat((IntPtr)Addrs.PlayerAddrs.STATIC_PLAYER_SPEED);
-                }
-            }
+            public static float Speed => Memory.ReadFloat((IntPtr)Addrs.PlayerAddrs.STATIC_PLAYER_SPEED);
 
             /// <summary>
             /// Returns the car's left and right headlights intensity value.
@@ -122,11 +110,11 @@ namespace NFSScript.MW
             /// <returns></returns>
             public static Dictionary<string, float> GetCarHeadlightsBrightnessIntensityValue()
             {
-                Dictionary<string, float> dic = new Dictionary<string, float>();
+                var dic = new Dictionary<string, float>();
 
 
-                dic.Add("Left", memory.ReadFloat((IntPtr)Addrs.PlayerAddrs.STATIC_PLAYER_HEADLIGHTS_LEFT));
-                dic.Add("Right", memory.ReadFloat((IntPtr)Addrs.PlayerAddrs.STATIC_PLAYER_HEADLIGHTS_RIGHT));
+                dic.Add("Left", Memory.ReadFloat((IntPtr)Addrs.PlayerAddrs.STATIC_PLAYER_HEADLIGHTS_LEFT));
+                dic.Add("Right", Memory.ReadFloat((IntPtr)Addrs.PlayerAddrs.STATIC_PLAYER_HEADLIGHTS_RIGHT));
 
                 return dic;
             }

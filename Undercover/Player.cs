@@ -16,10 +16,10 @@ namespace NFSScript.Undercover
         {
             get
             {
-                byte b = memory.ReadByte((IntPtr)Addrs.PlayerAddrs.STATIC_IS_IN_PURSUIT);
+                var b = Memory.ReadByte((IntPtr)Addrs.PlayerAddrs.STATIC_IS_IN_PURSUIT);
                 if (b == 1)
                     return true;
-                else return false;
+                return false;
             }
         }
         /// <summary>
@@ -31,13 +31,7 @@ namespace NFSScript.Undercover
             /// Returns the <see cref="Player"/>'s car current speed in MPH.
             /// </summary>
             /// <returns></returns>
-            public static float Speed
-            {
-                get
-                {
-                    return memory.ReadFloat((IntPtr)Addrs.PlayerAddrs.STATIC_PLAYER_SPEED);
-                }
-            }
+            public static float Speed => Memory.ReadFloat((IntPtr)Addrs.PlayerAddrs.STATIC_PLAYER_SPEED);
         }
     }
 }

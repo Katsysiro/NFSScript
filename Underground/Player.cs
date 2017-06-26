@@ -13,32 +13,17 @@ namespace NFSScript.Underground
         /// <summary>
         /// <see cref="Player"/>'s cash (Read only).
         /// </summary>
-        public static int Cash
-        {
-            get
-            {
-                return memory.ReadInt32((IntPtr)Addrs.PlayerAddrs.STATIC_PLAYER_CASH);
-            }
-        }
+        public static int Cash => Memory.ReadInt32((IntPtr)Addrs.PlayerAddrs.STATIC_PLAYER_CASH);
 
         /// <summary>
         /// Returns the total amount of money that the <see cref="Player"/> has earned (Read only).
         /// </summary>
-        public static int TotalMoneyEarned
-        {
-            get {
-                return memory.ReadInt32((IntPtr)Addrs.PlayerAddrs.STATIC_PLAYER_TOTAL_MONEY_EARNED);
-            }
-        }
+        public static int TotalMoneyEarned => Memory.ReadInt32((IntPtr)Addrs.PlayerAddrs.STATIC_PLAYER_TOTAL_MONEY_EARNED);
 
         /// <summary>
         /// Gets <see cref="Player"/>'s style points (Read only).
         /// </summary>
-        public static int StylePoints
-        {
-            get { return memory.ReadInt32((IntPtr)Addrs.PlayerAddrs.STATIC_PLAYER_STYLE_POINTS);
-            }
-        }
+        public static int StylePoints => Memory.ReadInt32((IntPtr)Addrs.PlayerAddrs.STATIC_PLAYER_STYLE_POINTS);
 
         /// <summary>
         /// Award the <see cref="Player"/> with cash.
@@ -46,7 +31,7 @@ namespace NFSScript.Underground
         /// <param name="value"></param>
         public static void AwardCash(int value)
         {
-            memory.WriteInt32((IntPtr)Addrs.PlayerAddrs.STATIC_PLAYER_CASH, Cash + value);
+            Memory.WriteInt32((IntPtr)Addrs.PlayerAddrs.STATIC_PLAYER_CASH, Cash + value);
         }
 
         /// <summary>
@@ -55,7 +40,7 @@ namespace NFSScript.Underground
         /// <param name="value"></param>
         public static void AwardStylePoints(int value)
         {
-            memory.WriteInt32((IntPtr)Addrs.PlayerAddrs.STATIC_PLAYER_STYLE_POINTS, StylePoints + value);
+            Memory.WriteInt32((IntPtr)Addrs.PlayerAddrs.STATIC_PLAYER_STYLE_POINTS, StylePoints + value);
         }
 
         /// <summary>
@@ -67,13 +52,7 @@ namespace NFSScript.Underground
             /// Returns the <see cref="Player"/> car's current speed in MPH
             /// </summary>
             /// <returns></returns>
-            public static float Speed
-            {
-                get
-                {
-                    return memory.ReadFloat((IntPtr)Addrs.PlayerAddrs.STATIC_PLAYER_SPEED_MPH);
-                }
-            }
+            public static float Speed => Memory.ReadFloat((IntPtr)Addrs.PlayerAddrs.STATIC_PLAYER_SPEED_MPH);
         }
     }
 }

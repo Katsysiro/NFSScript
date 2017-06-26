@@ -1,10 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
-using System.Linq;
-using System.Text;
-
-
+using System.Timers;
 using Tick = System.Timers.Timer;
 
 namespace NFSScript.Types
@@ -39,7 +34,7 @@ namespace NFSScript.Types
             t.Stop();
         }
 
-        private void TickCall(object sender, System.Timers.ElapsedEventArgs e)
+        private void TickCall(object sender, ElapsedEventArgs e)
         {
             action();
         }

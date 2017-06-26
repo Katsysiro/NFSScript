@@ -32,7 +32,7 @@ namespace NFSScript
         /// <summary>
         /// The ID of the <see cref="EAGLPhysicsObject"/>.
         /// </summary>
-        public abstract byte ID { get; set; }
+        public abstract byte Id { get; set; }
     }
 
     /// <summary>
@@ -41,13 +41,14 @@ namespace NFSScript
     /// <typeparam name="T"></typeparam>
     public abstract class Listable<T> : IListable, IDisposable where T : IListable
     {
-        private static List<IListable> List = new List<IListable>();
-        private bool disposed;
+        // TODO: Should this be a list of T?
+        private static readonly List<IListable> List = new List<IListable>();
+        private bool _disposed;
 
         /// <summary>
         /// Constructs the <see cref="Listable{T}"/> instance.
         /// </summary>
-        public Listable()
+        protected Listable()
         {
             List.Add(this);
         }
@@ -57,13 +58,13 @@ namespace NFSScript
         /// </summary>
         ~Listable()
         {
-            this.Dispose(false);
+            Dispose(false);
         }
 
         /// <summary/>
         public static void ForEach(Action<T> action)
         {
-            foreach (IListable listable in List)
+            foreach (var listable in List)
                 action((T)listable);
         }
 
@@ -79,11 +80,10 @@ namespace NFSScript
         /// <summary/>
         protected virtual void Dispose(bool disposing)
         {
-            if (this.disposed)
+            if (_disposed)
                 return;
-            int num = disposing ? 1 : 0;
             List.Remove(this);
-            this.disposed = true;
+            _disposed = true;
         }
     }
 }

@@ -1,14 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Runtime.InteropServices;
+﻿using System.Runtime.InteropServices;
 
 namespace NFSScript
 {
     /// <summary>
     /// Specifies key codes and modifiers.
     /// </summary>
+    // TODO: What's with these enum values? It looks like a decompiler went spaghetti. What's going on?
     [ComVisible(true)]
     public enum Keys
     {
@@ -399,6 +396,6 @@ namespace NFSScript
         /// <summary/>
         Control = 131072,
         /// <summary/>
-        Alt = 262144,
+        Alt = 262144
     }
 }

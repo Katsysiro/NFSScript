@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Text;
 
 namespace NFSScript
@@ -17,6 +15,8 @@ namespace NFSScript
         /// <returns></returns>
         public static byte ToByte(this bool x)
         {
+            // ReSharper disable once ConvertIfStatementToReturnStatement
+            // This must have explicit constant return or else it'll require a cast which is slower
             if (x)
                 return 1;
             return 0;

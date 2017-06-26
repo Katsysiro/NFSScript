@@ -1,12 +1,11 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using System.Collections.Generic;
-using NFSScript.Core;
+using NFSScript.Math;
 using static NFSScript.Core.GameMemory;
 using static NFSScript.Core.CarbonAddresses;
 using static NFSScript.CarbonFunctions;
-using NFSScript.Math;
 
 namespace NFSScript.Carbon
 {
@@ -27,9 +26,9 @@ namespace NFSScript.Carbon
         {
             get
             {
-                float x = memory.ReadFloat((IntPtr)PlayerAddrs.STATIC_PLAYER_LAST_KNOWN_POSITION_X);
-                float y = memory.ReadFloat((IntPtr)PlayerAddrs.STATIC_PLAYER_LAST_KNOWN_POSITION_Y);
-                float z = memory.ReadFloat((IntPtr)PlayerAddrs.STATIC_PLAYER_LAST_KNOWN_POSITION_Z);
+                var x = Memory.ReadFloat((IntPtr)PlayerAddrs.STATIC_PLAYER_LAST_KNOWN_POSITION_X);
+                var y = Memory.ReadFloat((IntPtr)PlayerAddrs.STATIC_PLAYER_LAST_KNOWN_POSITION_Y);
+                var z = Memory.ReadFloat((IntPtr)PlayerAddrs.STATIC_PLAYER_LAST_KNOWN_POSITION_Z);
 
                 return new Vector3(x, y, z);
             }
@@ -42,14 +41,14 @@ namespace NFSScript.Carbon
         {
             get
             {
-                int address = memory.ReadInt32((IntPtr)memory.getBaseAddress + PlayerAddrs.PNON_STATIC_PLAYER_CASH);
-                address = memory.ReadInt32((IntPtr)address + PlayerAddrs.POINTER_PLAYER_CASH_1);
-                address = memory.ReadInt32((IntPtr)address + PlayerAddrs.POINTER_PLAYER_CASH_2);
-                address = memory.ReadInt32((IntPtr)address + PlayerAddrs.POINTER_PLAYER_CASH_3);
-                address = memory.ReadInt32((IntPtr)address + PlayerAddrs.POINTER_PLAYER_CASH_4);
+                var address = Memory.ReadInt32((IntPtr)Memory.getBaseAddress + PlayerAddrs.PNON_STATIC_PLAYER_CASH);
+                address = Memory.ReadInt32((IntPtr)address + PlayerAddrs.POINTER_PLAYER_CASH_1);
+                address = Memory.ReadInt32((IntPtr)address + PlayerAddrs.POINTER_PLAYER_CASH_2);
+                address = Memory.ReadInt32((IntPtr)address + PlayerAddrs.POINTER_PLAYER_CASH_3);
+                address = Memory.ReadInt32((IntPtr)address + PlayerAddrs.POINTER_PLAYER_CASH_4);
                 //address = memory.ReadInt32((IntPtr)address + PlayerAddrs.POINTER_PLAYER_CASH_5);
 
-                return memory.ReadInt32((IntPtr)address + PlayerAddrs.POINTER_PLAYER_CASH_5);
+                return Memory.ReadInt32((IntPtr)address + PlayerAddrs.POINTER_PLAYER_CASH_5);
             }
         }
 
@@ -60,29 +59,23 @@ namespace NFSScript.Carbon
         {
             get
             {
-                uint value = memory.ReadUInteger((IntPtr)PlayerAddrs.STATIC_POLICE_IGNORE_PLAYER);
+                var value = Memory.ReadUInteger((IntPtr)PlayerAddrs.STATIC_POLICE_IGNORE_PLAYER);
                 if (value == POLICE_IGNORE_PLAYER_ENABLED)
                     return true;
-                else return false;
+                return false;
             }
             set
             {
                 if (value)
-                    memory.WriteUInteger((IntPtr)PlayerAddrs.STATIC_POLICE_IGNORE_PLAYER, POLICE_IGNORE_PLAYER_ENABLED);
-                else memory.WriteUInteger((IntPtr)PlayerAddrs.STATIC_POLICE_IGNORE_PLAYER, POLICE_IGNORE_PLAYER_DISABLED);
+                    Memory.WriteUInteger((IntPtr)PlayerAddrs.STATIC_POLICE_IGNORE_PLAYER, POLICE_IGNORE_PLAYER_ENABLED);
+                else Memory.WriteUInteger((IntPtr)PlayerAddrs.STATIC_POLICE_IGNORE_PLAYER, POLICE_IGNORE_PLAYER_DISABLED);
             }
         }
 
         /// <summary>
         /// Sets a value indicating whether the AI controls the <see cref="Player"/>'s car.
         /// </summary>
-        public static bool IsControlledByAi
-        {
-            get
-            {
-                return _safeGetAIControlValue();
-            }
-        }
+        public static bool IsControlledByAi => _safeGetAIControlValue();
 
         /// <summary>
         /// Returns the name of the player.
@@ -91,13 +84,13 @@ namespace NFSScript.Carbon
         {
             get
             {
-                int address = memory.ReadInt32((IntPtr)memory.getBaseAddress + PlayerAddrs.NON_STATIC_PLAYER_NAME);
-                address = memory.ReadInt32((IntPtr)address + PlayerAddrs.POINTER_PLAYER_NAME_1);
-                address = memory.ReadInt32((IntPtr)address + PlayerAddrs.POINTER_PLAYER_NAME_2);
-                address = memory.ReadInt32((IntPtr)address + PlayerAddrs.POINTER_PLAYER_NAME_3);
-                address = memory.ReadInt32((IntPtr)address + PlayerAddrs.POINTER_PLAYER_NAME_4);
+                var address = Memory.ReadInt32((IntPtr)Memory.getBaseAddress + PlayerAddrs.NON_STATIC_PLAYER_NAME);
+                address = Memory.ReadInt32((IntPtr)address + PlayerAddrs.POINTER_PLAYER_NAME_1);
+                address = Memory.ReadInt32((IntPtr)address + PlayerAddrs.POINTER_PLAYER_NAME_2);
+                address = Memory.ReadInt32((IntPtr)address + PlayerAddrs.POINTER_PLAYER_NAME_3);
+                address = Memory.ReadInt32((IntPtr)address + PlayerAddrs.POINTER_PLAYER_NAME_4);
 
-                return Encoding.ASCII.GetString(memory.ReadByteArray((IntPtr)address + PlayerAddrs.POINTER_PLAYER_NAME_5, 15).Where(x => x != 0x00).ToArray());
+                return Encoding.ASCII.GetString(Memory.ReadByteArray((IntPtr)address + PlayerAddrs.POINTER_PLAYER_NAME_5, 15).Where(x => x != 0x00).ToArray());
             }
         }
 
@@ -107,13 +100,13 @@ namespace NFSScript.Carbon
         /// <param name="value"></param>
         public static void AwardCash(int value)
         {
-            int address = memory.ReadInt32((IntPtr)memory.getBaseAddress + PlayerAddrs.PNON_STATIC_PLAYER_CASH);
-            address = memory.ReadInt32((IntPtr)address + PlayerAddrs.POINTER_PLAYER_CASH_1);
-            address = memory.ReadInt32((IntPtr)address + PlayerAddrs.POINTER_PLAYER_CASH_2);
-            address = memory.ReadInt32((IntPtr)address + PlayerAddrs.POINTER_PLAYER_CASH_3);
-            address = memory.ReadInt32((IntPtr)address + PlayerAddrs.POINTER_PLAYER_CASH_4);
+            var address = Memory.ReadInt32((IntPtr)Memory.getBaseAddress + PlayerAddrs.PNON_STATIC_PLAYER_CASH);
+            address = Memory.ReadInt32((IntPtr)address + PlayerAddrs.POINTER_PLAYER_CASH_1);
+            address = Memory.ReadInt32((IntPtr)address + PlayerAddrs.POINTER_PLAYER_CASH_2);
+            address = Memory.ReadInt32((IntPtr)address + PlayerAddrs.POINTER_PLAYER_CASH_3);
+            address = Memory.ReadInt32((IntPtr)address + PlayerAddrs.POINTER_PLAYER_CASH_4);
 
-            memory.WriteInt32((IntPtr)address + PlayerAddrs.POINTER_PLAYER_CASH_5, Cash + value);
+            Memory.WriteInt32((IntPtr)address + PlayerAddrs.POINTER_PLAYER_CASH_5, Cash + value);
         }
 
         /// <summary>
@@ -121,8 +114,8 @@ namespace NFSScript.Carbon
         /// </summary>
         public static void ForceAIControl()
         {
-            uint u = memory.ReadUInteger((IntPtr)PlayerAddrs.STATIC_PLAYER_AI_CONTROL);
-            memory.WriteByte((IntPtr)u + PlayerAddrs.POINTER_PLAYER_AI_CONTROL_POINTER, 1);
+            var u = Memory.ReadUInteger((IntPtr)PlayerAddrs.STATIC_PLAYER_AI_CONTROL);
+            Memory.WriteByte((IntPtr)u + PlayerAddrs.POINTER_PLAYER_AI_CONTROL_POINTER, 1);
         }
 
         /// <summary>
@@ -130,8 +123,8 @@ namespace NFSScript.Carbon
         /// </summary>
         public static void ClearAIControl()
         {
-            uint u = memory.ReadUInteger((IntPtr)PlayerAddrs.STATIC_PLAYER_AI_CONTROL);
-            memory.WriteByte((IntPtr)u + PlayerAddrs.POINTER_PLAYER_AI_CONTROL_POINTER, 0);
+            var u = Memory.ReadUInteger((IntPtr)PlayerAddrs.STATIC_PLAYER_AI_CONTROL);
+            Memory.WriteByte((IntPtr)u + PlayerAddrs.POINTER_PLAYER_AI_CONTROL_POINTER, 0);
         }
 
         /// <summary>
@@ -148,7 +141,7 @@ namespace NFSScript.Carbon
         /// <param name="b">Valid range is 1-5</param>
         public static void SaveCurrentPositionToHOT(byte b)
         {
-            memory.WriteByte((IntPtr)PlayerAddrs.STATIC_PLAYER_HOT_SAVE_POSITION, b);
+            Memory.WriteByte((IntPtr)PlayerAddrs.STATIC_PLAYER_HOT_SAVE_POSITION, b);
         }
 
         /// <summary>
@@ -157,15 +150,15 @@ namespace NFSScript.Carbon
         /// <param name="b">Valid range is 1-5</param>
         public static void WarpToSavedPositionFromHOT(byte b)
         {
-            memory.WriteByte((IntPtr)PlayerAddrs.STATIC_PLAYER_HOT_WARP_TO_SAVED_POSITION, b);
+            Memory.WriteByte((IntPtr)PlayerAddrs.STATIC_PLAYER_HOT_WARP_TO_SAVED_POSITION, b);
         }
         
         internal static bool _safeGetAIControlValue()
         {
-            byte skipFEEnabled = memory.ReadByte((IntPtr)GameAddrs.STATIC_SKIP_FE_DAMAGE_ENABLED);
-            byte skipFEAI = memory.ReadByte((IntPtr)GameAddrs.STATIC_SKIP_FE_AI_CONTROL_PLAYER);
-            uint u = memory.ReadUInteger((IntPtr)PlayerAddrs.STATIC_PLAYER_AI_CONTROL);
-            byte aiControl = memory.ReadByte((IntPtr)u + PlayerAddrs.POINTER_PLAYER_AI_CONTROL_POINTER);
+            var skipFEEnabled = Memory.ReadByte((IntPtr)GameAddrs.STATIC_SKIP_FE_DAMAGE_ENABLED);
+            var skipFEAI = Memory.ReadByte((IntPtr)GameAddrs.STATIC_SKIP_FE_AI_CONTROL_PLAYER);
+            var u = Memory.ReadUInteger((IntPtr)PlayerAddrs.STATIC_PLAYER_AI_CONTROL);
+            var aiControl = Memory.ReadByte((IntPtr)u + PlayerAddrs.POINTER_PLAYER_AI_CONTROL_POINTER);
 
             if (aiControl == 1)
                 return true;
@@ -174,7 +167,7 @@ namespace NFSScript.Carbon
             {
                 if (skipFEAI == 1)
                     return true;
-                else if (skipFEAI == 0)
+                if (skipFEAI == 0)
                     return false;
             }
 
@@ -193,23 +186,23 @@ namespace NFSScript.Carbon
             {
                 get
                 {
-                    int address = memory.ReadInt32((IntPtr)memory.getBaseAddress + PlayerAddrs.NON_STATIC_PLAYER_CREW_NAME);
-                    address = memory.ReadInt32((IntPtr)address + PlayerAddrs.POINTER_PLAYER_CREW_NAME_1);
-                    address = memory.ReadInt32((IntPtr)address + PlayerAddrs.POINTER_PLAYER_CREW_NAME_2);
-                    address = memory.ReadInt32((IntPtr)address + PlayerAddrs.POINTER_PLAYER_CREW_NAME_3);
-                    address = memory.ReadInt32((IntPtr)address + PlayerAddrs.POINTER_PLAYER_CREW_NAME_4);
+                    var address = Memory.ReadInt32((IntPtr)Memory.getBaseAddress + PlayerAddrs.NON_STATIC_PLAYER_CREW_NAME);
+                    address = Memory.ReadInt32((IntPtr)address + PlayerAddrs.POINTER_PLAYER_CREW_NAME_1);
+                    address = Memory.ReadInt32((IntPtr)address + PlayerAddrs.POINTER_PLAYER_CREW_NAME_2);
+                    address = Memory.ReadInt32((IntPtr)address + PlayerAddrs.POINTER_PLAYER_CREW_NAME_3);
+                    address = Memory.ReadInt32((IntPtr)address + PlayerAddrs.POINTER_PLAYER_CREW_NAME_4);
 
-                    return Encoding.ASCII.GetString(memory.ReadByteArray((IntPtr)address + PlayerAddrs.POINTER_PLAYER_CREW_NAME_5, 15).Where(x => x != 0x00).Where(x => x != 0x03).ToArray());
+                    return Encoding.ASCII.GetString(Memory.ReadByteArray((IntPtr)address + PlayerAddrs.POINTER_PLAYER_CREW_NAME_5, 15).Where(x => x != 0x00).Where(x => x != 0x03).ToArray());
                 }
                 set
                 {
-                    int address = memory.ReadInt32((IntPtr)memory.getBaseAddress + PlayerAddrs.NON_STATIC_PLAYER_CREW_NAME);
-                    address = memory.ReadInt32((IntPtr)address + PlayerAddrs.POINTER_PLAYER_CREW_NAME_1);
-                    address = memory.ReadInt32((IntPtr)address + PlayerAddrs.POINTER_PLAYER_CREW_NAME_2);
-                    address = memory.ReadInt32((IntPtr)address + PlayerAddrs.POINTER_PLAYER_CREW_NAME_3);
-                    address = memory.ReadInt32((IntPtr)address + PlayerAddrs.POINTER_PLAYER_CREW_NAME_4);
+                    var address = Memory.ReadInt32((IntPtr)Memory.getBaseAddress + PlayerAddrs.NON_STATIC_PLAYER_CREW_NAME);
+                    address = Memory.ReadInt32((IntPtr)address + PlayerAddrs.POINTER_PLAYER_CREW_NAME_1);
+                    address = Memory.ReadInt32((IntPtr)address + PlayerAddrs.POINTER_PLAYER_CREW_NAME_2);
+                    address = Memory.ReadInt32((IntPtr)address + PlayerAddrs.POINTER_PLAYER_CREW_NAME_3);
+                    address = Memory.ReadInt32((IntPtr)address + PlayerAddrs.POINTER_PLAYER_CREW_NAME_4);
 
-                    memory.WriteStringASCII((IntPtr)address + PlayerAddrs.POINTER_PLAYER_CREW_NAME_5, new string(value.Take(15).ToArray()));
+                    Memory.WriteStringASCII((IntPtr)address + PlayerAddrs.POINTER_PLAYER_CREW_NAME_5, new string(value.Take(15).ToArray()));
                 }
             }
 
@@ -218,23 +211,17 @@ namespace NFSScript.Carbon
             /// </summary>
             public static int Color
             {
-                get
-                {
-                    return memory.ReadInt32(_getCrewColorAddress());
-                }
-                set
-                {
-                    memory.WriteInt32(_getCrewColorAddress(), value);
-                }
+                get => Memory.ReadInt32(_getCrewColorAddress());
+                set => Memory.WriteInt32(_getCrewColorAddress(), value);
             }
 
             internal static IntPtr _getCrewColorAddress()
             {
-                int addr = memory.ReadInt32((IntPtr)memory.getBaseAddress + 0x0069816C);
-                addr = memory.ReadInt32((IntPtr)addr + 0x320);
-                addr = memory.ReadInt32((IntPtr)addr + 0x304);
-                addr = memory.ReadInt32((IntPtr)addr + 0x240);
-                addr = memory.ReadInt32((IntPtr)addr + 0x28C);
+                var addr = Memory.ReadInt32((IntPtr)Memory.getBaseAddress + 0x0069816C);
+                addr = Memory.ReadInt32((IntPtr)addr + 0x320);
+                addr = Memory.ReadInt32((IntPtr)addr + 0x304);
+                addr = Memory.ReadInt32((IntPtr)addr + 0x240);
+                addr = Memory.ReadInt32((IntPtr)addr + 0x28C);
                 addr = addr + 0x774;
 
                 return (IntPtr)addr;
@@ -253,19 +240,19 @@ namespace NFSScript.Carbon
             {
                 get
                 {
-                    int addr = (int)memory.getBaseAddress;
-                    float x = memory.ReadFloat((IntPtr)addr + PlayerAddrs.NON_STATIC_PLAYER_X_POS);
-                    float y = memory.ReadFloat((IntPtr)addr + PlayerAddrs.NON_STATIC_PLAYER_Y_POS);
-                    float z = memory.ReadFloat((IntPtr)addr + PlayerAddrs.NON_STATIC_PLAYER_Z_POS);
+                    var addr = (int)Memory.getBaseAddress;
+                    var x = Memory.ReadFloat((IntPtr)addr + PlayerAddrs.NON_STATIC_PLAYER_X_POS);
+                    var y = Memory.ReadFloat((IntPtr)addr + PlayerAddrs.NON_STATIC_PLAYER_Y_POS);
+                    var z = Memory.ReadFloat((IntPtr)addr + PlayerAddrs.NON_STATIC_PLAYER_Z_POS);
 
                     return new Vector3(x, y, z);
                 }
                 set
                 {
-                    int addr = (int)memory.getBaseAddress;
-                    memory.WriteFloat((IntPtr)addr + PlayerAddrs.NON_STATIC_PLAYER_X_POS, value.X);
-                    memory.WriteFloat((IntPtr)addr + PlayerAddrs.NON_STATIC_PLAYER_Y_POS, value.Y);
-                    memory.WriteFloat((IntPtr)addr + PlayerAddrs.NON_STATIC_PLAYER_Z_POS, value.Z);
+                    var addr = (int)Memory.getBaseAddress;
+                    Memory.WriteFloat((IntPtr)addr + PlayerAddrs.NON_STATIC_PLAYER_X_POS, value.X);
+                    Memory.WriteFloat((IntPtr)addr + PlayerAddrs.NON_STATIC_PLAYER_Y_POS, value.Y);
+                    Memory.WriteFloat((IntPtr)addr + PlayerAddrs.NON_STATIC_PLAYER_Z_POS, value.Z);
                 }
             }
 
@@ -276,32 +263,26 @@ namespace NFSScript.Carbon
             {
                 get
                 {
-                    float x = memory.ReadFloat((IntPtr)PlayerAddrs.STATIC_PLAYER_X_ROT);
-                    float y = memory.ReadFloat((IntPtr)PlayerAddrs.STATIC_PLAYER_Y_ROT);
-                    float z = memory.ReadFloat((IntPtr)PlayerAddrs.STATIC_PLAYER_Z_ROT);
-                    float w = memory.ReadFloat((IntPtr)PlayerAddrs.STATIC_PLAYER_W_ROT);
+                    var x = Memory.ReadFloat((IntPtr)PlayerAddrs.STATIC_PLAYER_X_ROT);
+                    var y = Memory.ReadFloat((IntPtr)PlayerAddrs.STATIC_PLAYER_Y_ROT);
+                    var z = Memory.ReadFloat((IntPtr)PlayerAddrs.STATIC_PLAYER_Z_ROT);
+                    var w = Memory.ReadFloat((IntPtr)PlayerAddrs.STATIC_PLAYER_W_ROT);
 
                     return new Quaternion(x, y, z, w);
                 }
                 set
                 {
-                    memory.WriteFloat((IntPtr)PlayerAddrs.STATIC_PLAYER_X_ROT, value.x);
-                    memory.WriteFloat((IntPtr)PlayerAddrs.STATIC_PLAYER_Y_ROT, value.y);
-                    memory.WriteFloat((IntPtr)PlayerAddrs.STATIC_PLAYER_Z_ROT, value.z);
-                    memory.WriteFloat((IntPtr)PlayerAddrs.STATIC_PLAYER_W_ROT, value.w);
+                    Memory.WriteFloat((IntPtr)PlayerAddrs.STATIC_PLAYER_X_ROT, value.X);
+                    Memory.WriteFloat((IntPtr)PlayerAddrs.STATIC_PLAYER_Y_ROT, value.Y);
+                    Memory.WriteFloat((IntPtr)PlayerAddrs.STATIC_PLAYER_Z_ROT, value.Z);
+                    Memory.WriteFloat((IntPtr)PlayerAddrs.STATIC_PLAYER_W_ROT, value.W);
                 }
             }
 
             /// <summary>
             /// Returns the <see cref="Player"/>'s car speed.
             /// </summary>
-            public static float Speed
-            {
-                get
-                {
-                    return memory.ReadFloat((IntPtr)memory.getBaseAddress + PlayerAddrs.NON_STATIC_PLAYER_SPEED);
-                }
-            }
+            public static float Speed => Memory.ReadFloat((IntPtr)Memory.getBaseAddress + PlayerAddrs.NON_STATIC_PLAYER_SPEED);
 
             /// <summary>
             /// Resets the <see cref="Player"/>'s car.
@@ -311,8 +292,8 @@ namespace NFSScript.Carbon
                 Function.Call(RESET_PLAYER_CAR);
             }
 
-            static int axisAddr = memory.ReadInt32((IntPtr)memory.getBaseAddress + PlayerAddrs.NON_STATIC_LEFT_AXIS);
-            static int axisAddr2 = memory.ReadInt32((IntPtr)axisAddr + PlayerAddrs.PSTATIC_LEFT_AXIS_OFFSET_1);
+            static int axisAddr = Memory.ReadInt32((IntPtr)Memory.getBaseAddress + PlayerAddrs.NON_STATIC_LEFT_AXIS);
+            static int axisAddr2 = Memory.ReadInt32((IntPtr)axisAddr + PlayerAddrs.PSTATIC_LEFT_AXIS_OFFSET_1);
             static int finalAxisAddress = axisAddr2 + PlayerAddrs.PSTATIC_LEFT_AXIS_OFFSET_2;
 
             /// <summary>
@@ -320,14 +301,8 @@ namespace NFSScript.Carbon
             /// </summary>
             public static float LeftAxis
             {
-                get
-                {
-                    return memory.ReadFloat((IntPtr)finalAxisAddress);
-                }
-                set
-                {
-                    memory.WriteFloat((IntPtr)finalAxisAddress, value);
-                }
+                get => Memory.ReadFloat((IntPtr)finalAxisAddress);
+                set => Memory.WriteFloat((IntPtr)finalAxisAddress, value);
             }
 
             /// <summary>
@@ -335,14 +310,8 @@ namespace NFSScript.Carbon
             /// </summary>
             public static float RightAxis
             {
-                get
-                {
-                    return memory.ReadFloat((IntPtr)(finalAxisAddress - 0x4));
-                }
-                set
-                {
-                    memory.WriteFloat((IntPtr)(finalAxisAddress - 0x4), value);
-                }
+                get => Memory.ReadFloat((IntPtr)(finalAxisAddress - 0x4));
+                set => Memory.WriteFloat((IntPtr)(finalAxisAddress - 0x4), value);
             }
 
             /// <summary>
@@ -350,14 +319,8 @@ namespace NFSScript.Carbon
             /// </summary>
             public static float ForwardAxis
             {
-                get
-                {
-                    return memory.ReadFloat((IntPtr)(finalAxisAddress + 0x14));
-                }
-                set
-                {
-                    memory.WriteFloat((IntPtr)(finalAxisAddress + 0x14), value);
-                }
+                get => Memory.ReadFloat((IntPtr)(finalAxisAddress + 0x14));
+                set => Memory.WriteFloat((IntPtr)(finalAxisAddress + 0x14), value);
             }
 
             /// <summary>
@@ -365,26 +328,14 @@ namespace NFSScript.Carbon
             /// </summary>
             public static float BackwardAxis
             {
-                get
-                {
-                    return memory.ReadFloat((IntPtr)(finalAxisAddress + 0x18));
-                }
-                set
-                {
-                    memory.WriteFloat((IntPtr)(finalAxisAddress + 0x18), value);
-                }
+                get => Memory.ReadFloat((IntPtr)(finalAxisAddress + 0x18));
+                set => Memory.WriteFloat((IntPtr)(finalAxisAddress + 0x18), value);
             }
 
             /// <summary>
             /// Returns true if the speedbreaker is currently in use by the player.
             /// </summary>
-            public static bool IsUsingSpeedbreaker
-            {
-                get
-                {
-                    return memory.ReadInt32((IntPtr)PlayerAddrs.STATIC_IS_PLAYER_USING_SPEED_BREAKER) == 1;
-                }
-            }
+            public static bool IsUsingSpeedbreaker => Memory.ReadInt32((IntPtr)PlayerAddrs.STATIC_IS_PLAYER_USING_SPEED_BREAKER) == 1;
 
             /// <summary>
             /// Sets a value indicating whether the car should drift like in-game cutscnes (NIS) using the handbrake. (Unsafe, may crash the game if not called on the proper game state).
@@ -393,16 +344,16 @@ namespace NFSScript.Carbon
             {
                 get
                 {
-                    byte b = memory.ReadByte((IntPtr)PlayerAddrs.STATIC_AUGMENTED_DRIFT_WITH_EBRAKE);
+                    var b = Memory.ReadByte((IntPtr)PlayerAddrs.STATIC_AUGMENTED_DRIFT_WITH_EBRAKE);
                     if (b == 1)
                         return true;
-                    else return false;
+                    return false;
                 }
                 set
                 {
-                    if (value == true)
-                        memory.WriteByte((IntPtr)PlayerAddrs.STATIC_AUGMENTED_DRIFT_WITH_EBRAKE, 1);
-                    else memory.WriteByte((IntPtr)PlayerAddrs.STATIC_AUGMENTED_DRIFT_WITH_EBRAKE, 0);
+                    if (value)
+                        Memory.WriteByte((IntPtr)PlayerAddrs.STATIC_AUGMENTED_DRIFT_WITH_EBRAKE, 1);
+                    else Memory.WriteByte((IntPtr)PlayerAddrs.STATIC_AUGMENTED_DRIFT_WITH_EBRAKE, 0);
                 }
             }
 
@@ -413,8 +364,8 @@ namespace NFSScript.Carbon
             /// <param name="right"></param>
             public static void SetCarHeadlightsBrightnessIntensityValue(float left, float right)
             {
-                memory.WriteFloat((IntPtr)PlayerAddrs.STATIC_PLAYER_HEADLIGHTS_LEFT, left);
-                memory.WriteFloat((IntPtr)PlayerAddrs.STATIC_PLAYER_HEADLIGHTS_RIGHT, right);
+                Memory.WriteFloat((IntPtr)PlayerAddrs.STATIC_PLAYER_HEADLIGHTS_LEFT, left);
+                Memory.WriteFloat((IntPtr)PlayerAddrs.STATIC_PLAYER_HEADLIGHTS_RIGHT, right);
             }
 
             /// <summary>
@@ -423,11 +374,11 @@ namespace NFSScript.Carbon
             /// <returns></returns>
             public static Dictionary<string, float> GetCarHeadlightsBrightnessIntensityValue()
             {
-                Dictionary<string, float> dic = new Dictionary<string, float>();
+                var dic = new Dictionary<string, float>();
 
 
-                dic.Add("Left", memory.ReadFloat((IntPtr)PlayerAddrs.STATIC_PLAYER_HEADLIGHTS_LEFT));
-                dic.Add("Right", memory.ReadFloat((IntPtr)PlayerAddrs.STATIC_PLAYER_HEADLIGHTS_RIGHT));
+                dic.Add("Left", Memory.ReadFloat((IntPtr)PlayerAddrs.STATIC_PLAYER_HEADLIGHTS_LEFT));
+                dic.Add("Right", Memory.ReadFloat((IntPtr)PlayerAddrs.STATIC_PLAYER_HEADLIGHTS_RIGHT));
 
                 return dic;
             }

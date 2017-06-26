@@ -2,7 +2,6 @@
 using System.Diagnostics;
 using System.Runtime.InteropServices;
 using System.Text;
-
 using static NFSScript.Core.NativeMethods;
 
 namespace NFSScript.Core
@@ -15,41 +14,40 @@ namespace NFSScript.Core
         /// <summary>
         /// 
         /// </summary>
-        public static bool debugMode;
-        private IntPtr baseAddress;
-        private ProcessModule processModule;
-        private Process[] mainProcess;
-        private IntPtr processHandle;
+        public static bool DebugMode;
+        private IntPtr _baseAddress;
+        private ProcessModule _processModule;
+        private Process[] _mainProcess;
 
         /// <summary>
         /// 
         /// </summary>
-        public string processName { get; set; }
+        public string ProcessName { get; set; }
 
         /// <summary>
         /// Get the process handle.
         /// </summary>
-        public IntPtr ProcessHandle { get { return processHandle; } }
+        public IntPtr ProcessHandle { get; private set; }
 
         /// <summary>
         /// 
         /// </summary>
-        public long getBaseAddress
+        public long BaseAddress
         {
             get
             {
-                this.baseAddress = (IntPtr)0;
-                this.processModule = this.mainProcess[0].MainModule;
-                this.baseAddress = this.processModule.BaseAddress;
-                return (long)this.baseAddress;
+                // Before you complain, this will be inlined by the JIT.
+                // The method call should make it clearer that this isn't a transparent operation.
+                SetVariables();
+                return (long)_baseAddress;
             }
         }
 
         private void SetVariables()
         {
-            baseAddress = IntPtr.Zero;
-            processModule = mainProcess[0].MainModule;
-            baseAddress = processModule.BaseAddress;
+            _baseAddress = IntPtr.Zero;
+            _processModule = _mainProcess[0].MainModule;
+            _baseAddress = _processModule.BaseAddress;
         }
 
         /// <summary>
@@ -64,7 +62,7 @@ namespace NFSScript.Core
         /// </summary>
         public GMemory(string pProcessName)
         {
-            this.processName = pProcessName;
+            ProcessName = pProcessName;
             CheckProcess();
             SetVariables();
         }
@@ -74,18 +72,18 @@ namespace NFSScript.Core
         /// </summary>
         public bool CheckProcess()
         {
-            if (this.processName != null)
+            if (ProcessName != null)
             {
-                this.mainProcess = Process.GetProcessesByName(this.processName);
-                if (this.mainProcess.Length == 0)
+                _mainProcess = Process.GetProcessesByName(ProcessName);
+                if (_mainProcess.Length == 0)
                 {
-                    this.ErrorProcessNotFound(this.processName);
+                    ErrorProcessNotFound(ProcessName);
                     return false;
                 }
-                this.processHandle = OpenProcess(2035711U, false, this.mainProcess[0].Id);
-                if (!(this.processHandle == IntPtr.Zero))
+                ProcessHandle = OpenProcess(2035711U, false, _mainProcess[0].Id);
+                if (!(ProcessHandle == IntPtr.Zero))
                     return true;
-                this.ErrorProcessNotFound(this.processName);
+                ErrorProcessNotFound(ProcessName);
                 return false;
             }
             //int num = (int)MessageBox.Show("Programmer, define process name first!");
@@ -100,20 +98,20 @@ namespace NFSScript.Core
         /// <param name="isRelativeToMemoryBase"></param>
         public byte[] ReadByteArray(int address, uint size, bool isRelativeToMemoryBase)
         {
-            if (processHandle == IntPtr.Zero)
+            if (ProcessHandle == IntPtr.Zero)
                 CheckProcess();
             try
             {
                 if (isRelativeToMemoryBase)
-                    address += (int)baseAddress;
+                    address += (int)_baseAddress;
 
-                IntPtr addr = (IntPtr)address;
+                var addr = (IntPtr)address;
                 uint lpflOldProtect;
-                byte[] lpBuffer = new byte[size];
+                var lpBuffer = new byte[size];
 
-                VirtualProtectEx(processHandle, addr, (UIntPtr)size, 0x4, out lpflOldProtect);
-                bool read = ReadProcessMemory(processHandle, addr, lpBuffer, size, 0x0);
-                VirtualProtectEx(processHandle, addr, (UIntPtr)size, lpflOldProtect, out lpflOldProtect);
+                VirtualProtectEx(ProcessHandle, addr, (UIntPtr)size, 0x4, out lpflOldProtect);
+                var read = ReadProcessMemory(ProcessHandle, addr, lpBuffer, size, 0x0);
+                VirtualProtectEx(ProcessHandle, addr, (UIntPtr)size, lpflOldProtect, out lpflOldProtect);
 
                 if (read)
                     return lpBuffer;
@@ -121,10 +119,9 @@ namespace NFSScript.Core
             }
             catch (Exception ex)
             {
-                if (debugMode)
-                    Log.Print("ERROR", string.Format(
-                        "Error during ReadByteArray:\r\nAddress: {0}, Size: {1}, isRelativeToMemoryBase: {2}\r\n{3}",
-                        address.ToString("X"), size, isRelativeToMemoryBase, ex.ToString()));
+                if (DebugMode)
+                    Log.Print("ERROR",
+                        $"Error during ReadByteArray:\r\nAddress: {address:X}, Size: {size}, isRelativeToMemoryBase: {isRelativeToMemoryBase}\r\n{ex}");
                 return new byte[1];
             }
         }
@@ -156,10 +153,9 @@ namespace NFSScript.Core
             }
             catch (Exception ex)
             {
-                if (debugMode)
-                    Log.Print("ERROR", string.Format(
-                        "Error during ReadString:\r\nEncoding: {0}, Address: {1}, Length: {2}, isRelativeToMemoryBase: {3}\r\n{4}",
-                        encoding.BodyName, address.ToString("X"), length, isRelativeToMemoryBase, ex.ToString()));
+                if (DebugMode)
+                    Log.Print("ERROR",
+                        $"Error during ReadString:\r\nEncoding: {encoding.BodyName}, Address: {address:X}, Length: {length}, isRelativeToMemoryBase: {isRelativeToMemoryBase}\r\n{ex}");
                 return string.Empty;
             }
         }
@@ -172,28 +168,27 @@ namespace NFSScript.Core
         /// <param name="isRelativeToMemoryBase"></param>
         public bool WriteByteArray(int address, byte[] bytes, bool isRelativeToMemoryBase)
         {
-            if (processHandle == IntPtr.Zero)
+            if (ProcessHandle == IntPtr.Zero)
                 CheckProcess();
             try
             {
                 if (isRelativeToMemoryBase)
-                    address += (int)baseAddress;
+                    address += (int)_baseAddress;
 
-                IntPtr addr = (IntPtr)address;
+                var addr = (IntPtr)address;
                 uint lpflOldProtect;
 
-                VirtualProtectEx(processHandle, addr, (UIntPtr)(bytes.Length), 0x4, out lpflOldProtect);
-                bool flag = WriteProcessMemory(processHandle, addr, bytes, (uint)bytes.Length, 0x0);
-                VirtualProtectEx(processHandle, addr, (UIntPtr)(bytes.Length), lpflOldProtect, out lpflOldProtect);
+                VirtualProtectEx(ProcessHandle, addr, (UIntPtr)(bytes.Length), 0x4, out lpflOldProtect);
+                var flag = WriteProcessMemory(ProcessHandle, addr, bytes, (uint)bytes.Length, 0x0);
+                VirtualProtectEx(ProcessHandle, addr, (UIntPtr)(bytes.Length), lpflOldProtect, out lpflOldProtect);
 
                 return flag;
             }
             catch (Exception ex)
             {
-                if (debugMode)
-                    Log.Print("ERROR", string.Format(
-                        "Error during WriteByteArray:\r\nAddress: {0}, bytes.Length: {1}, isRelativeToMemoryBase: {2}\r\n{3}",
-                        address.ToString("X"), bytes.Length, isRelativeToMemoryBase, ex.ToString()));
+                if (DebugMode)
+                    Log.Print("ERROR",
+                        $"Error during WriteByteArray:\r\nAddress: {address:X}, bytes.Length: {bytes.Length}, isRelativeToMemoryBase: {isRelativeToMemoryBase}\r\n{ex}");
                 return false;
             }
         }
@@ -228,10 +223,9 @@ namespace NFSScript.Core
             }
             catch (Exception ex)
             {
-                if (debugMode)
+                if (DebugMode)
                     Log.Print("ERROR",
-                        string.Format("Error during WriteString:\r\nEncoding: {0}, Address: {1}, String: {2}, isRelativeToMemoryBase: {3}\r\n{4}",
-                        encoding.BodyName, address.ToString("X"), str, isRelativeToMemoryBase, ex.ToString()));
+                        $"Error during WriteString:\r\nEncoding: {encoding.BodyName}, Address: {address:X}, String: {str}, isRelativeToMemoryBase: {isRelativeToMemoryBase}\r\n{ex}");
                 return false;
             }
         }
@@ -241,12 +235,13 @@ namespace NFSScript.Core
         /// </summary>
         public Process GetMainProcess()
         {
-            return this.mainProcess[0];
+            return _mainProcess[0];
         }
 
         private void ErrorProcessNotFound(string pProcessName)
         {
-            Log.Print("ERROR", string.Format("{0} {1}", processName, "is not running or has not been found. Try to open the loader as an administrator."));
+            // FIXME: Shouldn't this be pProcessName?
+            Log.Print("ERROR", $"{ProcessName} is not running or has not been found. Try to open the loader as an administrator.");
             Environment.Exit(0);
         }
     }

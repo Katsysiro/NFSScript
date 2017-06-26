@@ -19,18 +19,12 @@ namespace NFSScript.Undercover
         /// <summary>
         /// Returns the save game directory path.
         /// </summary>
-        public static string SaveDirectory { get { return Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "NFS Undercover"); } }
+        public static string SaveDirectory => Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "NFS Undercover");
 
         /// <summary>
         /// Returns the amount of seconds it takes to render a frame
         /// </summary>
-        public static float LastFrameTime
-        {
-            get
-            {
-                return memory.ReadFloat((IntPtr)Addrs.GenericAddrs.STATIC_LAST_FRAME_TIME);
-            }
-        }
+        public static float LastFrameTime => Memory.ReadFloat((IntPtr)Addrs.GenericAddrs.STATIC_LAST_FRAME_TIME);
 
         /// <summary>
         /// Returns a boolean that indicates whether the game is paused or not.
@@ -39,10 +33,10 @@ namespace NFSScript.Undercover
         {
             get
             {
-                byte b = memory.ReadByte((IntPtr)Addrs.GameAddrs.STATIC_IS_GAME_NOT_PAUSED);
+                var b = Memory.ReadByte((IntPtr)Addrs.GameAddrs.STATIC_IS_GAME_NOT_PAUSED);
                 if (b == 0)
                     return true;
-                else return false;
+                return false;
             }
         }
 
@@ -51,8 +45,8 @@ namespace NFSScript.Undercover
         /// </summary>
         public static bool IsSoundEnabled
         {
-            get { return _readAudioIDValue(SOUND_ID); }
-            set { _setAudioIDValue(SOUND_ID, value); }
+            get => _readAudioIDValue(SOUND_ID);
+            set => _setAudioIDValue(SOUND_ID, value);
         }
 
         /// <summary>
@@ -60,8 +54,8 @@ namespace NFSScript.Undercover
         /// </summary>
         public static bool IsAudioStreamingEnabled
         {
-            get { return _readAudioIDValue(AUDIO_STREAMING_ID); }
-            set { _setAudioIDValue(AUDIO_STREAMING_ID, value); }
+            get => _readAudioIDValue(AUDIO_STREAMING_ID);
+            set => _setAudioIDValue(AUDIO_STREAMING_ID, value);
         }
 
         /// <summary>
@@ -69,8 +63,8 @@ namespace NFSScript.Undercover
         /// </summary>
         public static bool IsSpeechEnabled
         {
-            get { return _readAudioIDValue(SPEECH_ID); }
-            set { _setAudioIDValue(SPEECH_ID, value); }
+            get => _readAudioIDValue(SPEECH_ID);
+            set => _setAudioIDValue(SPEECH_ID, value);
         }
 
         /// <summary>
@@ -78,8 +72,8 @@ namespace NFSScript.Undercover
         /// </summary>
         public static bool IsNISAudioEnabled
         {
-            get { return _readAudioIDValue(NIS_AUDIO_ID); }
-            set { _setAudioIDValue(NIS_AUDIO_ID, value); }
+            get => _readAudioIDValue(NIS_AUDIO_ID);
+            set => _setAudioIDValue(NIS_AUDIO_ID, value);
         }
 
         /// <summary>
@@ -92,7 +86,7 @@ namespace NFSScript.Undercover
             if (enabled)
                 value = 1;
 
-            memory.WriteByte((IntPtr)Addrs.GameAddrs.STATIC_SKIP_FE, value);
+            Memory.WriteByte((IntPtr)Addrs.GameAddrs.STATIC_SKIP_FE, value);
         }
 
         /// <summary>
@@ -205,7 +199,7 @@ namespace NFSScript.Undercover
         {
             byte b = 0;
             if (value) b = 1;
-            IntPtr address = IntPtr.Zero;
+            var address = IntPtr.Zero;
             switch (id)
             {
                 case SOUND_ID:
@@ -228,7 +222,7 @@ namespace NFSScript.Undercover
                     return;
             }
 
-            memory.WriteByte(address, b);
+            Memory.WriteByte(address, b);
         }
 
         internal static bool _readAudioIDValue(int id)
@@ -237,19 +231,19 @@ namespace NFSScript.Undercover
             switch (id)
             {
                 case SOUND_ID:
-                    b = memory.ReadByte((IntPtr)Addrs.GenericAddrs.STATIC_IS_SOUND_ENABLED);
+                    b = Memory.ReadByte((IntPtr)Addrs.GenericAddrs.STATIC_IS_SOUND_ENABLED);
                     break;
 
                 case AUDIO_STREAMING_ID:
-                    b = memory.ReadByte((IntPtr)Addrs.GenericAddrs.STATIC_IS_AUDIO_STREAMING_ENABLED);
+                    b = Memory.ReadByte((IntPtr)Addrs.GenericAddrs.STATIC_IS_AUDIO_STREAMING_ENABLED);
                     break;
 
                 case SPEECH_ID:
-                    b = memory.ReadByte((IntPtr)Addrs.GenericAddrs.STATIC_IS_SPEECH_ENABLED);
+                    b = Memory.ReadByte((IntPtr)Addrs.GenericAddrs.STATIC_IS_SPEECH_ENABLED);
                     break;
 
                 case NIS_AUDIO_ID:
-                    b = memory.ReadByte((IntPtr)Addrs.GenericAddrs.STATIC_IS_NISAUDIO_ENABLED);
+                    b = Memory.ReadByte((IntPtr)Addrs.GenericAddrs.STATIC_IS_NISAUDIO_ENABLED);
                     break;
 
                 default:
@@ -266,7 +260,7 @@ namespace NFSScript.Undercover
         /// <returns></returns>
         public static string GetSecretCodeField()
         {
-            return memory.ReadStringASCII((IntPtr)Addrs.GameAddrs.STATIC_GET_SECRET_CODE_FIELD, 27);
+            return Memory.ReadStringASCII((IntPtr)Addrs.GameAddrs.STATIC_GET_SECRET_CODE_FIELD, 27);
         }
     }
 
@@ -278,14 +272,14 @@ namespace NFSScript.Undercover
         /// <summary>
         /// The address where the main GameFlowManager is located at.
         /// </summary>
-        public static IntPtr Address { get { return (IntPtr)Addrs.GenericAddrs.STATIC_GAME_STATE; } }
+        public static IntPtr Address => (IntPtr)Addrs.GenericAddrs.STATIC_GAME_STATE;
 
         private int gameStateValue;
 
         /// <summary>
         /// The main GameFlowManager.
         /// </summary>
-        public static GameFlowManager TheGameFlowManager { get { return new GameFlowManager(memory.ReadInt32(Address)); } }
+        public static GameFlowManager TheGameFlowManager => new GameFlowManager(Memory.ReadInt32(Address));
 
         /// <summary>
         /// Instantiate a GameFlowManager class.

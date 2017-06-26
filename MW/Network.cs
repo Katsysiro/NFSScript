@@ -19,8 +19,8 @@ namespace NFSScript.MW
         /// </summary>
         public static string LobbyIP
         {
-            get { return _readNetworkLobbyIP(); }
-            set { _setNetworkLobbyIP(value); }
+            get => _readNetworkLobbyIP();
+            set => _setNetworkLobbyIP(value);
         }
 
         /// <summary>
@@ -28,8 +28,8 @@ namespace NFSScript.MW
         /// </summary>
         public static ushort LobbyPort
         {
-            get { return _readNetworkLobbyPort(); }
-            set { _setNetworkLobbyPort(value); }
+            get => _readNetworkLobbyPort();
+            set => _setNetworkLobbyPort(value);
         }
 
         /// <summary>
@@ -37,13 +37,13 @@ namespace NFSScript.MW
         /// </summary>
         public static bool Debug
         {
-            get { return _readIsNetworkDebug(); }
-            set { _setIsNetworkDebug(value); }
+            get => _readIsNetworkDebug();
+            set => _setIsNetworkDebug(value);
         }
 
         internal static bool _readIsNetworkDebug()
         {
-            return memory.ReadByte((IntPtr)Addrs.NetworkAddrs.STATIC_NETWORK_DEBUG) == 1;
+            return Memory.ReadByte((IntPtr)Addrs.NetworkAddrs.STATIC_NETWORK_DEBUG) == 1;
         }
 
         internal static void _setIsNetworkDebug(bool value)
@@ -52,30 +52,30 @@ namespace NFSScript.MW
             if (value)
                 b = 1;
 
-            memory.WriteByte((IntPtr)Addrs.NetworkAddrs.STATIC_NETWORK_DEBUG, b);
+            Memory.WriteByte((IntPtr)Addrs.NetworkAddrs.STATIC_NETWORK_DEBUG, b);
         }
 
         internal static ushort _readNetworkLobbyPort()
         {
-            return memory.ReadUShort((IntPtr)Addrs.NetworkAddrs.STATIC_NETWORK_LOBBY_PORT);
+            return Memory.ReadUShort((IntPtr)Addrs.NetworkAddrs.STATIC_NETWORK_LOBBY_PORT);
         }
 
         internal static void _setNetworkLobbyPort(ushort port)
         {
-            memory.WriteUShort((IntPtr)Addrs.NetworkAddrs.STATIC_NETWORK_LOBBY_PORT, port);
+            Memory.WriteUShort((IntPtr)Addrs.NetworkAddrs.STATIC_NETWORK_LOBBY_PORT, port);
         }
 
         internal static string _readNetworkLobbyIP()
         {
-            IntPtr address = (IntPtr)Addrs.NetworkAddrs.STATIC_NETWORK_LOBBY_IP;
-            return memory.ReadStringASCII(address, NETWORK_LOBBY_IP_LENGTH);
+            var address = (IntPtr)Addrs.NetworkAddrs.STATIC_NETWORK_LOBBY_IP;
+            return Memory.ReadStringASCII(address, NETWORK_LOBBY_IP_LENGTH);
         }
 
         internal static void _setNetworkLobbyIP(string ip)
         {
-            IntPtr address = (IntPtr)Addrs.NetworkAddrs.STATIC_NETWORK_LOBBY_IP;
+            var address = (IntPtr)Addrs.NetworkAddrs.STATIC_NETWORK_LOBBY_IP;
             ASM.Abolish(address, NETWORK_LOBBY_IP_LENGTH);
-            memory.WriteStringASCII(address, ip.Substring(0, NETWORK_LOBBY_IP_LENGTH));
+            Memory.WriteStringASCII(address, ip.Substring(0, NETWORK_LOBBY_IP_LENGTH));
         }
 
         /// <summary>
@@ -86,11 +86,11 @@ namespace NFSScript.MW
             /// <summary>
             /// Returns an array of players in the current game room.
             /// </summary>
-            public static Player[] Players { get { return _readPlayers(); } }
+            public static Player[] Players => _readPlayers();
 
             internal static Player[] _readPlayers()
             {
-                Player[] players = new Player[4];
+                var players = new Player[4];
                 players[0] = new Player(0);
                 players[1] = new Player(1);
                 players[2] = new Player(2);
@@ -107,33 +107,37 @@ namespace NFSScript.MW
                 /// <summary>
                 /// The minimum amount of laps in the player's own host game.
                 /// </summary>
-                public static byte MinimumLaps { get { return _readMinLaps(); } set { _setMinLaps(value); } }
+                public static byte MinimumLaps { get => _readMinLaps();
+                    set => _setMinLaps(value);
+                }
 
                 /// <summary>
                 /// The maximum amount of laps in the player's own host game.
                 /// </summary>
-                public static byte MaximumLaps { get { return _readMaxLaps(); } set { _setMaxLaps(value); } }
+                public static byte MaximumLaps { get => _readMaxLaps();
+                    set => _setMaxLaps(value);
+                }
 
                 internal static byte _readMaxLaps()
                 {
-                    return memory.ReadByte((IntPtr)Addrs.NetworkAddrs.STATIC_NETWORK_HOST_MAX_LAPS_1);
+                    return Memory.ReadByte((IntPtr)MWAddresses.NetworkAddrs.STATIC_NETWORK_HOST_MAX_LAPS_1);
                 }
 
                 internal static byte _readMinLaps()
                 {
-                    return memory.ReadByte((IntPtr)Addrs.NetworkAddrs.STATIC_NETWORK_HOST_MIN_LAPS_1);
+                    return Memory.ReadByte((IntPtr)MWAddresses.NetworkAddrs.STATIC_NETWORK_HOST_MIN_LAPS_1);
                 }
 
                 internal static void _setMaxLaps(byte laps)
                 {
-                    memory.WriteByte((IntPtr)Addrs.NetworkAddrs.STATIC_NETWORK_HOST_MAX_LAPS_1, laps);
-                    memory.WriteByte((IntPtr)Addrs.NetworkAddrs.STATIC_NETWORK_HOST_MAX_LAPS_2, laps);
+                    Memory.WriteByte((IntPtr)MWAddresses.NetworkAddrs.STATIC_NETWORK_HOST_MAX_LAPS_1, laps);
+                    Memory.WriteByte((IntPtr)MWAddresses.NetworkAddrs.STATIC_NETWORK_HOST_MAX_LAPS_2, laps);
                 }
 
                 internal static void _setMinLaps(byte laps)
                 {
-                    memory.WriteByte((IntPtr)Addrs.NetworkAddrs.STATIC_NETWORK_HOST_MIN_LAPS_1, laps);
-                    memory.WriteByte((IntPtr)Addrs.NetworkAddrs.STATIC_NETWORK_HOST_MIN_LAPS_2, laps);
+                    Memory.WriteByte((IntPtr)MWAddresses.NetworkAddrs.STATIC_NETWORK_HOST_MIN_LAPS_1, laps);
+                    Memory.WriteByte((IntPtr)MWAddresses.NetworkAddrs.STATIC_NETWORK_HOST_MIN_LAPS_2, laps);
                 }
             }
         }
@@ -151,12 +155,12 @@ namespace NFSScript.MW
             /// <summary>
             /// The name of the <see cref="Player"/>.
             /// </summary>
-            public string Name { get { return _readName(); } }
+            public string Name => _readName();
 
             /// <summary>
             /// The unique ID of the <see cref="Player"/>.
             /// </summary>
-            public string UID { get { return _readUID(); } }
+            public string UID => _readUID();
 
             /// <summary>
             /// Instantiate a <see cref="Network"/> <see cref="Player"/> class by ID.
@@ -173,27 +177,27 @@ namespace NFSScript.MW
             /// <returns></returns>
             public override string ToString()
             {
-                return string.Format("ID: {0} Player: {1} UID: {2}", ID, Name, UID);
+                return $"ID: {ID} Player: {Name} UID: {UID}";
             }
 
             internal string _readName()
             {
-                int offset = 0;
-                for (int i = 0; i < ID; i++)
+                var offset = 0;
+                for (var i = 0; i < ID; i++)
                 {
-                    offset = offset + Addrs.NetworkAddrs.STATIC_OFFSET_GAME_ROOM_PLAYER;
+                    offset = offset + MWAddresses.NetworkAddrs.STATIC_OFFSET_GAME_ROOM_PLAYER;
                 }
-                return Encoding.ASCII.GetString(memory.ReadByteArray((IntPtr)Addrs.NetworkAddrs.STATIC_NETWORK_GAME_ROOM_PLAYER + offset, 12).Where(x => x != 0x00).ToArray());
+                return Encoding.ASCII.GetString(Memory.ReadByteArray((IntPtr)MWAddresses.NetworkAddrs.STATIC_NETWORK_GAME_ROOM_PLAYER + offset, 12).Where(x => x != 0x00).ToArray());
             }
 
             internal string _readUID()
             {
-                int offset = 0;
-                for (int i = 0; i < ID; i++)
+                var offset = 0;
+                for (var i = 0; i < ID; i++)
                 {
-                    offset = offset + Addrs.NetworkAddrs.STATIC_OFFSET_GAME_ROOM_PLAYER;
+                    offset = offset + MWAddresses.NetworkAddrs.STATIC_OFFSET_GAME_ROOM_PLAYER;
                 }
-                return memory.ReadStringASCII((IntPtr)Addrs.NetworkAddrs.STATIC_NETWORK_GAME_ROOM_PLAYER + Addrs.NetworkAddrs.STATIC_OFFSET_GAME_ROOM_PLAYER_UID
+                return Memory.ReadStringASCII((IntPtr)MWAddresses.NetworkAddrs.STATIC_NETWORK_GAME_ROOM_PLAYER + MWAddresses.NetworkAddrs.STATIC_OFFSET_GAME_ROOM_PLAYER_UID
                     + offset, 9).Replace(" ", string.Empty);
             }
         }
