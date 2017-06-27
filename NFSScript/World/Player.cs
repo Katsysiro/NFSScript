@@ -1,8 +1,7 @@
-﻿using System;
+﻿using NFSScript.Math;
 using static NFSScript.Core.GameMemory;
 using static NFSScript.Core.WorldAddresses;
 using static NFSScript.World.EASharpBindings;
-using NFSScript.Math;
 
 namespace NFSScript.World
 {
@@ -12,13 +11,13 @@ namespace NFSScript.World
     public static class Player
     {
         /// <summary>
-        /// Returns the current status of the player.
+        /// Returns status of the player.
         /// </summary>
         public static PlayerStatus Status
         {
             get
             {
-                return (PlayerStatus)memory.ReadInt32((IntPtr)memory.getBaseAddress + GameAddrs.NON_STATIC_PLAYER_STATUS);
+                return (PlayerStatus)genericMemory.Read<int>(GameAddrs.NON_STATIC_PLAYER_STATUS);
             }
         }
 
@@ -29,7 +28,7 @@ namespace NFSScript.World
         {
             get
             {
-                return memory.ReadByte((IntPtr)memory.getBaseAddress + GameAddrs.NON_STATIC_IS_FREE_ROAM) == 1;
+                return genericMemory.Read<byte>(GameAddrs.NON_STATIC_IS_FREE_ROAM) == 1;
             }
         }
 
@@ -40,7 +39,7 @@ namespace NFSScript.World
         {
             get
             {
-                return memory.ReadInt32((IntPtr)memory.getBaseAddress + PlayerAddrs.NON_STATIC_PLAYER_CASH);
+                return genericMemory.Read<int>(PlayerAddrs.NON_STATIC_PLAYER_CASH);
             }
         }
 
@@ -51,7 +50,7 @@ namespace NFSScript.World
         {
             get
             {
-                return memory.ReadInt32((IntPtr)memory.getBaseAddress + PlayerAddrs.NON_STATIC_PLAYER_BOOST);
+                return genericMemory.Read<int>(PlayerAddrs.NON_STATIC_PLAYER_BOOST);
             }
         }
 
@@ -62,23 +61,15 @@ namespace NFSScript.World
         {
             get
             {
-                int address = memory.ReadInt32((IntPtr)memory.getBaseAddress + PlayerAddrs.NON_STATIC_GEMS_COLLECTED);
-                address = memory.ReadInt32((IntPtr)address + PlayerAddrs.PSTATIC_GEMS_COLLECTED_1);
-                address = memory.ReadInt32((IntPtr)address + PlayerAddrs.PSTATIC_GEMS_COLLECTED_2);
-                address = memory.ReadInt32((IntPtr)address + PlayerAddrs.PSTATIC_GEMS_COLLECTED_3);
-                address = memory.ReadInt32((IntPtr)address + PlayerAddrs.PSTATIC_GEMS_COLLECTED_4);
-                address = memory.ReadInt32((IntPtr)address + PlayerAddrs.PSTATIC_GEMS_COLLECTED_5);
+                int address = genericMemory.Read<int>(PlayerAddrs.NON_STATIC_GEMS_COLLECTED);
+                address = genericMemory.Read<int>(address + PlayerAddrs.PSTATIC_GEMS_COLLECTED_1, false);
+                address = genericMemory.Read<int>(address + PlayerAddrs.PSTATIC_GEMS_COLLECTED_2, false);
+                address = genericMemory.Read<int>(address + PlayerAddrs.PSTATIC_GEMS_COLLECTED_3, false);
+                address = genericMemory.Read<int>(address + PlayerAddrs.PSTATIC_GEMS_COLLECTED_4, false);
+                address = genericMemory.Read<int>(address + PlayerAddrs.PSTATIC_GEMS_COLLECTED_5, false);
 
-                return memory.ReadInt32((IntPtr)address);
+                return genericMemory.Read<int>(address, false);
             }
-        }
-
-        /// <summary>
-        /// Disables auto-drive.
-        /// </summary>
-        public static void DisableAutoDrive()
-        {
-            memory.WriteByte((IntPtr)memory.getBaseAddress + PlayerAddrs.NON_STATIC_AUTODRIVE, 0);
         }
 
         /// <summary>
@@ -89,11 +80,10 @@ namespace NFSScript.World
         /// </remarks>
         public static void ChangeAutoDrive(bool enableAutoDrive)
         {
-            if(enableAutoDrive)
-                memory.WriteByte((IntPtr)memory.getBaseAddress + PlayerAddrs.NON_STATIC_AUTODRIVE, 1);
+            if (enableAutoDrive)
+                genericMemory.Write<byte>(PlayerAddrs.NON_STATIC_AUTODRIVE, 1);
             else
-                memory.WriteByte((IntPtr)memory.getBaseAddress + PlayerAddrs.NON_STATIC_AUTODRIVE, 0);
-
+                genericMemory.Write<byte>(PlayerAddrs.NON_STATIC_AUTODRIVE, 0);
         }
 
         /// <summary>
@@ -102,47 +92,7 @@ namespace NFSScript.World
         public static class Car
         {
             /// <summary>
-            /// The <see cref="Player"/>'s car position.
-            /// </summary>
-            public static Vector3 Position
-            {
-                get
-                {
-                    int addr = Game.PWorld_Cars + CarOffset;
-                    float x = memory.ReadFloat((IntPtr)addr + GameAddrs.PSTATIC_CAR_X_POS);
-                    float y = memory.ReadFloat((IntPtr)addr + GameAddrs.PSTATIC_CAR_Y_POS);
-                    float z = memory.ReadFloat((IntPtr)addr + GameAddrs.PSTATIC_CAR_Z_POS);
-
-                    return new Vector3(x, y, z);
-                }
-                set
-                {
-                    int addr = Game.PWorld_Cars + CarOffset;
-                    memory.WriteFloat((IntPtr)addr + GameAddrs.PSTATIC_CAR_X_POS, value.X);
-                    memory.WriteFloat((IntPtr)addr + GameAddrs.PSTATIC_CAR_Y_POS, value.Y);
-                    memory.WriteFloat((IntPtr)addr + GameAddrs.PSTATIC_CAR_Z_POS, value.Z);
-                }
-            }
-
-            /// <summary>
-            /// The <see cref="Player"/>'s car rotation.
-            /// </summary>
-            public static Quaternion Rotation
-            {
-                get
-                {
-                    int addr = Game.PWorld_Cars + CarOffset;
-                    float q1 = memory.ReadFloat((IntPtr)(addr + (GameAddrs.PSTATIC_CAR_ANGULAR_VELOCITY + 0x5C)));
-                    float q2 = memory.ReadFloat((IntPtr)(addr + (GameAddrs.PSTATIC_CAR_FACING_SOUTH)));
-                    float q3 = memory.ReadFloat((IntPtr)(addr + (GameAddrs.PSTATIC_CAR_FACING_UP)));
-                    float q4 = memory.ReadFloat((IntPtr)(addr + (GameAddrs.PSTATIC_CAR_FACING_EAST)));
-
-                    return new Quaternion(q1, q2, q3, q4);
-                }
-            }
-
-            /// <summary>
-            /// Gets the local player's memory offset relative to <see cref="Game.PWorld_Cars"/>.
+            /// Gets the local player's memory offset relative to <see cref="Game.PWorld_Objects"/>.
             /// </summary>
             public static int CarOffset
             {
@@ -151,16 +101,16 @@ namespace NFSScript.World
                     for (int i = 0; i < 0x78; i++)
                     {
                         int offset = 0xB0 * i;
-                        int addr = Game.PWorld_Cars + offset;
+                        int addr = Game.PWorld_Objects + offset;
 
                         // This check can be improved with bytes from offset +0x5C to +0x60.
                         // 0x5D is non-player-checkish, 0x5C is initialized-checkish, check game code for more info.
-                        float localX = memory.ReadFloat((IntPtr)(memory.getBaseAddress + PlayerAddrs.NON_STATIC_PLAYER_X_POS));
-                        float localY = memory.ReadFloat((IntPtr)(memory.getBaseAddress + PlayerAddrs.NON_STATIC_PLAYER_Y_POS));
-                        float localZ = memory.ReadFloat((IntPtr)(memory.getBaseAddress + PlayerAddrs.NON_STATIC_PLAYER_Z_POS));
-                        float opponentX = memory.ReadFloat((IntPtr)(addr + GameAddrs.PSTATIC_CAR_X_POS));
-                        float opponentY = -memory.ReadFloat((IntPtr)(addr + GameAddrs.PSTATIC_CAR_Y_POS)); // the - at the start is important
-                        float opponentZ = memory.ReadFloat((IntPtr)(addr + GameAddrs.PSTATIC_CAR_Z_POS));
+                        float localX = genericMemory.Read<float>(PlayerAddrs.NON_STATIC_PLAYER_X_POS);
+                        float localY = genericMemory.Read<float>(PlayerAddrs.NON_STATIC_PLAYER_Y_POS);
+                        float localZ = genericMemory.Read<float>(PlayerAddrs.NON_STATIC_PLAYER_Z_POS);
+                        float opponentX = genericMemory.Read<float>(addr + GameAddrs.PSTATIC_CAR_X_POS, false);
+                        float opponentY = -genericMemory.Read<float>(addr + GameAddrs.PSTATIC_CAR_Y_POS, false);
+                        float opponentZ = genericMemory.Read<float>(addr + GameAddrs.PSTATIC_CAR_Z_POS, false);
 
                         if (Mathf.Abs(localX - opponentX) < 1f &&
                             Mathf.Abs(localY - opponentY) < 1f &&
@@ -174,6 +124,46 @@ namespace NFSScript.World
             }
 
             /// <summary>
+            /// The <see cref="Player"/>'s car position.
+            /// </summary>
+            public static Vector3 Position
+            {
+                get
+                {
+                    int addr = Game.PWorld_Objects + CarOffset;
+                    float x = genericMemory.Read<float>(addr + GameAddrs.PSTATIC_CAR_X_POS, false);
+                    float y = genericMemory.Read<float>(addr + GameAddrs.PSTATIC_CAR_Y_POS, false);
+                    float z = genericMemory.Read<float>(addr + GameAddrs.PSTATIC_CAR_Z_POS, false);
+
+                    return new Vector3(x, y, z);
+                }
+                set
+                {
+                    int addr = Game.PWorld_Objects + CarOffset;
+                    genericMemory.Write<float>(addr + GameAddrs.PSTATIC_CAR_X_POS, value.X, false);
+                    genericMemory.Write<float>(addr + GameAddrs.PSTATIC_CAR_Y_POS, value.Y, false);
+                    genericMemory.Write<float>(addr + GameAddrs.PSTATIC_CAR_Z_POS, value.Z, false);
+                }
+            }
+
+            /// <summary>
+            /// The <see cref="Player"/>'s car rotation.
+            /// </summary>
+            public static Quaternion Rotation
+            {
+                get
+                {
+                    int addr = Game.PWorld_Objects + CarOffset;
+                    float q1 = genericMemory.Read<float>(addr + GameAddrs.PSTATIC_CAR_ANGULAR_VELOCITY + 0x5C, false);
+                    float q2 = genericMemory.Read<float>(addr + GameAddrs.PSTATIC_CAR_FACING_SOUTH, false);
+                    float q3 = genericMemory.Read<float>(addr + GameAddrs.PSTATIC_CAR_FACING_UP, false);
+                    float q4 = genericMemory.Read<float>(addr + GameAddrs.PSTATIC_CAR_FACING_EAST, false);
+
+                    return new Quaternion(q1, q2, q3, q4);
+                }
+            }
+
+            /// <summary>
             /// The <see cref="Player"/>'s car speed in MPS, you need to set it in MPS as well.
             /// </summary>
             /// <remarks>
@@ -183,21 +173,21 @@ namespace NFSScript.World
             {
                 get
                 {
-                    int address = memory.ReadInt32((IntPtr)memory.getBaseAddress + 0x91F9D0);
-                    address = memory.ReadInt32((IntPtr)address + 0x68);
-                    
-                    return memory.ReadFloat((IntPtr)address);
+                    // TODO: Don't add to PlayerAddrs. There's a player base, it might include speed as well.
+                    int address = genericMemory.Read<int>(0x91F9D0) + 0x68;
+
+                    return genericMemory.Read<float>(address, false);
                 }
                 set
                 {
-                    int addr = Game.PWorld_Cars + CarOffset;
-                    float southMult = memory.ReadFloat((IntPtr)addr + GameAddrs.PSTATIC_CAR_FACING_SOUTH);
-                    float vertMult = memory.ReadFloat((IntPtr)addr + GameAddrs.PSTATIC_CAR_FACING_UP);
-                    float eastMult = memory.ReadFloat((IntPtr)addr + GameAddrs.PSTATIC_CAR_FACING_EAST);
+                    int addr = Game.PWorld_Objects + CarOffset;
+                    float southMult = genericMemory.Read<float>(addr + GameAddrs.PSTATIC_CAR_FACING_SOUTH, false);
+                    float vertMult = genericMemory.Read<float>(addr + GameAddrs.PSTATIC_CAR_FACING_UP, false);
+                    float eastMult = genericMemory.Read<float>(addr + GameAddrs.PSTATIC_CAR_FACING_EAST, false);
 
-                    memory.WriteFloat((IntPtr)addr + GameAddrs.PSTATIC_CAR_VELOCITY_TOWARDS_SOUTH, southMult * value);
-                    memory.WriteFloat((IntPtr)addr + GameAddrs.PSTATIC_CAR_VERTICAL_VELOCITY, vertMult * value);
-                    memory.WriteFloat((IntPtr)addr + GameAddrs.PSTATIC_CAR_VELOCITY_TOWARDS_EAST, eastMult * value);
+                    genericMemory.Write(addr + GameAddrs.PSTATIC_CAR_VELOCITY_TOWARDS_SOUTH, southMult * value, false);
+                    genericMemory.Write(addr + GameAddrs.PSTATIC_CAR_VERTICAL_VELOCITY, vertMult * value, false);
+                    genericMemory.Write(addr + GameAddrs.PSTATIC_CAR_VELOCITY_TOWARDS_EAST, eastMult * value, false);
                 }
             }
 
@@ -211,13 +201,13 @@ namespace NFSScript.World
             {
                 get
                 {
-                    int addr = Game.PWorld_Cars + CarOffset;
-                    return memory.ReadFloat((IntPtr)(addr +GameAddrs.PSTATIC_CAR_GRAVITY));
+                    int addr = Game.PWorld_Objects + CarOffset;
+                    return genericMemory.Read<float>(addr + GameAddrs.PSTATIC_CAR_GRAVITY, false);
                 }
                 set
                 {
-                    int addr = Game.PWorld_Cars + CarOffset;
-                    memory.WriteFloat((IntPtr)(addr + GameAddrs.PSTATIC_CAR_GRAVITY), value);
+                    int addr = Game.PWorld_Objects + CarOffset;
+                    genericMemory.Write<float>(addr + GameAddrs.PSTATIC_CAR_GRAVITY, value, false);
                 }
             }
 
@@ -231,13 +221,13 @@ namespace NFSScript.World
             {
                 get
                 {
-                    int addr = Game.PWorld_Cars + CarOffset;
-                    return memory.ReadFloat((IntPtr)(addr +GameAddrs.PSTATIC_CAR_WEIGHT));
+                    int addr = Game.PWorld_Objects + CarOffset;
+                    return genericMemory.Read<float>(addr + GameAddrs.PSTATIC_CAR_WEIGHT, false);
                 }
                 set
                 {
-                    int addr = Game.PWorld_Cars + CarOffset;
-                    memory.WriteFloat((IntPtr)(addr + GameAddrs.PSTATIC_CAR_WEIGHT), value);
+                    int addr = Game.PWorld_Objects + CarOffset;
+                    genericMemory.Write<float>(addr + GameAddrs.PSTATIC_CAR_WEIGHT, value, false);
                 }
             }
 
@@ -248,13 +238,13 @@ namespace NFSScript.World
             {
                 get
                 {
-                    int addr = Game.PWorld_Cars + CarOffset;
-                    return memory.ReadFloat((IntPtr)(addr + GameAddrs.PSTATIC_CAR_VELOCITY_TOWARDS_EAST));
+                    int addr = Game.PWorld_Objects + CarOffset;
+                    return genericMemory.Read<float>(addr + GameAddrs.PSTATIC_CAR_VELOCITY_TOWARDS_EAST, false);
                 }
                 set
                 {
-                    int addr = Game.PWorld_Cars + CarOffset;
-                    memory.WriteFloat((IntPtr)(addr + GameAddrs.PSTATIC_CAR_VELOCITY_TOWARDS_EAST), value);
+                    int addr = Game.PWorld_Objects + CarOffset;
+                    genericMemory.Write<float>(addr + GameAddrs.PSTATIC_CAR_VELOCITY_TOWARDS_EAST, value, false);
                 }
             }
 
@@ -265,13 +255,13 @@ namespace NFSScript.World
             {
                 get
                 {
-                    int addr = Game.PWorld_Cars + CarOffset;
-                    return memory.ReadFloat((IntPtr)(addr + GameAddrs.PSTATIC_CAR_VELOCITY_TOWARDS_SOUTH));
+                    int addr = Game.PWorld_Objects + CarOffset;
+                    return genericMemory.Read<float>(addr + GameAddrs.PSTATIC_CAR_VELOCITY_TOWARDS_SOUTH, false);
                 }
                 set
                 {
-                    int addr = Game.PWorld_Cars + CarOffset;
-                    memory.WriteFloat((IntPtr)(addr + GameAddrs.PSTATIC_CAR_VELOCITY_TOWARDS_SOUTH), value);
+                    int addr = Game.PWorld_Objects + CarOffset;
+                    genericMemory.Write<float>(addr + GameAddrs.PSTATIC_CAR_VELOCITY_TOWARDS_SOUTH, value, false);
                 }
             }
 
@@ -282,13 +272,13 @@ namespace NFSScript.World
             {
                 get
                 {
-                    int addr = Game.PWorld_Cars + CarOffset;
-                    return memory.ReadFloat((IntPtr)(addr + GameAddrs.PSTATIC_CAR_VERTICAL_VELOCITY));
+                    int addr = Game.PWorld_Objects + CarOffset;
+                    return genericMemory.Read<float>(addr + GameAddrs.PSTATIC_CAR_VERTICAL_VELOCITY, false);
                 }
                 set
                 {
-                    int addr = Game.PWorld_Cars + CarOffset;
-                    memory.WriteFloat((IntPtr)(addr + GameAddrs.PSTATIC_CAR_VERTICAL_VELOCITY), value);
+                    int addr = Game.PWorld_Objects + CarOffset;
+                    genericMemory.Write<float>(addr + GameAddrs.PSTATIC_CAR_VERTICAL_VELOCITY, value, false);
                 }
             }
 
@@ -299,13 +289,13 @@ namespace NFSScript.World
             {
                 get
                 {
-                    int addr = Game.PWorld_Cars + CarOffset;
-                    return memory.ReadFloat((IntPtr)(addr + GameAddrs.PSTATIC_CAR_ANGULAR_VELOCITY));
+                    int addr = Game.PWorld_Objects + CarOffset;
+                    return genericMemory.Read<float>(addr + GameAddrs.PSTATIC_CAR_ANGULAR_VELOCITY, false);
                 }
                 set
                 {
-                    int addr = Game.PWorld_Cars + CarOffset;
-                    memory.WriteFloat((IntPtr)(addr + GameAddrs.PSTATIC_CAR_ANGULAR_VELOCITY), value);
+                    int addr = Game.PWorld_Objects + CarOffset;
+                    genericMemory.Write<float>(addr + GameAddrs.PSTATIC_CAR_ANGULAR_VELOCITY, value, false);
                 }
             }
 
@@ -316,54 +306,50 @@ namespace NFSScript.World
             {
                 VelocityTowardsSouth = 0;
                 VelocityTowardsEast = 0;
+                VerticalVelocity = 0;
             }
 
             /// <summary>
-            /// Pushes the <see cref="Player"/>'s car to north.
+            /// Pushes the <see cref="Player"/>'s car to <seealso cref="Directions"/>.
             /// </summary>
-            /// <param name="amountOfForce">Amount of force applied to the car.</param>
+            /// <param name="toDirection">Direction to which the car will be pushed.</param>
+            /// <param name="amountOfForce">Amount of force applied to the car in meters per second.</param>
             /// <param name="resetWhenSetting">Whether to reset the current value before applying the force.</param>
-            public static void PushNorth(float amountOfForce, bool resetWhenSetting = false)
+            public static void Push(Directions toDirection, float amountOfForce, bool resetWhenSetting = false)
             {
-                if (resetWhenSetting)
-                    VelocityTowardsSouth = 0f;
-                VelocityTowardsSouth -= amountOfForce;
-            }
-
-            /// <summary>
-            /// Pushes the <see cref="Player"/>'s car to west.
-            /// </summary>
-            /// <param name="amountOfForce">Amount of force applied to the car.</param>
-            /// <param name="resetWhenSetting">Whether to reset the current value before applying the force.</param>
-            public static void PushWest(float amountOfForce, bool resetWhenSetting = false)
-            {
-                if (resetWhenSetting)
-                    VelocityTowardsEast = 0f;
-                VelocityTowardsEast -= amountOfForce;
-            }
-
-            /// <summary>
-            /// Pushes the <see cref="Player"/>'s car to east.
-            /// </summary>
-            /// <param name="amountOfForce">Amount of force applied to the car.</param>
-            /// <param name="resetWhenSetting">Whether to reset the current value before applying the force.</param>
-            public static void PushEast(float amountOfForce, bool resetWhenSetting = false)
-            {
-                if (resetWhenSetting)
-                    VelocityTowardsEast = 0f;
-                VelocityTowardsEast += amountOfForce;
-            }
-
-            /// <summary>
-            /// Pushes the <see cref="Player"/>'s car to south.
-            /// </summary>
-            /// <param name="amountOfForce">Amount of force applied to the car.</param>
-            /// <param name="resetWhenSetting">Whether to reset the current value before applying the force.</param>
-            public static void PushSouth(float amountOfForce, bool resetWhenSetting = false)
-            {
-                if (resetWhenSetting)
-                    VelocityTowardsSouth = 0f;
-                VelocityTowardsSouth += amountOfForce;
+                switch (toDirection)
+                {
+                    case Directions.North:
+                        if (resetWhenSetting)
+                            VelocityTowardsSouth = 0f;
+                        VelocityTowardsSouth -= amountOfForce;
+                        break;
+                    case Directions.West:
+                        if (resetWhenSetting)
+                            VelocityTowardsEast = 0f;
+                        VelocityTowardsEast -= amountOfForce;
+                        break;
+                    case Directions.East:
+                        if (resetWhenSetting)
+                            VelocityTowardsEast = 0f;
+                        VelocityTowardsEast += amountOfForce;
+                        break;
+                    case Directions.South:
+                        if (resetWhenSetting)
+                            VelocityTowardsSouth = 0f;
+                        VelocityTowardsSouth += amountOfForce;
+                        break;
+                    case Directions.Forwards:
+                        if (resetWhenSetting)
+                            Speed = 0;
+                        Speed += amountOfForce;
+                        break;
+                    case Directions.Backwards:
+                        if (resetWhenSetting)
+                            Speed = 0;
+                        Speed -= amountOfForce;
+                        break;
+                }
             }
 
             /// <summary>
@@ -377,7 +363,7 @@ namespace NFSScript.World
             /// <summary>
             /// Pushes the <see cref="Player"/>'s car above.
             /// </summary>
-            /// <param name="amountOfForce">Amount of force applied to the car.</param>
+            /// <param name="amountOfForce">Amount of force applied to the car in meters per second.</param>
             /// <param name="resetWhenSetting">Whether to reset the current value before applying the force.</param>
             public static void ForceJump(float amountOfForce, bool resetWhenSetting = false)
             {
@@ -389,7 +375,7 @@ namespace NFSScript.World
             /// <summary>
             /// Applies a force that turns the <see cref="Player"/>'s car clockwise.
             /// </summary>
-            /// <param name="amountOfForce">Amount of force applied to the car.</param>
+            /// <param name="amountOfForce">Amount of force applied to the car in meters per second.</param>
             /// <param name="resetWhenSetting">Whether to reset the current value before applying the force.</param>
             public static void TurnClockwise(float amountOfForce, bool resetWhenSetting = false)
             {
@@ -401,7 +387,7 @@ namespace NFSScript.World
             /// <summary>
             /// Applies a force that turns the <see cref="Player"/>'s car counter-clockwise.
             /// </summary>
-            /// <param name="amountOfForce">Amount of force applied to the car.</param>
+            /// <param name="amountOfForce">Amount of force applied to the car in meters per second.</param>
             /// <param name="resetWhenSetting">Whether to reset the current value before applying the force.</param>
             public static void TurnCounterClockwise(float amountOfForce, bool resetWhenSetting = false)
             {
@@ -411,35 +397,25 @@ namespace NFSScript.World
             }
 
             /// <summary>
-            /// Disables collision with walls.
+            /// Changes wall collision state.
             /// </summary>
-            public static void DisableWallCollisions()
+            public static void ChangeWallCollision(bool enableWallCollision)
             {
-                memory.WriteByte((IntPtr)memory.getBaseAddress + PlayerAddrs.NON_STATIC_WALL_COLLISION, 0x38);
+                if (enableWallCollision)
+                    genericMemory.Write<byte>(PlayerAddrs.NON_STATIC_WALL_COLLISION, 0x84);
+                else
+                    genericMemory.Write<byte>(PlayerAddrs.NON_STATIC_WALL_COLLISION, 0x38);
             }
 
             /// <summary>
-            /// Enables collision with walls.
+            /// Changes car collision state.
             /// </summary>
-            public static void EnableWallCollisions()
+            public static void ChangeCarCollision(bool enableCarCollision)
             {
-                memory.WriteByte((IntPtr)memory.getBaseAddress + PlayerAddrs.NON_STATIC_WALL_COLLISION, 0x84);
-            }
-
-            /// <summary>
-            /// Disables car collision.
-            /// </summary>
-            public static void DisableCarCollision()
-            {
-                memory.WriteByte((IntPtr)memory.getBaseAddress + PlayerAddrs.NON_STATIC_CAR_COLLISION, 0xEB);
-            }
-
-            /// <summary>
-            /// Enables car collision.
-            /// </summary>
-            public static void EnableCarCollision()
-            {
-                memory.WriteByte((IntPtr)memory.getBaseAddress + PlayerAddrs.NON_STATIC_CAR_COLLISION, 0x74);
+                if (enableCarCollision)
+                    genericMemory.Write<byte>(PlayerAddrs.NON_STATIC_CAR_COLLISION, 0x74);
+                else
+                    genericMemory.Write<byte>(PlayerAddrs.NON_STATIC_CAR_COLLISION, 0xEB);
             }
         }
     }
@@ -467,19 +443,17 @@ namespace NFSScript.World
         }
 
         /// <summary>
-        /// Enables powerup cooldown.
+        /// Changes powerup cooldown init-state.
         /// </summary>
-        public static void EnablePowerupCooldown()
+        public static void ChangePowerupCooldown(bool enablePowerupCooldown, bool refreshCurrentCooldowns = false)
         {
-            memory.WriteByteArray((IntPtr)memory.getBaseAddress + PlayerAddrs.NON_STATIC_POWERUP_COOLDOWN, new byte[] { 0x80, 0x7D, 0xFB, 0x0 });
-        }
+            if (refreshCurrentCooldowns)
+                RechargeAllPowerups();
 
-        /// <summary>
-        /// Blocks powerups from going into cooldown.
-        /// </summary>
-        public static void DisablePowerupCooldown()
-        {
-            memory.WriteByteArray((IntPtr)memory.getBaseAddress + PlayerAddrs.NON_STATIC_POWERUP_COOLDOWN, new byte[] { 0x3A, 0xC0, 0x90, 0x90 });
+            if (enablePowerupCooldown)
+                genericMemory.WriteByteArray(PlayerAddrs.NON_STATIC_POWERUP_COOLDOWN, new byte[] { 0x80, 0x7D, 0xFB, 0x0 }, true);
+            else
+                genericMemory.WriteByteArray(PlayerAddrs.NON_STATIC_POWERUP_COOLDOWN, new byte[] { 0x3A, 0xC0, 0x90, 0x90 }, true);
         }
     }
 }

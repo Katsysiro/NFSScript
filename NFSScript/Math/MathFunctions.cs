@@ -190,6 +190,23 @@ namespace NFSScript.Math
         }
     }
 
+    /// <summary/>
+    public enum Directions
+    {
+        /// <summary/>
+        North,
+        /// <summary/>
+        West,
+        /// <summary/>
+        East,
+        /// <summary/>
+        South,
+        /// <summary/>
+        Forwards,
+        /// <summary/>
+        Backwards
+    }
+
     /// <summary>
     /// 
     /// </summary>

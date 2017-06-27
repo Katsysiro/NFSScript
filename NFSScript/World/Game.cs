@@ -1,8 +1,8 @@
 ﻿using System;
 using static NFSScript.Core.GameMemory;
 using static NFSScript.Core.WorldAddresses;
-using static NFSScript.WorldFunctions;
 using static NFSScript.World.EASharpBindings;
+using static NFSScript.WorldFunctions;
 
 namespace NFSScript.World
 {
@@ -10,7 +10,7 @@ namespace NFSScript.World
     /// A class that represents the main game manager.
     /// </summary>
     public static class Game
-    {        
+    {
         /// <summary>
         /// Returns the amount of seconds it takes to render a frame.
         /// </summary>
@@ -18,7 +18,7 @@ namespace NFSScript.World
         {
             get
             {
-                return memory.ReadFloat((IntPtr)memory.getBaseAddress + GenericAddrs.NON_STATIC_LAST_FRAME_TIME);
+                return genericMemory.Read<float>(GenericAddrs.NON_STATIC_LAST_FRAME_TIME);
             }
         }
 
@@ -29,7 +29,7 @@ namespace NFSScript.World
         {
             get
             {
-                return memory.ReadByte((IntPtr)memory.getBaseAddress + GenericAddrs.NON_STATIC_IS_GAMEPLAY_ACTIVE) == 1;
+                return genericMemory.Read<byte>(GenericAddrs.NON_STATIC_IS_GAMEPLAY_ACTIVE) == 1;
             }
         }
 
@@ -38,8 +38,8 @@ namespace NFSScript.World
         /// </summary>
         public static float MasterVolume
         {
-            get { return memory.ReadFloat((IntPtr)memory.getBaseAddress + GameAddrs.NON_STATIC_MASTER_VOLUME); }
-            set { memory.WriteFloat((IntPtr)memory.getBaseAddress + GameAddrs.NON_STATIC_MASTER_VOLUME, value); }
+            get { return genericMemory.Read<float>(GameAddrs.NON_STATIC_MASTER_VOLUME); }
+            set { genericMemory.Write<float>(GameAddrs.NON_STATIC_MASTER_VOLUME, value); }
         }
 
         /// <summary>
@@ -47,8 +47,8 @@ namespace NFSScript.World
         /// </summary>
         public static float SpeechVolume
         {
-            get { return memory.ReadFloat((IntPtr)memory.getBaseAddress + GameAddrs.NON_STATIC_SPEECH_VOLUME); }
-            set { memory.WriteFloat((IntPtr)GameAddrs.NON_STATIC_SPEECH_VOLUME, value); }
+            get { return genericMemory.Read<float>(GameAddrs.NON_STATIC_SPEECH_VOLUME); }
+            set { genericMemory.Write<float>(GameAddrs.NON_STATIC_SPEECH_VOLUME, value); }
         }
 
         /// <summary>
@@ -56,8 +56,8 @@ namespace NFSScript.World
         /// </summary>
         public static float SoundEffectsVolume
         {
-            get { return memory.ReadFloat((IntPtr)memory.getBaseAddress + GameAddrs.NON_STATIC_SOUND_EFFECTS_VOLUME); }
-            set { memory.WriteFloat((IntPtr)memory.getBaseAddress + GameAddrs.NON_STATIC_SOUND_EFFECTS_VOLUME, value); }
+            get { return genericMemory.Read<float>(GameAddrs.NON_STATIC_SOUND_EFFECTS_VOLUME); }
+            set { genericMemory.Write<float>(GameAddrs.NON_STATIC_SOUND_EFFECTS_VOLUME, value); }
         }
 
         /// <summary>
@@ -65,8 +65,8 @@ namespace NFSScript.World
         /// </summary>
         public static float CarVolume
         {
-            get { return memory.ReadFloat((IntPtr)memory.getBaseAddress + GameAddrs.NON_STATIC_CAR_VOLUME); }
-            set { memory.WriteFloat((IntPtr)memory.getBaseAddress + GameAddrs.NON_STATIC_CAR_VOLUME, value); }
+            get { return genericMemory.Read<float>(GameAddrs.NON_STATIC_CAR_VOLUME); }
+            set { genericMemory.Write<float>(GameAddrs.NON_STATIC_CAR_VOLUME, value); }
         }
 
         /// <summary>
@@ -74,8 +74,8 @@ namespace NFSScript.World
         /// </summary>
         public static float FreeRoamMusicVolune
         {
-            get { return memory.ReadFloat((IntPtr)memory.getBaseAddress + GameAddrs.NON_STATIC_FREE_ROAM_MUSIC_VOLUME); }
-            set { memory.WriteFloat((IntPtr)memory.getBaseAddress + GameAddrs.NON_STATIC_FREE_ROAM_MUSIC_VOLUME, value); }
+            get { return genericMemory.Read<float>(GameAddrs.NON_STATIC_FREE_ROAM_MUSIC_VOLUME); }
+            set { genericMemory.Write<float>(GameAddrs.NON_STATIC_FREE_ROAM_MUSIC_VOLUME, value); }
         }
 
         /// <summary>
@@ -83,18 +83,18 @@ namespace NFSScript.World
         /// </summary>
         public static float EventMusicVolume
         {
-            get { return memory.ReadFloat((IntPtr)memory.getBaseAddress + GameAddrs.NON_STATIC_EVENT_MUSIC_VOLUME); }
-            set { memory.WriteFloat((IntPtr)memory.getBaseAddress + GameAddrs.NON_STATIC_EVENT_MUSIC_VOLUME, value); }
+            get { return genericMemory.Read<float>(GameAddrs.NON_STATIC_EVENT_MUSIC_VOLUME); }
+            set { genericMemory.Write<float>(GameAddrs.NON_STATIC_EVENT_MUSIC_VOLUME, value); }
         }
 
         /// <summary>
         /// 
         /// </summary>
-        public static int PWorld_Cars
+        public static int PWorld_Objects
         {
             get
             {
-                return memory.ReadInt32(((IntPtr)memory.getBaseAddress + GameAddrs.NON_STATIC_WORLD_CARS));
+                return genericMemory.Read<int>(GameAddrs.NON_STATIC_WORLD_OBJECTS);
             }
         }
 
@@ -136,7 +136,7 @@ namespace NFSScript.World
             /// <param name="pMixTriggerString"></param>
             /// <param name="value"></param>
             public static unsafe void SendMixTrigger(string pMixTriggerString, int value)
-            {               
+            {
                 CallBinding(_EASharpBinding_17, pMixTriggerString, value);
             }
         }
@@ -175,7 +175,7 @@ namespace NFSScript.World
             {
                 CallBinding(_EASharpBinding_33, cameraName);
             }
-            
+
             /// <summary>
             /// Shakes the camera.
             /// </summary>
