@@ -48,9 +48,10 @@
     </AssemblyOriginatorKeyFile>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="NFSScript">
-      <HintPath>..\NFSScript\bin\Release\NFSScript.dll</HintPath>
-    </Reference>
+    <ProjectReference Include="..\NFSScript\NFSScript.csproj">
+      <Project>{55A95250-696D-4C73-8E96-593D211A5974}</Project>
+      <Name>NFSScript</Name>
+    </ProjectReference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Windows.Forms" />
