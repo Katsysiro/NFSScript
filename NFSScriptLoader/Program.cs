@@ -100,7 +100,7 @@ namespace NFSScriptLoader
         /// </summary>
         private static void INIInit()
         {
-            INIFile ini = new INIFile(NFS_SCRIPT_INI_FILE_NAME);
+            var ini = new IniFile(NFS_SCRIPT_INI_FILE_NAME);
             if (File.Exists(ini.Path))
             {
                 if (ini.KeyExists("ShowConsole", "NFSScript"))
@@ -195,8 +195,8 @@ namespace NFSScriptLoader
             gameMemory = new RunningMemory(gameProcessName);
             gameMemory.ReadInt32((IntPtr)0);
 
-            GameMemory.memory = gameMemory;
-            GameMemory.genericMemory = new GMemory(gameMemory.processName);
+            GameMemory.Memory = gameMemory;
+            GameMemory.GenericMemory = new GMemory(gameMemory.processName);
             if (settingDebug == 1)
                 RunningMemory.debugMode = true;
         }

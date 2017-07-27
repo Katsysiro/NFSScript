@@ -49,7 +49,7 @@
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\NFSScript\NFSScript.csproj">
-      <Project>{55A95250-696D-4C73-8E96-593D211A5974}</Project>
+      <Project>{55a95250-696d-4c73-8e96-593d211a5974}</Project>
       <Name>NFSScript</Name>
     </ProjectReference>
     <Reference Include="System" />
