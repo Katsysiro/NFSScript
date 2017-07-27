@@ -12,6 +12,7 @@ using System.Threading;
 using System.Timers;
 using System.Windows.Forms;
 using Microsoft.CSharp;
+using Microsoft.JScript;
 using Microsoft.VisualBasic;
 using NFSScript;
 using NFSScript.Core;
@@ -532,6 +533,19 @@ namespace NFSScriptLoader
                 GenerateInMemory = true
             };
 
+            // TODO this doesn't support C#6 and above
+            // we can fix that with this CodeDom provider from nuget:
+            // https://www.nuget.org/packages/Microsoft.CodeDom.Providers.DotNetCompilerPlatform/
+            // then we can do this:
+            // new Microsoft.CodeDom.Providers.DotNetCompilerPlatform.CSharpCodeProvider();
+            
+            // TODO perhaps add support for F#
+            // that comes in the form of another custom package
+            // https://github.com/fsprojects/FSharp.Compiler.CodeDom
+            
+            // since we're at it, why not PowerShell?
+            // https://github.com/adamdriscoll/PowerShellCodeDomProvider
+            
             switch (sourceFile.Extension.ToUpperInvariant())
             {
                 case ".CS":
@@ -539,6 +553,9 @@ namespace NFSScriptLoader
                     break;
                 case ".VB":
                     provider = new VBCodeProvider();
+                    break;
+                case ".JS":
+                    provider = new JScriptCodeProvider();
                     break;
             }
 

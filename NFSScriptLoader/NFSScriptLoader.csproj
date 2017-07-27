@@ -52,6 +52,7 @@
       <Project>{55a95250-696d-4c73-8e96-593d211a5974}</Project>
       <Name>NFSScript</Name>
     </ProjectReference>
+    <Reference Include="Microsoft.JScript" />
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Windows.Forms" />
