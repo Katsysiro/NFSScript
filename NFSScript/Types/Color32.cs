@@ -76,7 +76,7 @@ namespace NFSScript
             }
             catch
             {
-                throw new Exception($"{hex} {"is not a valid color."}");
+                throw new Exception($"{hex} is not a valid color.");
             }
         }
     }

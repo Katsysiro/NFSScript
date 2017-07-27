@@ -5,12 +5,15 @@
       <sourceFolder url="file://$MODULE_DIR$/../../MyMod" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/../../NFSScript" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/../../NFSScriptLoader" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/../../TestProject" isTestSource="false" />
       <excludeFolder url="file://$MODULE_DIR$/../../MyMod/bin" />
       <excludeFolder url="file://$MODULE_DIR$/../../MyMod/obj" />
       <excludeFolder url="file://$MODULE_DIR$/../../NFSScript/bin" />
       <excludeFolder url="file://$MODULE_DIR$/../../NFSScript/obj" />
       <excludeFolder url="file://$MODULE_DIR$/../../NFSScriptLoader/bin" />
       <excludeFolder url="file://$MODULE_DIR$/../../NFSScriptLoader/obj" />
+      <excludeFolder url="file://$MODULE_DIR$/../../TestProject/bin" />
+      <excludeFolder url="file://$MODULE_DIR$/../../TestProject/obj" />
       <excludeFolder url="file://$MODULE_DIR$/../../packages" />
     </content>
     <orderEntry type="sourceFolder" forTests="false" />

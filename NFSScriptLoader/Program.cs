@@ -1,22 +1,20 @@
 ﻿using System;
+using System.CodeDom.Compiler;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.IO;
-using System.Media;
-using System.Reflection;
-using System.Runtime.CompilerServices;
-using System.Runtime.InteropServices;
-using System.Windows.Forms;
-using System.Threading;
-using Microsoft.CSharp;
-using System.CodeDom.Compiler;
 using System.Globalization;
+using System.IO;
 using System.Linq;
+using System.Reflection;
+using System.Runtime.InteropServices;
+using System.Text;
+using System.Threading;
+using System.Timers;
+using System.Windows.Forms;
+using Microsoft.CSharp;
+using Microsoft.VisualBasic;
 using NFSScript;
 using NFSScript.Core;
-using NFSScript.Math;
-using NFSScript.Carbon;
-
 using Tick = System.Timers.Timer;
 using RunningMemory = NFSScript.Core.VAMemory;
 using NFSSKeys = NFSScript.Keys;
@@ -25,57 +23,66 @@ namespace NFSScriptLoader
 {
     public class Program
     {
-        static Tick timer;
+        // ReSharper disable InconsistentNaming
+        private static class InternalPtrs
+        {
+            public static IntPtr GAMEPLAY_ACTIVE;
+            public static IntPtr IS_ACTIVITY_MODE;
+        }
+        // ReSharper restore InconsistentNaming
+        
+        private static class Settings
+        {
+            internal static bool ShowConsole;
+            internal static bool Debug;
+        }
+        private static Tick _timer;
 
-        static int settingShowConsole = 0;
-        static int settingDebug = 0;
+        private static bool _inGameplay;
+        private static bool _inRace;
 
-        private static bool inGameplay = false;
-        private static bool inRace = false;
+        private const int UpdateTick = 1;
+        private const int WaitBeforeLoad = 5000;
 
-        private static IntPtr GAMEPLAY_ACTIVE, IS_ACTIVITY_MODE;
+        private static List<ModScript> _scripts;
 
-        private const int UPDATE_TICK = 1;
-        private const int WAIT_BEFORE_LOAD = 5000;
+//        private const int WH_KEYBOARD_LL = 13;
+//        private const int WM_KEYUP = 256;
+//        private const int WM_KEYDOWN = 257;
+//        private const int SW_HIDE = 0;
+//        private const int SW_SHOW = 5;
 
-        static List<ModScript> scripts;
+        private const string IniFileName = "NFSScriptSettings.ini";
 
-        private const int WH_KEYBOARD_LL = 13;
-        private const int WM_KEYUP = 256;
-        private const int WM_KEYDOWN = 257;
-        private const int SW_HIDE = 0;
-        private const int SW_SHOW = 5;
-
-
-        private const string NFS_SCRIPT_INI_FILE_NAME = "NFSScriptSettings.ini";
-
-        private static int resetKey = (int)NFSSKeys.Insert;
+        private const int ResetKey = (int) NFSSKeys.Insert;
 
         public delegate IntPtr LowLevelKeyboardProc(int nCode, IntPtr wParam, IntPtr lParam);
-        private static LowLevelKeyboardProc _proc = new LowLevelKeyboardProc(HookCallback);
-        private static IntPtr _hookID = IntPtr.Zero;
+        
+        private static readonly LowLevelKeyboardProc Proc = HookCallback;
+        private static IntPtr _hookId = IntPtr.Zero;
 
-        static NFSGame currentNFSGame;
+        private static NFSGame _currentNFSGame;
 
-        public static RunningMemory gameMemory;
+        /// <summary>
+        /// For internal use only!
+        /// </summary>
+        public static RunningMemory GameMemory;
 
-        static Process gameProcess;
+        private static string _gameProcessName = string.Empty;
+        private static string _processNameTitle = string.Empty;
 
-        static string gameProcessName = string.Empty;
-        static string processNameTitle = string.Empty;
+        public static Process GameProcess { get; private set; }
 
-        static int EntryPoint(string pwzArgument)
+        private static void EntryPoint(string pwzArgument)
         {
-            Log.Print(NFSScriptLoader.INFO_TAG, "NFSScript by Dennis Stanistan");
+            Log.Print(NFSScriptLoader.INFO_TAG, $"{pwzArgument} by Dennis Stanistan");
 
-            INIInit();
+            InitIni();
             GetNFSGame();
             Start();
-
-            return 0;
         }
 
-        static void Main(string[] args)
+        private static void Main()
         {
             EntryPoint("NFSScript");
         }
@@ -86,34 +93,34 @@ namespace NFSScriptLoader
         private static void Terminate()
         {
             CallScriptsOnExit();
-            timer.Dispose();
-            scripts = null;
-            inGameplay = false;
-            inRace = false;
-            gameMemory = null;
-            _hookID = IntPtr.Zero;
+            _timer.Dispose();
+            _scripts = null;
+            _inGameplay = false;
+            _inRace = false;
+            GameMemory = null;
+            _hookId = IntPtr.Zero;
             Environment.Exit(0);
         }
 
         /// <summary>
         /// Loads data from the .ini file.
         /// </summary>
-        private static void INIInit()
+        private static void InitIni()
         {
-            var ini = new IniFile(NFS_SCRIPT_INI_FILE_NAME);
+            var ini = new IniFile(IniFileName);
             if (File.Exists(ini.Path))
             {
                 if (ini.KeyExists("ShowConsole", "NFSScript"))
                 {
-                    settingShowConsole = FlexiableParse(ini.Read("ShowConsole", "NFSScript"));                    
+                    Settings.ShowConsole = FlexiableParse(ini.Read("ShowConsole", "NFSScript")) == 1;                    
                 }
                 if (ini.KeyExists("Debug", "NFSScript"))
                 {
-                    settingDebug = FlexiableParse(ini.Read("Debug", "NFSScript"));
+                    Settings.Debug = FlexiableParse(ini.Read("Debug", "NFSScript")) == 1;
                 }
             }
 
-            if (settingShowConsole == 0)
+            if (!Settings.ShowConsole)
                 NativeMethods.ShowWindow(NativeMethods.GetConsoleWindow(), 0);
         }
 
@@ -123,43 +130,44 @@ namespace NFSScriptLoader
         private static void GetNFSGame()
         {
             Log.Print(NFSScriptLoader.INFO_TAG, "Getting executeable in directory.");
-            currentNFSGame = NFS.DetectGameExecutableInDirectory;
-            int wrldTick = 0;
-            switch (currentNFSGame)
+            _currentNFSGame = NFS.DetectGameExecutableInDirectory;
+            var wrldTick = 0;
+            // ReSharper disable once SwitchStatementMissingSomeCases
+            switch (_currentNFSGame)
             {
-                case NFSGame.None:
-                    Log.Print(NFSScriptLoader.ERROR_TAG, "A valid NFS executeable was not found.");
-                    Environment.Exit(0);
+                case NFSGame.Undetermined:
+                    Log.Print(NFSScriptLoader.ERROR_TAG, "A valid NFS executable was not found.");
+                    Environment.Exit(1);
                     return;
 
                 case NFSGame.Carbon:
                     Log.Print(NFSScriptLoader.INFO_TAG, "Need for Speed: Carbon detected.");
-                    SetProcessVariables(Process.Start(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, NFS.NFSC_EXE)));
+                    SetProcessVariables(Process.Start(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, NFS.ImageNames.Carbon)));
                     break;
 
                 case NFSGame.MW:
                     Log.Print(NFSScriptLoader.INFO_TAG, "Need for Speed: Most Wanted detected.");
-                    SetProcessVariables(Process.Start(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, NFS.SPEED_EXE)));
+                    SetProcessVariables(Process.Start(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, NFS.ImageNames.MWUG)));
                     break;
 
                 case NFSGame.Underground:
                     Log.Print(NFSScriptLoader.INFO_TAG, "Need for Speed: Underground detected.");
-                    SetProcessVariables(Process.Start(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, NFS.SPEED_EXE)));
+                    SetProcessVariables(Process.Start(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, NFS.ImageNames.MWUG)));
                     break;
 
                 case NFSGame.Underground2:
                     Log.Print(NFSScriptLoader.INFO_TAG, "Need for Speed: Underground 2 detected.");
-                    SetProcessVariables(Process.Start(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, NFS.SPEED2_EXE)));
+                    SetProcessVariables(Process.Start(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, NFS.ImageNames.UG2)));
                     break;
 
                 case NFSGame.ProStreet:
                     Log.Print(NFSScriptLoader.INFO_TAG, "Need for Speed: ProStreet detected.");
-                    SetProcessVariables(Process.Start(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, NFS.NFS_EXE)));
+                    SetProcessVariables(Process.Start(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, NFS.ImageNames.UndercoverProStreet)));
                     break;
 
                 case NFSGame.Undercover:
                     Log.Print(NFSScriptLoader.INFO_TAG, "Need for Speed: Undercover detected.");
-                    SetProcessVariables(Process.Start(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, NFS.NFS_EXE)));
+                    SetProcessVariables(Process.Start(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, NFS.ImageNames.UndercoverProStreet)));
                     break;
 
                 case NFSGame.World:
@@ -183,7 +191,7 @@ namespace NFSScriptLoader
                     Environment.Exit(0);
                     return;
             }
-            NFSScript.NFSScript.CurrentLoadedNFSGame = currentNFSGame;
+            NFSScript.NFSScript.CurrentLoadedNFSGame = _currentNFSGame;
         }
 
         /// <summary>
@@ -192,12 +200,12 @@ namespace NFSScriptLoader
         /// <param name="processName"></param>
         private static void GetGameMemory(string processName)
         {
-            gameMemory = new RunningMemory(gameProcessName);
-            gameMemory.ReadInt32((IntPtr)0);
+            GameMemory = new RunningMemory(_gameProcessName);
+            GameMemory.ReadInt32((IntPtr)0);
 
-            GameMemory.Memory = gameMemory;
-            GameMemory.GenericMemory = new GMemory(gameMemory.processName);
-            if (settingDebug == 1)
+            NFSScript.Core.GameMemory.Memory = GameMemory;
+            NFSScript.Core.GameMemory.GenericMemory = new GMemory(GameMemory.processName);
+            if (Settings.Debug)
                 RunningMemory.debugMode = true;
         }
 
@@ -208,10 +216,12 @@ namespace NFSScriptLoader
         {
             LoadScripts();
 
-            GetGameMemory(gameProcessName);
+            GetGameMemory(_gameProcessName);
             CallPreScriptMethod();
-            Log.Print(NFSScriptLoader.INFO_TAG, string.Format("{0} {1} {2}", "Delaying the loader's thread for", (WAIT_BEFORE_LOAD / 1000), "seconds before initializing."));
-            Thread.Sleep(WAIT_BEFORE_LOAD);
+            Log.Print(NFSScriptLoader.INFO_TAG,
+                $"Delaying the loader's thread for {(WaitBeforeLoad / 1000)} seconds before initializing.");
+            // TODO FIXME: this is a very bad way to do this...
+            Thread.Sleep(WaitBeforeLoad);
             Log.Print(NFSScriptLoader.INFO_TAG, "Delay is over, initializing.");
             // Step 1
             if (NFS.IsGameRunning())
@@ -224,10 +234,9 @@ namespace NFSScriptLoader
 
                 CallMainScriptMethod();
 
-                timer = new Tick();
-                timer.Interval = UPDATE_TICK;
-                timer.Elapsed += Update_Elapsed;
-                timer.Start();
+                _timer = new Tick {Interval = UpdateTick};
+                _timer.Elapsed += Update_Elapsed;
+                _timer.Start();
 
                 SetKeyboardHook();
             }
@@ -240,20 +249,20 @@ namespace NFSScriptLoader
         private static void WaitForGameLoad()
         {
             Log.Print(NFSScriptLoader.INFO_TAG, "Waiting for the game to fully load. (Disabled in Most Wanted)");
-            switch (currentNFSGame)
+            switch (_currentNFSGame)
             {
-                case NFSGame.None:
+                case NFSGame.Undetermined:
                     break;
 
                 case NFSGame.Underground:
-                    while (gameMemory.ReadByte((IntPtr)UGAddresses.GenericAddrs.STATIC_IS_GAME_LOADED) != 0x01 && NFS.IsGameRunning())
+                    while (GameMemory.ReadByte((IntPtr)UGAddresses.GenericAddrs.STATIC_IS_GAME_LOADED) != 0x01 && NFS.IsGameRunning())
                     {
                         Thread.Sleep(100);
                     }
                     break;
 
                 case NFSGame.Underground2:
-                    while (gameMemory.ReadByte((IntPtr)UG2Addresses.GenericAddrs.STATIC_IS_GAME_LOADED) != 0x01 && NFS.IsGameRunning())
+                    while (GameMemory.ReadByte((IntPtr)UG2Addresses.GenericAddrs.STATIC_IS_GAME_LOADED) != 0x01 && NFS.IsGameRunning())
                     {
                         Thread.Sleep(100);
                     }
@@ -263,28 +272,28 @@ namespace NFSScriptLoader
                     break;
 
                 case NFSGame.Carbon:
-                    while (gameMemory.ReadByte((IntPtr)CarbonAddresses.GenericAddrs.STATIC_IS_GAME_LOADED) != 0x01 && NFS.IsGameRunning())
+                    while (GameMemory.ReadByte((IntPtr)CarbonAddresses.GenericAddrs.STATIC_IS_GAME_LOADED) != 0x01 && NFS.IsGameRunning())
                     {
                         Thread.Sleep(100);
                     }
                     break;
 
                 case NFSGame.ProStreet:
-                    while(gameMemory.ReadByte((IntPtr)ProStreetAddresses.GenericAddrs.STATIC_IS_GAME_LOADED) != 0x01 && NFS.IsGameRunning())
+                    while(GameMemory.ReadByte((IntPtr)ProStreetAddresses.GenericAddrs.STATIC_IS_GAME_LOADED) != 0x01 && NFS.IsGameRunning())
                     {
                         Thread.Sleep(100);
                     }
                     break;
 
                 case NFSGame.Undercover:
-                    while (gameMemory.ReadByte((IntPtr)UndercoverAddresses.GenericAddrs.STATIC_IS_GAME_LOADED) != 0x01 && NFS.IsGameRunning())
+                    while (GameMemory.ReadByte((IntPtr)UndercoverAddresses.GenericAddrs.STATIC_IS_GAME_LOADED) != 0x01 && NFS.IsGameRunning())
                     {
                         Thread.Sleep(100);
                     }
                     break;
 
                 case NFSGame.World:
-                    while (gameMemory.ReadByte((IntPtr)gameMemory.getBaseAddress + WorldAddresses.GenericAddrs.NON_STATIC_IS_GAME_LOADED) != 0x01 && NFS.IsGameRunning())
+                    while (GameMemory.ReadByte((IntPtr)GameMemory.getBaseAddress + WorldAddresses.GenericAddrs.NON_STATIC_IS_GAME_LOADED) != 0x01 && NFS.IsGameRunning())
                     {
                         Thread.Sleep(100);
                     }
@@ -297,44 +306,44 @@ namespace NFSScriptLoader
         /// </summary>
         private static void ApplyAndLoadIntPtrs()
         {
-            switch (currentNFSGame)
+            switch (_currentNFSGame)
             {
-                case NFSGame.None:
+                case NFSGame.Undetermined:
                     break;
 
                 case NFSGame.Underground:
-                    GAMEPLAY_ACTIVE = (IntPtr)UGAddresses.GenericAddrs.STATIC_IS_GAMEPLAY_ACTIVE;
-                    IS_ACTIVITY_MODE = (IntPtr)UGAddresses.GenericAddrs.STATIC_IS_GAMEPLAY_ACTIVE;
+                    InternalPtrs.GAMEPLAY_ACTIVE = (IntPtr)UGAddresses.GenericAddrs.STATIC_IS_GAMEPLAY_ACTIVE;
+                    InternalPtrs.IS_ACTIVITY_MODE = (IntPtr)UGAddresses.GenericAddrs.STATIC_IS_GAMEPLAY_ACTIVE;
                     break;
 
                 case NFSGame.Underground2:
-                    GAMEPLAY_ACTIVE = (IntPtr)UG2Addresses.GenericAddrs.STATIC_IS_GAMEPLAY_ACTIVE;
-                    IS_ACTIVITY_MODE = IntPtr.Zero;
+                    InternalPtrs.GAMEPLAY_ACTIVE = (IntPtr)UG2Addresses.GenericAddrs.STATIC_IS_GAMEPLAY_ACTIVE;
+                    InternalPtrs.IS_ACTIVITY_MODE = IntPtr.Zero;
                     break;
 
                 case NFSGame.MW:
-                    GAMEPLAY_ACTIVE = (IntPtr)MWAddresses.GenericAddrs.STATIC_IS_GAMEPLAY_ACTIVE;
-                    IS_ACTIVITY_MODE = (IntPtr)MWAddresses.GameAddrs.STATIC_IS_ACTIVITY_MODE;
+                    InternalPtrs.GAMEPLAY_ACTIVE = (IntPtr)MWAddresses.GenericAddrs.STATIC_IS_GAMEPLAY_ACTIVE;
+                    InternalPtrs.IS_ACTIVITY_MODE = (IntPtr)MWAddresses.GameAddrs.STATIC_IS_ACTIVITY_MODE;
                     break;
 
                 case NFSGame.Carbon:
-                    GAMEPLAY_ACTIVE = (IntPtr)CarbonAddresses.GenericAddrs.STATIC_IS_GAMEPLAY_ACTIVE;
-                    IS_ACTIVITY_MODE = (IntPtr)CarbonAddresses.GameAddrs.STATIC_IS_ACTIVITY_MODE;
+                    InternalPtrs.GAMEPLAY_ACTIVE = (IntPtr)CarbonAddresses.GenericAddrs.STATIC_IS_GAMEPLAY_ACTIVE;
+                    InternalPtrs.IS_ACTIVITY_MODE = (IntPtr)CarbonAddresses.GameAddrs.STATIC_IS_ACTIVITY_MODE;
                     break;
 
                 case NFSGame.ProStreet:
-                    GAMEPLAY_ACTIVE = (IntPtr)ProStreetAddresses.GenericAddrs.STATIC_IS_GAMEPLAY_ACTIVE;
-                    IS_ACTIVITY_MODE = (IntPtr)ProStreetAddresses.GameAddrs.STATIC_IS_ACTIVITY_MODE;
+                    InternalPtrs.GAMEPLAY_ACTIVE = (IntPtr)ProStreetAddresses.GenericAddrs.STATIC_IS_GAMEPLAY_ACTIVE;
+                    InternalPtrs.IS_ACTIVITY_MODE = (IntPtr)ProStreetAddresses.GameAddrs.STATIC_IS_ACTIVITY_MODE;
                     break;
 
                 case NFSGame.Undercover:
-                    GAMEPLAY_ACTIVE = (IntPtr)UndercoverAddresses.GenericAddrs.STATIC_IS_GAMEPLAY_ACTIVE;
-                    IS_ACTIVITY_MODE = IntPtr.Zero;
+                    InternalPtrs.GAMEPLAY_ACTIVE = (IntPtr)UndercoverAddresses.GenericAddrs.STATIC_IS_GAMEPLAY_ACTIVE;
+                    InternalPtrs.IS_ACTIVITY_MODE = IntPtr.Zero;
                     break;
 
                 case NFSGame.World:
-                    GAMEPLAY_ACTIVE = (IntPtr)gameMemory.getBaseAddress + WorldAddresses.GenericAddrs.NON_STATIC_IS_GAMEPLAY_ACTIVE;
-                    IS_ACTIVITY_MODE = (IntPtr)gameMemory.getBaseAddress + WorldAddresses.GameAddrs.NON_STATIC_IS_ACTIVITY_MODE;
+                    InternalPtrs.GAMEPLAY_ACTIVE = (IntPtr)GameMemory.getBaseAddress + WorldAddresses.GenericAddrs.NON_STATIC_IS_GAMEPLAY_ACTIVE;
+                    InternalPtrs.IS_ACTIVITY_MODE = (IntPtr)GameMemory.getBaseAddress + WorldAddresses.GameAddrs.NON_STATIC_IS_ACTIVITY_MODE;
                     break;
             }
         }
@@ -344,43 +353,41 @@ namespace NFSScriptLoader
         /// </summary>
         private static void LoadScripts()
         {
-            scripts = new List<ModScript>();
-            string[] dllFiles = Directory.GetFiles(NFSScriptLoader.SCRIPTS_FOLDER, "*.dll");
-            string[] csFiles = Directory.GetFiles(NFSScriptLoader.SCRIPTS_FOLDER, "*.cs");
-            string[] vbFiles = Directory.GetFiles(NFSScriptLoader.SCRIPTS_FOLDER, "*.vb");
+            _scripts = new List<ModScript>();
+            var dllFiles = Directory.GetFiles(NFSScriptLoader.SCRIPTS_FOLDER, "*.dll");
+            var sourceFiles = Directory.GetFiles(NFSScriptLoader.SCRIPTS_FOLDER, "*.cs")
+                .Concat(Directory.GetFiles(NFSScriptLoader.SCRIPTS_FOLDER, "*.vb"));
 
-            int compiledScripts = 0;
+            var compiledScripts = 0;
 
-            for (int i = 0; i < dllFiles.Length; i++)
+            foreach (var file in dllFiles)
             {
-                if (IsValidAssembly(dllFiles[i]))
+                if (!IsValidAssembly(file)) continue;
+                var script = new ModScript(file);
+                _scripts.Add(script);
+                compiledScripts++;
+                Log.Print(NFSScriptLoader.INFO_TAG, $"Loaded {script.File}");
+            }
+            foreach (var file in sourceFiles)
+            {
+                if (!CompileScript(file))
                 {
-                    ModScript script = new ModScript(dllFiles[i]);
-                    scripts.Add(script);
-                    compiledScripts++;
-                    Log.Print(NFSScriptLoader.INFO_TAG, string.Format("{0} {1}", "Loaded", script.File));
+                    Log.Print(NFSScriptLoader.ERROR_TAG, $"Error compiling {file}!! Will abort.");
+                    NFSScriptLoader.CriticalError($"Could not compile script at {file}");
                 }
-            }
-            for (int i = 0; i < csFiles.Length; i++)
-            {
-                CompileScript(csFiles[i]);
-                compiledScripts++;
-            }
-            for (int i = 0; i < vbFiles.Length; i++)
-            {
-                CompileScript(vbFiles[i]);
+                
                 compiledScripts++;
             }
 
-            Log.Print(NFSScriptLoader.INFO_TAG, string.Format("{0} scripts are loaded.", compiledScripts));
+            Log.Print(NFSScriptLoader.INFO_TAG, $"{compiledScripts} scripts are loaded.");
         }
 
         private static void CallPreScriptMethod()
         {
-            for (int i = 0; i < scripts.Count; i++)
+            for (var i = 0; i < _scripts.Count; i++)
             {
-                if (scripts[i].HasPre)
-                    scripts[i].CallModFunction(ModScript.ModMethod.Pre);
+                if (_scripts[i].HasPre)
+                    _scripts[i].CallModFunction(ModScript.ModMethod.Pre);
             }
         }
 
@@ -389,10 +396,10 @@ namespace NFSScriptLoader
         /// </summary>
         private static void CallInitScriptMethod()
         {
-            for (int i = 0; i < scripts.Count; i++)
+            for (var i = 0; i < _scripts.Count; i++)
             {
-                if (scripts[i].HasInitialize)
-                    scripts[i].CallModFunction(ModScript.ModMethod.Initialize);
+                if (_scripts[i].HasInitialize)
+                    _scripts[i].CallModFunction(ModScript.ModMethod.Initialize);
             }
         }
 
@@ -401,10 +408,10 @@ namespace NFSScriptLoader
         /// </summary>
         private static void CallMainScriptMethod()
         {
-            for (int i = 0; i < scripts.Count; i++)
+            for (var i = 0; i < _scripts.Count; i++)
             {
-                if (scripts[i].HasMain)
-                    scripts[i].CallModFunction(ModScript.ModMethod.Main);
+                if (_scripts[i].HasMain)
+                    _scripts[i].CallModFunction(ModScript.ModMethod.Main);
             }
         }
 
@@ -413,64 +420,64 @@ namespace NFSScriptLoader
         /// </summary>
         private static void CallScriptsEvents()
         {
-            bool isGameplayActive = false;
-            if (currentNFSGame != NFSGame.Undercover && currentNFSGame != NFSGame.World)
-                isGameplayActive = gameMemory.ReadByte(GAMEPLAY_ACTIVE) == 1;
-            else if(currentNFSGame == NFSGame.Undercover)
-                isGameplayActive = gameMemory.ReadInt32((IntPtr)UndercoverAddresses.GenericAddrs.STATIC_GAME_STATE) == 6;
-            else if (currentNFSGame == NFSGame.World)
-                isGameplayActive = gameMemory.ReadInt32((IntPtr)gameMemory.getBaseAddress + WorldAddresses.GenericAddrs.NON_STATIC_GAME_STATE) == 6;
+            var isGameplayActive = false;
+            if (_currentNFSGame != NFSGame.Undercover && _currentNFSGame != NFSGame.World)
+                isGameplayActive = GameMemory.ReadByte(InternalPtrs.GAMEPLAY_ACTIVE) == 1;
+            else if(_currentNFSGame == NFSGame.Undercover)
+                isGameplayActive = GameMemory.ReadInt32((IntPtr)UndercoverAddresses.GenericAddrs.STATIC_GAME_STATE) == 6;
+            else if (_currentNFSGame == NFSGame.World)
+                isGameplayActive = GameMemory.ReadInt32((IntPtr)GameMemory.getBaseAddress + WorldAddresses.GenericAddrs.NON_STATIC_GAME_STATE) == 6;
 
-            if (isGameplayActive && !inGameplay)
+            if (isGameplayActive && !_inGameplay)
             {
-                for (int i = 0; i < scripts.Count; i++)
+                for (var i = 0; i < _scripts.Count; i++)
                 {
-                    if (scripts[i].HasOnGameplayStart && !scripts[i].IsInGameplay)
+                    if (_scripts[i].HasOnGameplayStart && !_scripts[i].IsInGameplay)
                     {
-                        scripts[i].CallModFunction(ModScript.ModMethod.OnGameplayStart);
-                        scripts[i].IsInGameplay = true;
+                        _scripts[i].CallModFunction(ModScript.ModMethod.OnGameplayStart);
+                        _scripts[i].IsInGameplay = true;
                     }
                 }
-                inGameplay = true;
+                _inGameplay = true;
             }
 
-            if (!isGameplayActive && inGameplay)
+            if (!isGameplayActive && _inGameplay)
             {
-                for (int i = 0; i < scripts.Count; i++)
+                for (var i = 0; i < _scripts.Count; i++)
                 {
-                    if (scripts[i].HasOnGameplayExit && scripts[i].IsInGameplay)
+                    if (_scripts[i].HasOnGameplayExit && _scripts[i].IsInGameplay)
                     {
-                        scripts[i].CallModFunction(ModScript.ModMethod.OnGameplayExit);
-                        scripts[i].IsInGameplay = false;
+                        _scripts[i].CallModFunction(ModScript.ModMethod.OnGameplayExit);
+                        _scripts[i].IsInGameplay = false;
                     }
                 }
-                inGameplay = false;
+                _inGameplay = false;
             }
 
-            if ((gameMemory.ReadByte(IS_ACTIVITY_MODE)) == 1 && !inRace)
+            if ((GameMemory.ReadByte(InternalPtrs.IS_ACTIVITY_MODE)) == 1 && !_inRace)
             {
-                for (int i = 0; i < scripts.Count; i++)
+                for (var i = 0; i < _scripts.Count; i++)
                 {
-                    if (scripts[i].HasOnActivityEnter && !scripts[i].IsInActivity)
+                    if (_scripts[i].HasOnActivityEnter && !_scripts[i].IsInActivity)
                     {
-                        scripts[i].CallModFunction(ModScript.ModMethod.OnActivityEnter);
-                        scripts[i].IsInActivity = true;
+                        _scripts[i].CallModFunction(ModScript.ModMethod.OnActivityEnter);
+                        _scripts[i].IsInActivity = true;
                     }
                 }
-                inRace = true;
+                _inRace = true;
             }
 
-            if ((gameMemory.ReadByte(IS_ACTIVITY_MODE)) == 0 && inRace)
+            if ((GameMemory.ReadByte(InternalPtrs.IS_ACTIVITY_MODE)) == 0 && _inRace)
             {
-                for (int i = 0; i < scripts.Count; i++)
+                for (var i = 0; i < _scripts.Count; i++)
                 {
-                    if (scripts[i].HasOnActivityExit && scripts[i].IsInActivity)
+                    if (_scripts[i].HasOnActivityExit && _scripts[i].IsInActivity)
                     {
-                        scripts[i].CallModFunction(ModScript.ModMethod.OnActivityExit);
-                        scripts[i].IsInActivity = false;
+                        _scripts[i].CallModFunction(ModScript.ModMethod.OnActivityExit);
+                        _scripts[i].IsInActivity = false;
                     }
                 }
-                inRace = false;
+                _inRace = false;
             }
         }
 
@@ -479,10 +486,10 @@ namespace NFSScriptLoader
         /// </summary>
         private static void CallScriptsOnExit()
         {
-            for (int i = 0; i < scripts.Count; i++)
+            for (var i = 0; i < _scripts.Count; i++)
             {
-                if (scripts[i].HasOnExit)
-                    scripts[i].CallModFunction(ModScript.ModMethod.OnExit);
+                if (_scripts[i].HasOnExit)
+                    _scripts[i].CallModFunction(ModScript.ModMethod.OnExit);
             }
         }
 
@@ -491,7 +498,7 @@ namespace NFSScriptLoader
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private static void Update_Elapsed(object sender, System.Timers.ElapsedEventArgs e)
+        private static void Update_Elapsed(object sender, ElapsedEventArgs e)
         {
             if (!NFS.IsGameRunning())
             {
@@ -500,10 +507,10 @@ namespace NFSScriptLoader
             }
 
             CallScriptsEvents();
-            for (int i = 0; i < scripts.Count; i++)
+            for (var i = 0; i < _scripts.Count; i++)
             {
-                if (scripts[i].HasUpdate)
-                    scripts[i].CallModFunction(ModScript.ModMethod.Update);
+                if (_scripts[i].HasUpdate)
+                    _scripts[i].CallModFunction(ModScript.ModMethod.Update);
             }
         }
 
@@ -513,46 +520,45 @@ namespace NFSScriptLoader
         /// <param name="file"></param>
         private static bool CompileScript(string file)
         {
-            FileInfo sourceFile = new FileInfo(file);
+            var sourceFile = new FileInfo(file);
             CodeDomProvider provider = null;
-            var csc = new CSharpCodeProvider(new Dictionary<string, string>() { { "CompilerVersion", "v4.0" } });
+            var csc = new CSharpCodeProvider(new Dictionary<string, string> { { "CompilerVersion", "v4.0" } });
 
-            var parameters = new CompilerParameters(new[] { "mscorlib.dll", "System.Core.dll", "System.Windows.Forms.dll", "NFSScript.dll" });
-            parameters.GenerateExecutable = false;
-            parameters.GenerateInMemory = true;
-
-            if (sourceFile.Extension.ToUpper(CultureInfo.InvariantCulture) == ".CS")
+            // TODO: maybe allow custom references like CS-Script
+            var parameters = new CompilerParameters(new[]
+                {"mscorlib.dll", "System.Core.dll", "System.Windows.Forms.dll", "NFSScript.dll"})
             {
-                provider = CodeDomProvider.CreateProvider("CSharp");
+                GenerateExecutable = false,
+                GenerateInMemory = true
+            };
+
+            switch (sourceFile.Extension.ToUpperInvariant())
+            {
+                case ".CS":
+                    provider = new CSharpCodeProvider();
+                    break;
+                case ".VB":
+                    provider = new VBCodeProvider();
+                    break;
             }
-            else if (sourceFile.Extension.ToUpper(CultureInfo.InvariantCulture) == ".VB")
-            {
-                provider = CodeDomProvider.CreateProvider("VisualBasic");
-            }
 
-            if (provider != null)
+            if (provider == null) return false;
+            
+            var results = provider.CompileAssemblyFromFile(parameters, file);
+            if (results.Errors.HasErrors)
             {
-                CompilerResults results = provider.CompileAssemblyFromFile(parameters, file);
-                if (results.Errors.HasErrors)
+                foreach (CompilerError r in results.Errors)
                 {
-                    foreach (CompilerError r in results.Errors)
-                    {
-                        Log.Print(NFSScriptLoader.ERROR_TAG, r.ToString());
-                    }
-                    return false;
+                    Log.Print(NFSScriptLoader.ERROR_TAG, r.ToString());
                 }
-                else
-                {
-                    Assembly ass = results.CompiledAssembly;
-                    ModScript script = new ModScript(ass, Path.GetFileName(file));
-                    scripts.Add(script);
-                    Log.Print(NFSScriptLoader.INFO_TAG, string.Format("{0} {1}", "Loaded", script.File));
-
-                    return true;
-                }
+                return false;
             }
+            var ass = results.CompiledAssembly;
+            var script = new ModScript(ass, Path.GetFileName(file));
+            _scripts.Add(script);
+            Log.Print(NFSScriptLoader.INFO_TAG, $"Loaded {script.File}");
 
-            return false;
+            return true;
         }
 
         /// <summary>
@@ -562,15 +568,15 @@ namespace NFSScriptLoader
         {
             Log.Print(NFSScriptLoader.INFO_TAG, "Restarting...");
             CallScriptsOnExit();
-            timer.Stop();
-            scripts = null;
-            inGameplay = false;
-            inRace = false;
+            _timer.Stop();
+            _scripts = null;
+            _inGameplay = false;
+            _inRace = false;
             LoadScripts();
             CallPreScriptMethod();
             CallInitScriptMethod();
             CallMainScriptMethod();            
-            timer.Start();
+            _timer.Start();
         }
 
         /// <summary>
@@ -593,10 +599,9 @@ namespace NFSScriptLoader
         /// <returns></returns>
         private static bool IsValidAssembly(string dll)
         {
-            Assembly a = null;
             try
             {
-                a = Assembly.LoadFrom(dll);
+                Assembly.LoadFrom(dll);
                 return true;
             }
             catch { return false; }
@@ -605,7 +610,7 @@ namespace NFSScriptLoader
         public static bool IsRunning(Process process)
         {
             if (process == null)
-                throw new ArgumentNullException("process");
+                throw new ArgumentNullException(nameof(process));
 
             try
             {
@@ -623,9 +628,9 @@ namespace NFSScriptLoader
         /// </summary>
         private static void SetKeyboardHook()
         {
-            _hookID = SetHook(_proc);
+            _hookId = SetHook(Proc);
             Application.Run();
-            NativeMethods.UnhookWindowsHookEx(_hookID);
+            NativeMethods.UnhookWindowsHookEx(_hookId);
         }
 
         /// <summary>
@@ -634,53 +639,54 @@ namespace NFSScriptLoader
         /// <param name="msg"></param>
         private static void PrintDebugMsg(string msg)
         {
-            if (settingDebug == 1)
+            if (Settings.Debug)
                 Log.Print(NFSScriptLoader.DEBUG_TAG, msg);
         }
 
         /// <summary>
         /// Get the hook callback.
         /// </summary>
-        /// <param name="nCode"></param>
-        /// <param name="wParam"></param>
-        /// <param name="lParam"></param>
+        /// <param name="nCode">classic EA param that does nothing</param>
+        /// <param name="wParam">event param</param>
+        /// <param name="lParam">key num param</param>
         /// <returns></returns>
         private static IntPtr HookCallback(int nCode, IntPtr wParam, IntPtr lParam)
         {
-            IntPtr mainWindowHandle = gameMemory.GetMainProcess().MainWindowHandle;
+            var mainWindowHandle = GameMemory.GetMainProcess().MainWindowHandle;
 
-            if ((currentNFSGame != NFSGame.World && !NFS.IsGameMinimized()) || (currentNFSGame == NFSGame.World && NFS.IsGameFocused()))
-            {
-                if (nCode >= 0 && wParam == (IntPtr)257) // OnKeyUp
-                {                    
-                    int num = Marshal.ReadInt32(lParam);
+            if ((_currentNFSGame == NFSGame.World || NFS.IsGameMinimized()) &&
+                (_currentNFSGame != NFSGame.World || !NFS.IsGameFocused()))
+                return NativeMethods.CallNextHookEx(_hookId, nCode, wParam, lParam);
+            if (nCode >= 0 && wParam == (IntPtr)257) // OnKeyUp
+            {                    
+                var num = Marshal.ReadInt32(lParam);
 
-                    if (num == resetKey)
-                        Restart();
+                if (num == ResetKey)
+                    Restart();
 
-                    for (int i = 0; i < scripts.Count; i++)
-                    {
-                        if (scripts[i].HasOnKeyUp)
-                        {
-                            scripts[i].CallModFunction(ModScript.ModMethod.OnKeyUp, (NFSSKeys)num);
-                        }
-                    }
-                }
-
-                if (nCode >= 0 && wParam == (IntPtr)256) // OnKeyDown
+                foreach (var script in _scripts)
                 {
-                    int num = Marshal.ReadInt32(lParam);
-                    for (int i = 0; i < scripts.Count; i++)
+                    if (script.HasOnKeyUp)
                     {
-                        if (scripts[i].HasOnKeyDown)
-                        {
-                            scripts[i].CallModFunction(ModScript.ModMethod.OnKeyDown, (NFSSKeys)num);
-                        }
+                        script.CallModFunction(ModScript.ModMethod.OnKeyUp, (NFSSKeys)num);
                     }
                 }
             }
 
-            return NativeMethods.CallNextHookEx(_hookID, nCode, wParam, lParam);
+            if (nCode < 0 || wParam != (IntPtr) 256) // OnKeyDown
+                return NativeMethods.CallNextHookEx(_hookId, nCode, wParam, lParam);
+            {
+                var num = Marshal.ReadInt32(lParam);
+                foreach (var script in _scripts)
+                {
+                    if (script.HasOnKeyDown)
+                    {
+                        script.CallModFunction(ModScript.ModMethod.OnKeyDown, (NFSSKeys)num);
+                    }
+                }
+            }
+
+            return NativeMethods.CallNextHookEx(_hookId, nCode, wParam, lParam);
         }
 
         /// <summary>
@@ -689,9 +695,9 @@ namespace NFSScriptLoader
         /// <param name="p"></param>
         private static void SetProcessVariables(Process p)
         {
-            gameProcess = p;
-            gameProcessName = p.ProcessName;
-            processNameTitle = p.MainWindowTitle;
+            GameProcess = p;
+            _gameProcessName = p.ProcessName;
+            _processNameTitle = p.MainWindowTitle;
 
             Log.Print(NFSScriptLoader.INFO_TAG, "Game memory is loaded.");
         }
@@ -703,23 +709,33 @@ namespace NFSScriptLoader
         /// <returns></returns>
         private static IntPtr SetHook(LowLevelKeyboardProc proc)
         {
-            using (Process currentProcess = Process.GetCurrentProcess())
+            using (var currentProcess = Process.GetCurrentProcess())
             {
-                using (ProcessModule mainModule = currentProcess.MainModule)
+                using (var mainModule = currentProcess.MainModule)
                     return NativeMethods.SetWindowsHookEx(13, proc, NativeMethods.GetModuleHandle(mainModule.ModuleName), 0U);
             }
         }
 
     }
 
-    struct NFS
+    internal struct NFS
     {
         // A list of constant strings that contain the executable file name.
-        public const string SPEED_EXE = "speed.exe";
-        public const string SPEED2_EXE = "speed2.exe";
-        public const string NFSC_EXE = "NFSC.exe";
-        public const string NFS_EXE = "nfs.exe";
-        public const string NFSW_EXE = "nfsw.exe";
+        internal static class ImageNames
+        {
+            public const string MWUG = "speed.exe";
+            public const string UG2 = "speed2.exe";
+            public const string Carbon = "NFSC.exe";
+            public const string UndercoverProStreet = "nfs.exe";
+            public const string World = "nfsw.exe";
+        }
+
+        private static class ContainedStrings
+        {
+            public static readonly byte[] MostWanted = Encoding.ASCII.GetBytes("Most Wanted");
+            public static readonly byte[] Underground = Encoding.ASCII.GetBytes("underground");
+            public static readonly byte[] Undercover = Encoding.ASCII.GetBytes("Undercover");
+        }
 
         /// <summary>
         /// Detects the supported game executable in directory.
@@ -728,49 +744,46 @@ namespace NFSScriptLoader
         {
             // This is a really bad way of detecting executables
             // TODO: Get game versions by their entry points
+            // TODO: (fallk) maybe just use window names? i don't have prostreet/undercover so i can't confirm if theyre all unique
             get
             {
-                if (File.Exists(SPEED_EXE)) // speed.exe exists
+                if (File.Exists(ImageNames.MWUG)) // speed.exe exists
                 {
-                    using (StreamReader sr = new StreamReader(SPEED_EXE))
+                    var which = File.OpenRead(ImageNames.MWUG)
+                        .ContainsWhich(ContainedStrings.MostWanted, ContainedStrings.Underground);
+
+                    if (which == ContainedStrings.MostWanted) // "Most Wanted" in .exe
                     {
-                        string input;
-                        while ((input = sr.ReadLine()) != null)
-                        {
-                            if (input.Contains("Most Wanted")) // speed.exe contains the string "Most Wanted"
-                                return NFSGame.MW; // Return NFSGame.MW
-                            else if (input.Contains("underground")) // speed.exe contains the string "underground"
-                                return NFSGame.Underground; // Return NFSGame.Underground
-                        }
+                        return NFSGame.MW;
                     }
-                    return NFSGame.Undetermined;
-                }
-                else if (File.Exists(SPEED2_EXE)) // speed2.exe exists
-                {
-                    return NFSGame.Underground2; //Return NFSGame.Underground2
-                }
-                else if (File.Exists(NFSC_EXE)) // NFSC.exe exists
-                {
-                    return NFSGame.Carbon; // Return NFSGame.Carbon
-                }
-                else if (File.Exists(NFS_EXE)) // nfs.exe exists
-                {
-                    using (StreamReader sr = new StreamReader(NFS_EXE))
+                    if (which == ContainedStrings.Underground) // "underground" in .exe
                     {
-                        string input;
-                        while ((input = sr.ReadLine()) != null)
-                        {
-                            if (input.Contains("Undercover")) // nfs.exe contains "undercover"
-                                return NFSGame.Undercover; // Return NFSGame.Undercover
-                        }
+                        return NFSGame.Underground;
                     }
-                    return NFSGame.ProStreet;
+                    if (which == null) // none of the above
+                    {
+                        return NFSGame.Undetermined;
+                    }
                 }
-                else if (File.Exists(NFSW_EXE))
+                if (File.Exists(ImageNames.UG2)) // speed2.exe exists
                 {
-                    return NFSGame.World; // Return NFSGame.World
+                    return NFSGame.Underground2;
                 }
-                else return NFSGame.None;
+                if (File.Exists(ImageNames.Carbon)) // NFSC.exe exists
+                {
+                    return NFSGame.Carbon;
+                }
+                if (File.Exists(ImageNames.UndercoverProStreet)) // nfs.exe exists
+                {
+                    return File.OpenRead(ImageNames.MWUG).Contains(ContainedStrings.Undercover) 
+                        ? NFSGame.Undercover 
+                        : NFSGame.ProStreet;
+                }
+                if (File.Exists(ImageNames.World)) // nfsw.exe exists
+                {
+                    return NFSGame.World;
+                }
+                return NFSGame.Undetermined;
             }
         }
 
@@ -786,11 +799,11 @@ namespace NFSScriptLoader
 
         public static bool IsGameRunning()
         {
-            return (uint)Process.GetProcessesByName(Program.gameMemory.GetMainProcess().ProcessName).Length > 0U;
+            return (uint)Process.GetProcessesByName(Program.GameMemory.GetMainProcess().ProcessName).Length > 0U;
         }
     }
 
-    public struct NFSScriptLoader
+    public static class NFSScriptLoader
     {
         public const string LOADER_TAG = "NFSScriptLoader";
         public const string ERROR_TAG = "NFSScriptLoader ERROR";
@@ -800,7 +813,13 @@ namespace NFSScriptLoader
 
         public static RunningMemory GetRunningGameMemory()
         {
-            return Program.gameMemory;
+            return Program.GameMemory;
+        }
+
+        // TODO in the future we can add something more useful like error dialog.
+        public static void CriticalError(string s)
+        {
+            throw new NotImplementedException();
         }
     }
 

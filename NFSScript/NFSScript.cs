@@ -66,7 +66,7 @@ namespace NFSScript
         /// <summary>
         /// None.
         /// </summary>
-        None = 0,
+        Undetermined = 0,
         /// <summary>
         /// The game Need for Speed: Underground.
         /// </summary>
@@ -98,6 +98,7 @@ namespace NFSScript
         /// <summary>
         /// Undetermined game.
         /// </summary>
-        Undetermined = 255
+        [Obsolete("No point in using 255 instead of 0, since both serve the same purpose.")]
+        LegacyUndetermined = 255
     }
 }
