@@ -72,22 +72,21 @@ namespace NFSScript.Core
         /// </summary>
         public bool CheckProcess()
         {
-            if (ProcessName != null)
+            if (ProcessName == null) return false;
+            
+            _mainProcess = Process.GetProcessesByName(ProcessName);
+            if (_mainProcess.Length == 0)
             {
-                _mainProcess = Process.GetProcessesByName(ProcessName);
-                if (_mainProcess.Length == 0)
-                {
-                    ErrorProcessNotFound(ProcessName);
-                    return false;
-                }
-                ProcessHandle = OpenProcess(2035711U, false, _mainProcess[0].Id);
-                if (!(ProcessHandle == IntPtr.Zero))
-                    return true;
                 ErrorProcessNotFound(ProcessName);
                 return false;
             }
-            //int num = (int)MessageBox.Show("Programmer, define process name first!");
+            ProcessHandle = OpenProcess(2035711U, false, _mainProcess[0].Id);
+            if (!(ProcessHandle == IntPtr.Zero))
+                return true;
+            
+            ErrorProcessNotFound(ProcessName);
             return false;
+            //int num = (int)MessageBox.Show("Programmer, define process name first!");
         }
 
         /// <summary>
@@ -240,7 +239,7 @@ namespace NFSScript.Core
 
         private void ErrorProcessNotFound(string pProcessName)
         {
-            // FIXME: Shouldn't this be pProcessName?
+            // TODO FIXME: Shouldn't this be pProcessName?
             Log.Print("ERROR", $"{ProcessName} is not running or has not been found. Try to open the loader as an administrator.");
             Environment.Exit(0);
         }

@@ -13,7 +13,7 @@ namespace NFSScript.Core
         public static VAMemory Memory;
 
         /// <summary>
-        /// A generic memory.
+        /// A generic memory class.
         /// </summary>
         public static GMemory GenericMemory;
 

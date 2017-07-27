@@ -2852,7 +2852,7 @@
             /// <summary>
             /// 
             /// </summary>
-            public const int NON_STATIC_WORLD_CARS = 0x9CF1D8;
+            public const int NON_STATIC_WORLD_OBJECTS = 0x9CF1D8;
 
             /// <summary>
             /// 
@@ -2928,11 +2928,6 @@
             public const int PSTATIC_CAR_FORCE_LIFT_SOUTH = 0x38;
 
             /// <summary>
-            /// Value is metres per second.
-            /// </summary>
-            public const int PSTATIC_CAR_SPEED = 0x28;
-
-            /// <summary>
             /// Car gravity, default value is different per car.
             /// </summary>
             public const int PSTATIC_CAR_GRAVITY = 0x2C;
@@ -2993,6 +2988,20 @@
             /// </summary>
             public const int PSTATIC_GEMS_COLLECTED_1 = 0xC, PSTATIC_GEMS_COLLECTED_2 = 0x4, PSTATIC_GEMS_COLLECTED_3 = 0x10,
                 PSTATIC_GEMS_COLLECTED_4 = 0x0, PSTATIC_GEMS_COLLECTED_5 = 0x58;
+
+            /// <summary>
+            /// Alias for:
+            /// <see cref="PSTATIC_GEMS_COLLECTED_1"/>,
+            /// <see cref="PSTATIC_GEMS_COLLECTED_2"/>,
+            /// <see cref="PSTATIC_GEMS_COLLECTED_3"/>,
+            /// <see cref="PSTATIC_GEMS_COLLECTED_4"/>, and
+            /// <see cref="PSTATIC_GEMS_COLLECTED_5"/>
+            /// </summary>
+            public static readonly int[] PSTATIC_GEMS_COLLECTED =
+            {
+                0xC, 0x4, 0x10,
+                0x0, 0x58
+            };
 
             /// <summary>
             /// 
