@@ -20,4 +20,4 @@ build:
   project: NFSScript.sln          # path to Visual Studio solution or project
 
   # MSBuild verbosity level
-  verbosity: detailed #normal/detailed
+  verbosity: normal
