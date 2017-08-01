@@ -1,11 +1,6 @@
 ﻿using System;
-using System.Runtime.InteropServices;
 using NFSScript.Core;
-using static NFSScript.Core.GameMemory;
-using static NFSScript.Core.WorldAddresses;
-using static NFSScript.WorldFunctions;
 using static NFSScript.World.EASharpBindings;
-using NFSScript.Math;
 
 namespace NFSScript.World
 {
@@ -14,7 +9,7 @@ namespace NFSScript.World
     /// </summary>
     public class EAVector3 : ExposedBase
     {
-        private bool exists = false;
+        private bool exists;
 
         /// <summary>
         /// 
@@ -32,7 +27,7 @@ namespace NFSScript.World
         /// <param name="x"></param>
         /// <param name="y"></param>
         /// <param name="z"></param>
-        public EAVector3(float x, float y, float z) : base()
+        public EAVector3(float x, float y, float z)
         {
             mSelf = (IntPtr)CallBinding<IntPtr>(_EASharpBinding_628, x, y, z);
 
@@ -46,7 +41,7 @@ namespace NFSScript.World
         {
             if (!exists)
             {
-                throw new DoesNotExistException(string.Format("An attempt was made to destroy an instance that does not exist inside the game."));
+                throw new DoesNotExistException("An attempt was made to destroy an instance that does not exist inside the game.");
             }
 
             CallBinding(_EASharpBinding_626, mSelf);

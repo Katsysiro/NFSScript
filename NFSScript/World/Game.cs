@@ -14,32 +14,20 @@ namespace NFSScript.World
         /// <summary>
         /// Returns the amount of seconds it takes to render a frame.
         /// </summary>
-        public static float LastFrameTime
-        {
-            get
-            {
-                return genericMemory.Read<float>(GenericAddrs.NON_STATIC_LAST_FRAME_TIME);
-            }
-        }
+        public static float LastFrameTime => GenericMemory.Read<float>(GenericAddrs.NON_STATIC_LAST_FRAME_TIME);
 
         /// <summary>
         /// Returns true if the gameplay is currently active.
         /// </summary>
-        public static bool IsGameplayActive
-        {
-            get
-            {
-                return genericMemory.Read<byte>(GenericAddrs.NON_STATIC_IS_GAMEPLAY_ACTIVE) == 1;
-            }
-        }
+        public static bool IsGameplayActive => GenericMemory.Read<byte>(GenericAddrs.NON_STATIC_IS_GAMEPLAY_ACTIVE) == 1;
 
         /// <summary>
         /// The master sound volume.
         /// </summary>
         public static float MasterVolume
         {
-            get { return genericMemory.Read<float>(GameAddrs.NON_STATIC_MASTER_VOLUME); }
-            set { genericMemory.Write<float>(GameAddrs.NON_STATIC_MASTER_VOLUME, value); }
+            get => GenericMemory.Read<float>(GameAddrs.NON_STATIC_MASTER_VOLUME);
+            set => GenericMemory.Write(GameAddrs.NON_STATIC_MASTER_VOLUME, value);
         }
 
         /// <summary>
@@ -47,8 +35,8 @@ namespace NFSScript.World
         /// </summary>
         public static float SpeechVolume
         {
-            get { return genericMemory.Read<float>(GameAddrs.NON_STATIC_SPEECH_VOLUME); }
-            set { genericMemory.Write<float>(GameAddrs.NON_STATIC_SPEECH_VOLUME, value); }
+            get => GenericMemory.Read<float>(GameAddrs.NON_STATIC_SPEECH_VOLUME);
+            set => GenericMemory.Write(GameAddrs.NON_STATIC_SPEECH_VOLUME, value);
         }
 
         /// <summary>
@@ -56,8 +44,8 @@ namespace NFSScript.World
         /// </summary>
         public static float SoundEffectsVolume
         {
-            get { return genericMemory.Read<float>(GameAddrs.NON_STATIC_SOUND_EFFECTS_VOLUME); }
-            set { genericMemory.Write<float>(GameAddrs.NON_STATIC_SOUND_EFFECTS_VOLUME, value); }
+            get => GenericMemory.Read<float>(GameAddrs.NON_STATIC_SOUND_EFFECTS_VOLUME);
+            set => GenericMemory.Write(GameAddrs.NON_STATIC_SOUND_EFFECTS_VOLUME, value);
         }
 
         /// <summary>
@@ -65,8 +53,8 @@ namespace NFSScript.World
         /// </summary>
         public static float CarVolume
         {
-            get { return genericMemory.Read<float>(GameAddrs.NON_STATIC_CAR_VOLUME); }
-            set { genericMemory.Write<float>(GameAddrs.NON_STATIC_CAR_VOLUME, value); }
+            get => GenericMemory.Read<float>(GameAddrs.NON_STATIC_CAR_VOLUME);
+            set => GenericMemory.Write(GameAddrs.NON_STATIC_CAR_VOLUME, value);
         }
 
         /// <summary>
@@ -74,8 +62,8 @@ namespace NFSScript.World
         /// </summary>
         public static float FreeRoamMusicVolune
         {
-            get { return genericMemory.Read<float>(GameAddrs.NON_STATIC_FREE_ROAM_MUSIC_VOLUME); }
-            set { genericMemory.Write<float>(GameAddrs.NON_STATIC_FREE_ROAM_MUSIC_VOLUME, value); }
+            get => GenericMemory.Read<float>(GameAddrs.NON_STATIC_FREE_ROAM_MUSIC_VOLUME);
+            set => GenericMemory.Write(GameAddrs.NON_STATIC_FREE_ROAM_MUSIC_VOLUME, value);
         }
 
         /// <summary>
@@ -83,20 +71,15 @@ namespace NFSScript.World
         /// </summary>
         public static float EventMusicVolume
         {
-            get { return genericMemory.Read<float>(GameAddrs.NON_STATIC_EVENT_MUSIC_VOLUME); }
-            set { genericMemory.Write<float>(GameAddrs.NON_STATIC_EVENT_MUSIC_VOLUME, value); }
+            get => GenericMemory.Read<float>(GameAddrs.NON_STATIC_EVENT_MUSIC_VOLUME);
+            set => GenericMemory.Write(GameAddrs.NON_STATIC_EVENT_MUSIC_VOLUME, value);
         }
 
         /// <summary>
         /// 
         /// </summary>
-        public static int PWorld_Objects
-        {
-            get
-            {
-                return genericMemory.Read<int>(GameAddrs.NON_STATIC_WORLD_OBJECTS);
-            }
-        }
+        //TODO: maybe remove the underscore here
+        public static int PWorld_Objects => GenericMemory.Read<int>(GameAddrs.NON_STATIC_WORLD_OBJECTS);
 
         /// <summary>
         /// Enable the loading screen.
@@ -135,7 +118,7 @@ namespace NFSScript.World
             /// </summary>
             /// <param name="pMixTriggerString"></param>
             /// <param name="value"></param>
-            public static unsafe void SendMixTrigger(string pMixTriggerString, int value)
+            public static void SendMixTrigger(string pMixTriggerString, int value)
             {
                 CallBinding(_EASharpBinding_17, pMixTriggerString, value);
             }
@@ -171,7 +154,7 @@ namespace NFSScript.World
             /// Changes camera configuration.
             /// </summary>
             /// <param name="cameraName"></param>
-            public static unsafe void Set(string cameraName)
+            public static void Set(string cameraName)
             {
                 CallBinding(_EASharpBinding_33, cameraName);
             }
@@ -296,7 +279,7 @@ namespace NFSScript.World
             /// <param name="vehicleKey"></param>
             /// <param name="position"></param>
             /// <param name="direction"></param>
-            public static unsafe void SpawnCop(uint vehicleKey, EAVector3 position, EAVector3 direction)
+            public static void SpawnCop(uint vehicleKey, EAVector3 position, EAVector3 direction)
             {
                 CallBinding(_EASharpBinding_53, vehicleKey, position.mSelf, direction.mSelf);
             }
@@ -341,7 +324,7 @@ namespace NFSScript.World
             /// <param name="position"></param>
             /// <param name="direction"></param>
             /// <param name="initialSpeed"></param>
-            public static unsafe void SpawnTraffic(uint vehicleKey, EAVector3 position, EAVector3 direction, float initialSpeed)
+            public static void SpawnTraffic(uint vehicleKey, EAVector3 position, EAVector3 direction, float initialSpeed)
             {
                 CallBinding(_EASharpBinding_492, vehicleKey, position.mSelf, direction.mSelf, initialSpeed);
             }
@@ -397,14 +380,14 @@ namespace NFSScript.World
         /// <summary>
         /// The address where the main GameFlowManager is located at.
         /// </summary>
-        public static IntPtr Address { get { return (IntPtr)memory.getBaseAddress + GenericAddrs.NON_STATIC_GAME_STATE; } }
+        public static IntPtr Address => (IntPtr)Memory.getBaseAddress + GenericAddrs.NON_STATIC_GAME_STATE;
 
-        private int gameStateValue;
+        private readonly int _gameStateValue;
 
         /// <summary>
         /// The main GameFlowManager.
         /// </summary>
-        public static GameFlowManager TheGameFlowManager { get { return new GameFlowManager(memory.ReadInt32(Address)); } }
+        public static GameFlowManager TheGameFlowManager => new GameFlowManager(Memory.ReadInt32(Address));
 
         /// <summary>
         /// Instantiate a GameFlowManager class.
@@ -412,7 +395,7 @@ namespace NFSScript.World
         /// <param name="gameStateValue"></param>
         private GameFlowManager(int gameStateValue)
         {
-            this.gameStateValue = gameStateValue;
+            _gameStateValue = gameStateValue;
         }
 
         /// <summary>
@@ -421,11 +404,7 @@ namespace NFSScript.World
         /// <param name="instance"></param>
         public static implicit operator int(GameFlowManager instance)
         {
-            if (instance == null)
-            {
-                return -1;
-            }
-            return instance.gameStateValue;
+            return instance?._gameStateValue ?? -1;
         }
 
         /// <summary>
@@ -434,7 +413,7 @@ namespace NFSScript.World
         /// <returns></returns>
         public override string ToString()
         {
-            return gameStateValue.ToString();
+            return _gameStateValue.ToString();
         }
     }
 }

@@ -1,9 +1,9 @@
 ﻿using System;
 using NFSScript.Core;
+using NFSScript.Math;
 using static NFSScript.Core.GameMemory;
 using static NFSScript.Core.MWAddresses;
 using static NFSScript.MWFunctions;
-using NFSScript.Math;
 
 namespace NFSScript.MW
 {
@@ -29,8 +29,8 @@ namespace NFSScript.MW
         {
             get
             {
-                ushort x = memory.ReadUShort((IntPtr)UIAddrs.STATIC_CURSOR_POS_X);
-                ushort y = memory.ReadUShort((IntPtr)UIAddrs.STATIC_CURSOR_POS_Y);
+                var x = Memory.ReadUShort((IntPtr)UIAddrs.STATIC_CURSOR_POS_X);
+                var y = Memory.ReadUShort((IntPtr)UIAddrs.STATIC_CURSOR_POS_Y);
 
                 return new Point(x, y);
             }
@@ -41,7 +41,7 @@ namespace NFSScript.MW
         /// </summary>
         public static void CallEATraxNotification()
         {
-            memory.WriteByte((IntPtr)UIAddrs.STATIC_TRIGGER_EA_TRAX_NOTIFICATION, 1);
+            Memory.WriteByte((IntPtr)UIAddrs.STATIC_TRIGGER_EA_TRAX_NOTIFICATION, 1);
         }
 
         /// <summary>
@@ -101,23 +101,23 @@ namespace NFSScript.MW
         private const int STRING_MAX_LENGTH = 128;
         internal static void _setHelloWorldString(string s)
         {
-            IntPtr address = (IntPtr)UIAddrs.STATIC_STRING_HELLO_WORLD_ADDRESS;
+            var address = (IntPtr)UIAddrs.STATIC_STRING_HELLO_WORLD_ADDRESS;
             ASM.Abolish(address, STRING_MAX_LENGTH);
-            string newString = s;
+            var newString = s;
             if (newString.Length > STRING_MAX_LENGTH)
                 newString = newString.Substring(0, STRING_MAX_LENGTH);
-            memory.WriteStringASCII(address, newString);
+            Memory.WriteStringASCII(address, newString);
         }
 
         private const int DEBUG_ERROR_STRING_MAX_LENGTH = 64;
         internal static void _setDebugErrorString(string s)
         {
-            IntPtr address = (IntPtr)UIAddrs.STATIC_DEBUG_ERROR_MSG_ADDRESS;
+            var address = (IntPtr)UIAddrs.STATIC_DEBUG_ERROR_MSG_ADDRESS;
             ASM.Abolish(address, DEBUG_ERROR_STRING_MAX_LENGTH);
-            string newString = s;
+            var newString = s;
             if (newString.Length > DEBUG_ERROR_STRING_MAX_LENGTH)
                 newString = newString.Substring(0, DEBUG_ERROR_STRING_MAX_LENGTH);
-            memory.WriteStringASCII(address, newString);
+            Memory.WriteStringASCII(address, newString);
         }
     }
 }

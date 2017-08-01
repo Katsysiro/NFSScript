@@ -7,9 +7,6 @@ namespace NFSScript.World
     /// </summary>
     internal static class MemoryBase
     {
-        internal static uint FunctionBase
-        {
-            get { return ((uint)memory.getBaseAddress - 0x400000); }
-        }
+        internal static uint FunctionBase => ((uint)Memory.getBaseAddress - 0x400000);
     }
 }

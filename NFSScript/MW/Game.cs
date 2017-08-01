@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using NFSScript.Math;
 using static NFSScript.Core.GameMemory;
 using Addrs = NFSScript.Core.MWAddresses;
 using Funcs = NFSScript.MWFunctions;
-using NFSScript.Math;
 
 namespace NFSScript.MW
 {
@@ -30,33 +30,21 @@ namespace NFSScript.MW
         /// <summary>
         /// Returns the save game directory path.
         /// </summary>
-        public static string SaveDirectory { get { return Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "NFS Most Wanted"); } }
+        public static string SaveDirectory => Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "NFS Most Wanted");
 
         /// <summary>
         /// The scale at which the gameplay's time is passing. (Not the global time scale)
         /// </summary>
         public static float GameSpeed
         {
-            get
-            {
-                return memory.ReadFloat((IntPtr)Addrs.GameAddrs.STATIC_GAME_SPEED);
-            }
-            set
-            {
-                memory.WriteFloat((IntPtr)Addrs.GameAddrs.STATIC_GAME_SPEED, value);
-            }
+            get => Memory.ReadFloat((IntPtr)Addrs.GameAddrs.STATIC_GAME_SPEED);
+            set => Memory.WriteFloat((IntPtr)Addrs.GameAddrs.STATIC_GAME_SPEED, value);
         }
 
         /// <summary>
         /// Returns the amount of seconds it takes to render a frame
         /// </summary>
-        public static float LastFrameTime
-        {
-            get
-            {
-                return memory.ReadFloat((IntPtr)Addrs.GenericAddrs.STATIC_LAST_FRAME_TIME);
-            }
-        }
+        public static float LastFrameTime => Memory.ReadFloat((IntPtr)Addrs.GenericAddrs.STATIC_LAST_FRAME_TIME);
 
         /// <summary>
         /// Returns true is the gameplay is active.
@@ -65,10 +53,10 @@ namespace NFSScript.MW
         {
             get
             {
-                byte b = memory.ReadByte((IntPtr)Addrs.GenericAddrs.STATIC_IS_GAMEPLAY_ACTIVE);
+                var b = Memory.ReadByte((IntPtr)Addrs.GenericAddrs.STATIC_IS_GAMEPLAY_ACTIVE);
                 if (b == 1)
                     return true;
-                else return false;
+                return false;
             }
         }
 
@@ -77,8 +65,8 @@ namespace NFSScript.MW
         /// </summary>
         public static bool IsSoundEnabled
         {
-            get { return _readAudioIDValue(SOUND_ID); }
-            set { _setAudioIDValue(SOUND_ID, value); }
+            get => _readAudioIDValue(SOUND_ID);
+            set => _setAudioIDValue(SOUND_ID, value);
         }
 
         /// <summary>
@@ -86,8 +74,8 @@ namespace NFSScript.MW
         /// </summary>
         public static bool IsAudioStreamingEnabled
         {
-            get { return _readAudioIDValue(AUDIO_STREAMING_ID); }
-            set { _setAudioIDValue(AUDIO_STREAMING_ID, value); }
+            get => _readAudioIDValue(AUDIO_STREAMING_ID);
+            set => _setAudioIDValue(AUDIO_STREAMING_ID, value);
         }
 
         /// <summary>
@@ -95,8 +83,8 @@ namespace NFSScript.MW
         /// </summary>
         public static bool IsSpeechEnabled
         {
-            get { return _readAudioIDValue(SPEECH_ID); }
-            set { _setAudioIDValue(SPEECH_ID, value); }
+            get => _readAudioIDValue(SPEECH_ID);
+            set => _setAudioIDValue(SPEECH_ID, value);
         }
 
         /// <summary>
@@ -104,8 +92,8 @@ namespace NFSScript.MW
         /// </summary>
         public static bool IsNISAudioEnabled
         {
-            get { return _readAudioIDValue(NIS_AUDIO_ID); }
-            set { _setAudioIDValue(NIS_AUDIO_ID, value); }
+            get => _readAudioIDValue(NIS_AUDIO_ID);
+            set => _setAudioIDValue(NIS_AUDIO_ID, value);
         }
 
         /// <summary>
@@ -114,8 +102,8 @@ namespace NFSScript.MW
         /// <param name="frames"></param>
         public static void StreamAnim(int frames)
         {
-            memory.WriteInteger((IntPtr)Addrs.GenericAddrs.STATIC_NUMBER_OF_STREAM_ANIM, frames);
-            memory.WriteByte((IntPtr)Addrs.GenericAddrs.STATIC_SAVE_STREAM_ANIM_FRAMES, 1);
+            Memory.WriteInteger((IntPtr)Addrs.GenericAddrs.STATIC_NUMBER_OF_STREAM_ANIM, frames);
+            Memory.WriteByte((IntPtr)Addrs.GenericAddrs.STATIC_SAVE_STREAM_ANIM_FRAMES, 1);
         }
 
         /// <summary>
@@ -126,7 +114,7 @@ namespace NFSScript.MW
         {
             byte b = 0;
             if (value) b = 1;
-            memory.WriteByte((IntPtr)Addrs.GenericAddrs.STATIC_USE_RECORDABLE, b);
+            Memory.WriteByte((IntPtr)Addrs.GenericAddrs.STATIC_USE_RECORDABLE, b);
         }
 
         /// <summary>
@@ -251,7 +239,7 @@ namespace NFSScript.MW
         {
             byte b = 0;
             if (value) b = 1;
-            memory.WriteByte((IntPtr)Addrs.GenericAddrs.STATIC_DO_SCREEN_PRINTF, b);
+            Memory.WriteByte((IntPtr)Addrs.GenericAddrs.STATIC_DO_SCREEN_PRINTF, b);
         }
 
         /// <summary>
@@ -264,7 +252,7 @@ namespace NFSScript.MW
             if (enabled)
                 value = 1;
 
-            memory.WriteByte((IntPtr)Addrs.GameAddrs.STATIC_SKIP_FE_ENABLED, value);
+            Memory.WriteByte((IntPtr)Addrs.GameAddrs.STATIC_SKIP_FE_ENABLED, value);
         }
 
         /// <summary>
@@ -309,27 +297,27 @@ namespace NFSScript.MW
         /// <returns></returns>
         public static Dictionary<string, float> GetCurrentPoliceLightsIntensity()
         {
-            Dictionary<string, float> dic = new Dictionary<string, float>();
+            var dic = new Dictionary<string, float>();
 
-            dic.Add("Redlights", memory.ReadFloat((IntPtr)Addrs.GameAddrs.STATIC_GLOBAL_COP_LIGHTS_RED));
-            dic.Add("Bluelights", memory.ReadFloat((IntPtr)Addrs.GameAddrs.STATIC_GLOBAL_COP_LIGHTS_BLUE));
-            dic.Add("Whitelights", memory.ReadFloat((IntPtr)Addrs.GameAddrs.STATIC_GLOBAL_COP_LIGHTS_WHITE));
+            dic.Add("Redlights", Memory.ReadFloat((IntPtr)Addrs.GameAddrs.STATIC_GLOBAL_COP_LIGHTS_RED));
+            dic.Add("Bluelights", Memory.ReadFloat((IntPtr)Addrs.GameAddrs.STATIC_GLOBAL_COP_LIGHTS_BLUE));
+            dic.Add("Whitelights", Memory.ReadFloat((IntPtr)Addrs.GameAddrs.STATIC_GLOBAL_COP_LIGHTS_WHITE));
 
             return dic;
         }
 
         internal static void _setPoliceSirensIntensity(float r, float b, float w)
         {
-            memory.WriteFloat((IntPtr)Addrs.GameAddrs.STATIC_GLOBAL_COP_LIGHTS_RED, r);
-            memory.WriteFloat((IntPtr)Addrs.GameAddrs.STATIC_GLOBAL_COP_LIGHTS_BLUE, b);
-            memory.WriteFloat((IntPtr)Addrs.GameAddrs.STATIC_GLOBAL_COP_LIGHTS_WHITE, w);
+            Memory.WriteFloat((IntPtr)Addrs.GameAddrs.STATIC_GLOBAL_COP_LIGHTS_RED, r);
+            Memory.WriteFloat((IntPtr)Addrs.GameAddrs.STATIC_GLOBAL_COP_LIGHTS_BLUE, b);
+            Memory.WriteFloat((IntPtr)Addrs.GameAddrs.STATIC_GLOBAL_COP_LIGHTS_WHITE, w);
         }
 
         internal static void _setAudioIDValue(int id, bool value)
         {
             byte b = 0;
             if (value) b = 1;
-            IntPtr address = IntPtr.Zero;
+            var address = IntPtr.Zero;
             switch (id)
             {
                 case SOUND_ID:
@@ -352,7 +340,7 @@ namespace NFSScript.MW
                     return;
             }
 
-            memory.WriteByte(address, b);
+            Memory.WriteByte(address, b);
         }
 
         internal static bool _readAudioIDValue(int id)
@@ -361,19 +349,19 @@ namespace NFSScript.MW
             switch (id)
             {
                 case SOUND_ID:
-                    b = memory.ReadByte((IntPtr)Addrs.GenericAddrs.STATIC_IS_SOUND_ENABLED);
+                    b = Memory.ReadByte((IntPtr)Addrs.GenericAddrs.STATIC_IS_SOUND_ENABLED);
                     break;
 
                 case AUDIO_STREAMING_ID:
-                    b = memory.ReadByte((IntPtr)Addrs.GenericAddrs.STATIC_IS_AUDIO_STREAMING_ENABLED);
+                    b = Memory.ReadByte((IntPtr)Addrs.GenericAddrs.STATIC_IS_AUDIO_STREAMING_ENABLED);
                     break;
 
                 case SPEECH_ID:
-                    b = memory.ReadByte((IntPtr)Addrs.GenericAddrs.STATIC_IS_SPEECH_ENABLED);
+                    b = Memory.ReadByte((IntPtr)Addrs.GenericAddrs.STATIC_IS_SPEECH_ENABLED);
                     break;
 
                 case NIS_AUDIO_ID:
-                    b = memory.ReadByte((IntPtr)Addrs.GenericAddrs.STATIC_IS_NIS_AUDIO_ENABLED);
+                    b = Memory.ReadByte((IntPtr)Addrs.GenericAddrs.STATIC_IS_NIS_AUDIO_ENABLED);
                     break;
 
                 default:
@@ -394,8 +382,8 @@ namespace NFSScript.MW
             /// </summary>
             public static float AnimationSpeed
             {
-                get { return memory.ReadFloat((IntPtr)Addrs.WorldAddrs.STATIC_ANIMATION_SPEED); }
-                set { memory.WriteFloat((IntPtr)Addrs.WorldAddrs.STATIC_ANIMATION_SPEED, value); }
+                get => Memory.ReadFloat((IntPtr)Addrs.WorldAddrs.STATIC_ANIMATION_SPEED);
+                set => Memory.WriteFloat((IntPtr)Addrs.WorldAddrs.STATIC_ANIMATION_SPEED, value);
             }
 
             /// <summary>
@@ -405,17 +393,17 @@ namespace NFSScript.MW
             {
                 get
                 {
-                    float x = memory.ReadFloat((IntPtr)Addrs.WorldAddrs.STATIC_GLOBAL_CAR_SCALE_X);
-                    float y = memory.ReadFloat((IntPtr)Addrs.WorldAddrs.STATIC_GLOBAL_CAR_SCALE_Y);
-                    float z = memory.ReadFloat((IntPtr)Addrs.WorldAddrs.STATIC_GLOBAL_CAR_SCALE_Z);
+                    var x = Memory.ReadFloat((IntPtr)Addrs.WorldAddrs.STATIC_GLOBAL_CAR_SCALE_X);
+                    var y = Memory.ReadFloat((IntPtr)Addrs.WorldAddrs.STATIC_GLOBAL_CAR_SCALE_Y);
+                    var z = Memory.ReadFloat((IntPtr)Addrs.WorldAddrs.STATIC_GLOBAL_CAR_SCALE_Z);
 
                     return new Vector3(x, y, z);
                 }
                 set
                 {
-                    memory.WriteFloat((IntPtr)Addrs.WorldAddrs.STATIC_GLOBAL_CAR_SCALE_X, value.X);
-                    memory.WriteFloat((IntPtr)Addrs.WorldAddrs.STATIC_GLOBAL_CAR_SCALE_Y, value.Y);
-                    memory.WriteFloat((IntPtr)Addrs.WorldAddrs.STATIC_GLOBAL_CAR_SCALE_Z, value.Z);
+                    Memory.WriteFloat((IntPtr)Addrs.WorldAddrs.STATIC_GLOBAL_CAR_SCALE_X, value.X);
+                    Memory.WriteFloat((IntPtr)Addrs.WorldAddrs.STATIC_GLOBAL_CAR_SCALE_Y, value.Y);
+                    Memory.WriteFloat((IntPtr)Addrs.WorldAddrs.STATIC_GLOBAL_CAR_SCALE_Z, value.Z);
                 }
             }
 
@@ -425,8 +413,8 @@ namespace NFSScript.MW
             /// <param name="heat"></param>
             public static void SetWorldHeat(float heat)
             {
-                uint addr = memory.ReadUInteger((IntPtr)Addrs.PlayerAddrs.PSTATIC_HEAT_LEVEL);
-                memory.WriteFloat((IntPtr)addr + Addrs.PlayerAddrs.POINTER_HEAT_LEVEL, heat);
+                var addr = Memory.ReadUInteger((IntPtr)Addrs.PlayerAddrs.PSTATIC_HEAT_LEVEL);
+                Memory.WriteFloat((IntPtr)addr + Addrs.PlayerAddrs.POINTER_HEAT_LEVEL, heat);
             }
 
             /// <summary>
@@ -439,11 +427,11 @@ namespace NFSScript.MW
             /// <param name="gravity"></param>
             public static void SetRainProperties(float rainSize, float intensity, float crossing, float fallSpeed, float gravity)
             {
-                memory.WriteFloat((IntPtr)Addrs.WorldAddrs.STATIC_RAIN_SIZE, rainSize);
-                memory.WriteFloat((IntPtr)Addrs.WorldAddrs.STATIC_RAIN_INTENSITY, intensity);
-                memory.WriteFloat((IntPtr)Addrs.WorldAddrs.STATIC_RAIN_XING, crossing);
-                memory.WriteFloat((IntPtr)Addrs.WorldAddrs.STATIC_RAIN_FALL_SPEED, fallSpeed);
-                memory.WriteFloat((IntPtr)Addrs.WorldAddrs.STATIC_RAIN_GRAVITY, gravity);
+                Memory.WriteFloat((IntPtr)Addrs.WorldAddrs.STATIC_RAIN_SIZE, rainSize);
+                Memory.WriteFloat((IntPtr)Addrs.WorldAddrs.STATIC_RAIN_INTENSITY, intensity);
+                Memory.WriteFloat((IntPtr)Addrs.WorldAddrs.STATIC_RAIN_XING, crossing);
+                Memory.WriteFloat((IntPtr)Addrs.WorldAddrs.STATIC_RAIN_FALL_SPEED, fallSpeed);
+                Memory.WriteFloat((IntPtr)Addrs.WorldAddrs.STATIC_RAIN_GRAVITY, gravity);
             }
 
             /// <summary>
@@ -452,13 +440,13 @@ namespace NFSScript.MW
             /// <returns></returns>
             public static Dictionary<string, float> GetRainProperties()
             {
-                Dictionary<string, float> dic = new Dictionary<string, float>();
+                var dic = new Dictionary<string, float>();
 
-                dic.Add("RainSize", memory.ReadFloat((IntPtr)Addrs.WorldAddrs.STATIC_RAIN_SIZE));
-                dic.Add("Intensity", memory.ReadFloat((IntPtr)Addrs.WorldAddrs.STATIC_RAIN_INTENSITY));
-                dic.Add("Crossing", memory.ReadFloat((IntPtr)Addrs.WorldAddrs.STATIC_RAIN_XING));
-                dic.Add("FallSpeed", memory.ReadFloat((IntPtr)Addrs.WorldAddrs.STATIC_RAIN_FALL_SPEED));
-                dic.Add("Gravity", memory.ReadFloat((IntPtr)Addrs.WorldAddrs.STATIC_RAIN_GRAVITY));
+                dic.Add("RainSize", Memory.ReadFloat((IntPtr)Addrs.WorldAddrs.STATIC_RAIN_SIZE));
+                dic.Add("Intensity", Memory.ReadFloat((IntPtr)Addrs.WorldAddrs.STATIC_RAIN_INTENSITY));
+                dic.Add("Crossing", Memory.ReadFloat((IntPtr)Addrs.WorldAddrs.STATIC_RAIN_XING));
+                dic.Add("FallSpeed", Memory.ReadFloat((IntPtr)Addrs.WorldAddrs.STATIC_RAIN_FALL_SPEED));
+                dic.Add("Gravity", Memory.ReadFloat((IntPtr)Addrs.WorldAddrs.STATIC_RAIN_GRAVITY));
 
                 return dic;
             }
@@ -515,36 +503,36 @@ namespace NFSScript.MW
 
             internal static void _setVisualTreatmentBlackBloomAmount(float value)
             {
-                int address = memory.ReadInt32((IntPtr)Addrs.CameraAddrs.PNON_STATIC_VISUAL_TREATMENT_ADDR);
-                address = memory.ReadInt32((IntPtr)address + Addrs.CameraAddrs.POINTER_VISUAL_TREAT);
+                var address = Memory.ReadInt32((IntPtr)Addrs.CameraAddrs.PNON_STATIC_VISUAL_TREATMENT_ADDR);
+                address = Memory.ReadInt32((IntPtr)address + Addrs.CameraAddrs.POINTER_VISUAL_TREAT);
 
-                memory.WriteFloat((IntPtr)address + 0xD8, value);
+                Memory.WriteFloat((IntPtr)address + 0xD8, value);
             }
 
             internal static void _setVisualTreatmentBloomAmount(float value)
             {
-                int address = memory.ReadInt32((IntPtr)Addrs.CameraAddrs.PNON_STATIC_VISUAL_TREATMENT_ADDR);
-                address = memory.ReadInt32((IntPtr)address + Addrs.CameraAddrs.POINTER_VISUAL_TREAT);
+                var address = Memory.ReadInt32((IntPtr)Addrs.CameraAddrs.PNON_STATIC_VISUAL_TREATMENT_ADDR);
+                address = Memory.ReadInt32((IntPtr)address + Addrs.CameraAddrs.POINTER_VISUAL_TREAT);
 
-                memory.WriteFloat((IntPtr)address + 0xD0, value);
+                Memory.WriteFloat((IntPtr)address + 0xD0, value);
             }
 
             internal static void _setVisualTreatmentSaturation(float value)
             {
-                int address = memory.ReadInt32((IntPtr)Addrs.CameraAddrs.PNON_STATIC_VISUAL_TREATMENT_ADDR);
-                address = memory.ReadInt32((IntPtr)address + Addrs.CameraAddrs.POINTER_VISUAL_TREAT);
+                var address = Memory.ReadInt32((IntPtr)Addrs.CameraAddrs.PNON_STATIC_VISUAL_TREATMENT_ADDR);
+                address = Memory.ReadInt32((IntPtr)address + Addrs.CameraAddrs.POINTER_VISUAL_TREAT);
 
-                memory.WriteFloat((IntPtr)address + 0xD4, value);
+                Memory.WriteFloat((IntPtr)address + 0xD4, value);
             }
 
             internal static void _setVisualTreatmentRGB(float r, float g, float b)
             {
-                int address = memory.ReadInt32((IntPtr)Addrs.CameraAddrs.PNON_STATIC_VISUAL_TREATMENT_ADDR);
-                address = memory.ReadInt32((IntPtr)address + Addrs.CameraAddrs.POINTER_VISUAL_TREAT);
+                var address = Memory.ReadInt32((IntPtr)Addrs.CameraAddrs.PNON_STATIC_VISUAL_TREATMENT_ADDR);
+                address = Memory.ReadInt32((IntPtr)address + Addrs.CameraAddrs.POINTER_VISUAL_TREAT);
 
-                memory.WriteFloat((IntPtr)address + 0xC0, r);
-                memory.WriteFloat((IntPtr)address + 0xC4, g);
-                memory.WriteFloat((IntPtr)address + 0xC8, b);
+                Memory.WriteFloat((IntPtr)address + 0xC0, r);
+                Memory.WriteFloat((IntPtr)address + 0xC4, g);
+                Memory.WriteFloat((IntPtr)address + 0xC8, b);
             }
         }
     }
@@ -557,14 +545,14 @@ namespace NFSScript.MW
         /// <summary>
         /// The address where the main GameFlowManager is located at.
         /// </summary>
-        public static IntPtr Address { get { return (IntPtr)Addrs.GenericAddrs.STATIC_GAME_STATE; } }
+        public static IntPtr Address => (IntPtr)Addrs.GenericAddrs.STATIC_GAME_STATE;
 
         private int gameStateValue;
 
         /// <summary>
         /// The main GameFlowManager.
         /// </summary>
-        public static GameFlowManager TheGameFlowManager { get { return new GameFlowManager(memory.ReadInt32(Address)); } }
+        public static GameFlowManager TheGameFlowManager => new GameFlowManager(Memory.ReadInt32(Address));
 
         /// <summary>
         /// Instantiate a GameFlowManager class.

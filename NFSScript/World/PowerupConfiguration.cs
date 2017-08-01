@@ -24,6 +24,6 @@
         /// <summary>
         /// 
         /// </summary>
-        kPowerupConfigMultiplayerPursuit,
+        kPowerupConfigMultiplayerPursuit
     }
 }

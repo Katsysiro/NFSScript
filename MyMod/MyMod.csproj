@@ -31,10 +31,10 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="NFSScript, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\NFSScript\bin\Release\NFSScript.dll</HintPath>
-    </Reference>
+    <ProjectReference Include="..\NFSScript\NFSScript.csproj">
+      <Project>{55a95250-696d-4c73-8e96-593d211a5974}</Project>
+      <Name>NFSScript</Name>
+    </ProjectReference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Windows.Forms" />

@@ -7,7 +7,7 @@ namespace NFSScript
     public class DoesNotExistException : Exception
     {
         /// <summary/>
-        public DoesNotExistException() : base()
+        public DoesNotExistException()
         { }
 
         /// <summary/>

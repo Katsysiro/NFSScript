@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using NFSScript.Types;
+﻿using NFSScript.Types;
 
 namespace NFSScript
 {

@@ -1,5 +1,4 @@
-﻿using System;
-using static NFSScript.World.EASharpBindings;
+﻿using static NFSScript.World.EASharpBindings;
 
 namespace NFSScript.World
 {
@@ -13,7 +12,7 @@ namespace NFSScript.World
         /// </summary>
         /// <param name="text"></param>
         /// <returns></returns>
-        public unsafe static uint Hash32(string text)
+        public static uint Hash32(string text)
         {
             return (uint)CallBinding<uint>(_EASharpBinding_94, text);
         }

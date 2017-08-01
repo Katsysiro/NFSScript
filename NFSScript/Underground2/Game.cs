@@ -12,13 +12,7 @@ namespace NFSScript.Underground2
         /// <summary>
         /// Returns the amount of seconds it takes to render a frame
         /// </summary>
-        public static float LastFrameTime
-        {
-            get
-            {
-                return memory.ReadFloat((IntPtr)Addrs.GenericAddrs.STATIC_LAST_FRAME_TIME);
-            }
-        }
+        public static float LastFrameTime => Memory.ReadFloat((IntPtr)Addrs.GenericAddrs.STATIC_LAST_FRAME_TIME);
 
         /// <summary>
         /// Returns a value indicating whether the game is active or not.
@@ -27,10 +21,10 @@ namespace NFSScript.Underground2
         {
             get
             {
-                byte b = memory.ReadByte((IntPtr)Addrs.GenericAddrs.STATIC_IS_GAMEPLAY_ACTIVE);
+                var b = Memory.ReadByte((IntPtr)Addrs.GenericAddrs.STATIC_IS_GAMEPLAY_ACTIVE);
                 if (b == 1)
                     return true;
-                else return false;
+                return false;
             }
         }
         
@@ -40,9 +34,9 @@ namespace NFSScript.Underground2
         public static bool IsInReplayMode
         {
             get {
-                byte b = memory.ReadByte((IntPtr)Addrs.GenericAddrs.STATIC_IS_REPLAY_MODE);
+                var b = Memory.ReadByte((IntPtr)Addrs.GenericAddrs.STATIC_IS_REPLAY_MODE);
                 if (b == 1) return true;
-                else return false;
+                return false;
             }
         }
 
@@ -52,7 +46,7 @@ namespace NFSScript.Underground2
         /// <returns></returns>
         public static char[] GetCheatField()
         {
-            return memory.ReadStringASCII((IntPtr)Addrs.GenericAddrs.STATIC_CHEAT_INPUT_FIELD, 32).ToCharArray();
+            return Memory.ReadStringASCII((IntPtr)Addrs.GenericAddrs.STATIC_CHEAT_INPUT_FIELD, 32).ToCharArray();
         }
 
         /// <summary>
@@ -65,8 +59,8 @@ namespace NFSScript.Underground2
             /// </summary>
             public static float CarsNeonBrightness
             {
-                get { return memory.ReadFloat((IntPtr)Addrs.WorldAddrs.STATIC_WORLD_CARS_NEON_BRIGHTNESS); }
-                set { memory.WriteFloat((IntPtr)Addrs.WorldAddrs.STATIC_WORLD_CARS_NEON_BRIGHTNESS, value); }
+                get => Memory.ReadFloat((IntPtr)Addrs.WorldAddrs.STATIC_WORLD_CARS_NEON_BRIGHTNESS);
+                set => Memory.WriteFloat((IntPtr)Addrs.WorldAddrs.STATIC_WORLD_CARS_NEON_BRIGHTNESS, value);
             }
         }
     }
@@ -79,14 +73,14 @@ namespace NFSScript.Underground2
         /// <summary>
         /// The address where the main GameFlowManager is located at.
         /// </summary>
-        public static IntPtr Address { get { return (IntPtr)Addrs.GenericAddrs.STATIC_GAME_STATE; } }
+        public static IntPtr Address => (IntPtr)Addrs.GenericAddrs.STATIC_GAME_STATE;
 
         private int gameStateValue;
 
         /// <summary>
         /// The main GameFlowManager.
         /// </summary>
-        public static GameFlowManager TheGameFlowManager { get { return new GameFlowManager(memory.ReadInt32(Address)); } }
+        public static GameFlowManager TheGameFlowManager => new GameFlowManager(Memory.ReadInt32(Address));
 
         /// <summary>
         /// Instantiate a GameFlowManager class.

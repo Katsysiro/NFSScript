@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Diagnostics;
+using System.IO;
 using NFSScript.Core;
 
 namespace NFSScript
@@ -10,8 +11,10 @@ namespace NFSScript
     public static class NFSScript
     {
         /// <summary>
-        /// DEBUG.
+        /// Does debug-y things.
         /// </summary>
+        // TODO: this bool should probably be a const. Opinions?
+        // TODO: ReSharper advises against ANSI style constant names, and recommends regular PascalCase. Opinions?
         public static bool DEBUG = false;
 
         /// <summary>
@@ -22,12 +25,12 @@ namespace NFSScript
         /// <summary>
         /// Returns the directory of the script loader (NFSScriptLoader.exe).
         /// </summary>
-        public static string Directory { get { return AppDomain.CurrentDomain.BaseDirectory; } }
+        public static string Directory => AppDomain.CurrentDomain.BaseDirectory;
 
         /// <summary>
         /// Returns the game's directory.
         /// </summary>
-        public static string GameDirectory { get { return System.IO.Path.GetDirectoryName(GameMemory.memory.GetMainProcess().MainModule.FileName); } }
+        public static string GameDirectory => Path.GetDirectoryName(GameMemory.Memory.GetMainProcess().MainModule.FileName);
     }
 
     /// <summary>
@@ -38,7 +41,7 @@ namespace NFSScript
         /// <summary>
         /// Returns a value that indicates whether the game is minimized or not.
         /// </summary>
-        public static bool IsMinimized { get { return NativeMethods.IsIconic(GameMemory.memory.GetMainProcess().MainWindowHandle); } }
+        public static bool IsMinimized => NativeMethods.IsIconic(GameMemory.Memory.GetMainProcess().MainWindowHandle);
 
         /// <summary>
         /// Returns a value that indicates whether the game window is focused or not.
@@ -47,27 +50,23 @@ namespace NFSScript
         {
             get
             {
-                int processID;
-                NativeMethods.GetWindowThreadProcessId(NativeMethods.GetForegroundWindow(), out processID);
-                Process processToCheck = Process.GetProcessById(processID);
-                if (GameMemory.memory.GetMainProcess().Id == processToCheck.Id)
-                {
-                    return true;
-                }
-                else return false;
+                int processId;
+                NativeMethods.GetWindowThreadProcessId(NativeMethods.GetForegroundWindow(), out processId);
+                var processToCheck = Process.GetProcessById(processId);
+                return GameMemory.Memory.GetMainProcess().Id == processToCheck.Id;
             }
         }
     }
 
     /// <summary>
-    /// NFSGame enum.
+    /// Enum of the different supported NFS games.
     /// </summary>
     public enum NFSGame : byte
     {
         /// <summary>
         /// None.
         /// </summary>
-        None = 0,
+        Undetermined = 0,
         /// <summary>
         /// The game Need for Speed: Underground.
         /// </summary>
@@ -99,6 +98,7 @@ namespace NFSScript
         /// <summary>
         /// Undetermined game.
         /// </summary>
-        Undetermined = 255
+        [Obsolete("No point in using 255 instead of 0, since both serve the same purpose.")]
+        LegacyUndetermined = 255
     }
 }

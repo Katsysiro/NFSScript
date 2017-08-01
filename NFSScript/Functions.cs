@@ -4,6 +4,9 @@ using System.Linq;
 using System.Text;
 using NFSScript.Core;
 
+// ReSharper disable InconsistentNaming
+// TODO: disabling right now so the class is readable. Remove in the future and either disable the inspection or fix it.
+
 namespace NFSScript
 {
     /// <summary>
@@ -5622,53 +5625,56 @@ namespace NFSScript
     /// </summary>
     public static class Function
     {
-        static Dictionary<IntPtr, string> memoryStringPointers = new Dictionary<IntPtr, string>();
+        /// <summary>
+        /// Maps Pointer->String
+        /// </summary>
+        public static readonly Dictionary<IntPtr, string> memoryStringPointers = new Dictionary<IntPtr, string>();
 
         private static ASMBuilder ParameterPush(params object[] o)
         {
-            ASMBuilder function = new ASMBuilder();
+            var function = new ASMBuilder();
             // Push parameters to the stack backwards since the stack is LIFO
-            for (int i = o.Length; i-- > 0;)
+            for (var i = o.Length; i-- > 0;)
             {
                 if (o[i] is byte b)
                 {
                     function.Push(b);
-                    Log.Debug(string.Format("Pushing byte {0} to the stack", b));
+                    Log.Debug($"Pushing byte {b} to the stack");
                 }
                 else if (o[i] is int num)
                 {
                     function.Push(num);
-                    Log.Debug(string.Format("Pushing int {0} to the stack", num));
+                    Log.Debug($"Pushing int {num} to the stack");
                 }
                 else if (o[i] is IntPtr ptr)
                 {
                     function.Push(ptr.ToInt32());
-                    Log.Debug(string.Format("Pushing address {0} to the stack", ptr.ToInt32().ToString("X")));
+                    Log.Debug($"Pushing address {ptr.ToInt32():X} to the stack");
                 }
                 else if (o[i] is short shrt)
                 {
                     function.Push(shrt);
-                    Log.Debug(string.Format("Pushing short {0} to the stack", shrt));
+                    Log.Debug($"Pushing short {shrt} to the stack");
                 }
                 else if (o[i] is float f)
                 {
                     function.Push(f);
-                    Log.Debug(string.Format("Pushing float {0} to the stack", f));
+                    Log.Debug($"Pushing float {f} to the stack");
                 }
                 else if (o[i] is double d)
                 {
                     function.Push(d);
-                    Log.Debug(string.Format("Pushing double {0} to the stack", d));
+                    Log.Debug($"Pushing double {d} to the stack");
                 }
                 else if (o[i] is bool boo)
                 {
                     function.Push(boo.ToByte());
-                    Log.Debug(string.Format("Pushing bool {0} to the stack", boo.ToString()));
+                    Log.Debug($"Pushing bool {boo} to the stack");
                 }
                 else if (o[i] is string s)
                 {
-                    IntPtr addr = IntPtr.Zero;
-                    IntPtr handle = GameMemory.memory.ProcessHandle;
+                    IntPtr addr;
+                    var handle = GameMemory.Memory.ProcessHandle;
                     if (memoryStringPointers.ContainsValue(s))
                     {
                         addr = memoryStringPointers.FirstOrDefault(x => x.Value == s).Key;
@@ -5683,14 +5689,14 @@ namespace NFSScript
                             break;
                         }
 
-                        UIntPtr bytesWritten = UIntPtr.Zero;
+                        UIntPtr bytesWritten;
 
                         if (!NativeMethods.WriteProcessMemory(handle, addr, Encoding.ASCII.GetBytes(s), (uint)s.Length + 4, out bytesWritten))
                         {
                             Log.Print("ERROR", "Could not write process memory!");
                             break;
                         }
-                        else memoryStringPointers.Add(addr, s);
+                        memoryStringPointers.Add(addr, s);
 
                         if (s.Length + 4 != (int)bytesWritten)
                         {
@@ -5698,7 +5704,7 @@ namespace NFSScript
                         }
 
                     }
-                    Log.Debug(string.Format("Pushing string {0} to the stack", s));
+                    Log.Debug($"Pushing string {s} to the stack");
                     function.Push(addr.ToInt32());
 
                 }
@@ -5707,7 +5713,7 @@ namespace NFSScript
                     int value = loc;
                     function.PushWORDPTRDS(value);
 
-                    Log.Debug(string.Format("Pushing the value of [0x{0}] to the stack", value.ToString("X")));
+                    Log.Debug($"Pushing the value of [0x{value:X}] to the stack");
                 }
                 else if(o[i] is null)
                 {
@@ -5717,25 +5723,26 @@ namespace NFSScript
                 else if (o[i] is sbyte sb)
                 {
                     function.Push(sb);
-                    Log.Debug(string.Format("Pushing sbyte {0} to the stack", sb));
+                    Log.Debug($"Pushing sbyte {sb} to the stack");
                 }
                 else if (o[i] is uint unum)
                 {
                     function.Push(unum);
-                    Log.Debug(string.Format("Pushing uint {0} to the stack", unum));
+                    Log.Debug($"Pushing uint {unum} to the stack");
                 }
                 else if (o[i] is ushort ushrt)
                 {
                     function.Push(ushrt);
-                    Log.Debug(string.Format("Pushing ushort {0} to the stack", ushrt));
+                    Log.Debug($"Pushing ushort {ushrt} to the stack");
                 }
-                else if (o[i] is Voidf voidf)
+                else if (o[i] is Voidf)
                 {
                     Log.Debug("You can't push Voidf, what were you thinking?");
                 }
                 else
                 {
-                    Log.Print("Function Error", string.Format("The type {0} is not supported in Function.Call yet! Pushing 0 instead.", o[i].GetType()));
+                    Log.Print("Function Error",
+                        $"The type {o[i].GetType()} is not supported in Function.Call yet! Pushing 0 instead.");
                     function.Push(0);
                 }
             }
@@ -5761,7 +5768,7 @@ namespace NFSScript
         /// <param name="align">Whether to align the stack or not.</param>
         public static void Call(bool align, uint address, params object[] o)
         {
-            ASMBuilder function = ParameterPush(o);
+            var function = ParameterPush(o);
             
             function.MovEAX(address);
             function.CallEAX();
@@ -5769,7 +5776,7 @@ namespace NFSScript
             if (align)
             {
                 // For stack alignment to prevent crashes
-                for (int i = 0; i < o.Length; i++)
+                for (var i = 0; i < o.Length; i++)
                 {
                     function.PopEAX();
                 }
@@ -5801,9 +5808,9 @@ namespace NFSScript
         /// <param name="align">Whether to align the stack or not.</param>
         public static object Call<T>(bool align, uint address, params object[] o)
         {
-            Type typeParameterType = typeof(T);
-            Any ret = Return(address, align, o);
-            object obj = null;
+            var typeParameterType = typeof(T);
+            var ret = Return(address, align, o);
+            object obj;
 
             if (typeParameterType == typeof(int))
             {
@@ -5811,7 +5818,7 @@ namespace NFSScript
             }
             else if (typeParameterType == typeof(IntPtr))
             {
-                obj = ASM.memoryReturnAllocation.Last().storedAddress;
+                obj = ASM.memoryReturnAllocation.Last().StoredAddress;
             }
             else if (typeParameterType == typeof(bool))
             {
@@ -5870,24 +5877,23 @@ namespace NFSScript
         /// <returns></returns>
         private static Any Return(uint address, bool align, params object[] o)
         {            
-            ASMBuilder function = ParameterPush(o);
+            var function = ParameterPush(o);
 
             function.MovEAX(address);
             function.CallEAX();
 
-            IntPtr handle = GameMemory.memory.ProcessHandle;
-            IntPtr retAddr = IntPtr.Zero;
+            var handle = GameMemory.Memory.ProcessHandle;
 
-            if (MemoryAllocMap.ExistsInMemoryReturnAlloc(address))
-                retAddr = MemoryAllocMap.GetMemoryAllocMapByCalledAddress(address).storedAddress;
-            else retAddr = NativeMethods.VirtualAllocEx(handle, IntPtr.Zero, 4 + 2, AllocationType.Commit, MemoryProtection.ExecuteReadWrite);
+            var retAddr = MemoryAllocMap.ExistsInMemoryReturnAlloc(address) 
+                ? MemoryAllocMap.GetMemoryAllocMapByCalledAddress(address).StoredAddress 
+                : NativeMethods.VirtualAllocEx(handle, IntPtr.Zero, 4 + 2, AllocationType.Commit, MemoryProtection.ExecuteReadWrite);
 
             function.MovEAXToAddress((uint)retAddr.ToInt32());
 
             if (align)
             {
                 // Stack alignment in order to prevent crashes
-                for (int i = 0; i < o.Length; i++)
+                for (var i = 0; i < o.Length; i++)
                 {
                     function.PopEAX();
                 }
@@ -5903,13 +5909,10 @@ namespace NFSScript
                 Log.Print("ERROR", "Failed to allocate memory!");
                 return null;
             }
-            else
-            {
-                if (!MemoryAllocMap.ExistsInMemoryReturnAlloc(address))
-                    ASM.memoryReturnAllocation.Add(new MemoryAllocMap(retAddr, address));
-            }
+            if (!MemoryAllocMap.ExistsInMemoryReturnAlloc(address))
+                ASM.memoryReturnAllocation.Add(new MemoryAllocMap(retAddr, address));
 
-            return GameMemory.memory.ReadByteArray(retAddr, 8+2);
+            return GameMemory.Memory.ReadByteArray(retAddr, 8+2);
         }
     }
 }

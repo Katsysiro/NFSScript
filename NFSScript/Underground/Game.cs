@@ -12,24 +12,12 @@ namespace NFSScript.Underground
         /// <summary>
         /// Returns the amount of seconds it takes to render a frame (I have no idea if this is the correct address though..)
         /// </summary>
-        public static float LastFrameTime
-        {
-            get
-            {
-                return memory.ReadFloat((IntPtr)Addrs.GenericAddrs.STATIC_LAST_FRAME_TIME);
-            }
-        }
+        public static float LastFrameTime => Memory.ReadFloat((IntPtr)Addrs.GenericAddrs.STATIC_LAST_FRAME_TIME);
 
         /// <summary>
         /// Returns for how long the gameplay is active.
         /// </summary>
-        public static float GameplayTimer
-        {
-            get
-            {
-                return memory.ReadFloat((IntPtr)Addrs.GenericAddrs.STATIC_GAMEPLAY_ACTIVE_TIMER);
-            }
-        }
+        public static float GameplayTimer => Memory.ReadFloat((IntPtr)Addrs.GenericAddrs.STATIC_GAMEPLAY_ACTIVE_TIMER);
 
         /// <summary>
         /// Returns a value indicating whether the game world is or not.
@@ -37,10 +25,10 @@ namespace NFSScript.Underground
         public static bool IsGameWorldLoaded {
             get
             {
-                byte b = memory.ReadByte((IntPtr)Addrs.GenericAddrs.STATIC_IS_GAME_WORLD_LOADED);
+                var b = Memory.ReadByte((IntPtr)Addrs.GenericAddrs.STATIC_IS_GAME_WORLD_LOADED);
                 if (b == 1)
                     return true;
-                else return false;
+                return false;
             }
         }
 
@@ -50,10 +38,10 @@ namespace NFSScript.Underground
         public static bool IsGameplayActive
         {
             get {
-                byte b = memory.ReadByte((IntPtr)Addrs.GenericAddrs.STATIC_IS_GAMEPLAY_ACTIVE);
+                var b = Memory.ReadByte((IntPtr)Addrs.GenericAddrs.STATIC_IS_GAMEPLAY_ACTIVE);
                 if (b == 1)
                     return true;
-                else return false;
+                return false;
             }
         }
 
@@ -63,7 +51,7 @@ namespace NFSScript.Underground
         /// <returns></returns>
         public static char[] GetCheatField()
         {
-            return memory.ReadStringASCII((IntPtr)Addrs.GenericAddrs.STATIC_CHEAT_INPUT_FIELD, 32).ToCharArray();
+            return Memory.ReadStringASCII((IntPtr)Addrs.GenericAddrs.STATIC_CHEAT_INPUT_FIELD, 32).ToCharArray();
         }
     }
 
@@ -75,14 +63,14 @@ namespace NFSScript.Underground
         /// <summary>
         /// The address where the main GameFlowManager is located at.
         /// </summary>
-        public static IntPtr Address { get { return (IntPtr)Addrs.GenericAddrs.STATIC_GAME_STATE; } }
+        public static IntPtr Address => (IntPtr)Addrs.GenericAddrs.STATIC_GAME_STATE;
 
         private int gameStateValue;
 
         /// <summary>
         /// The main GameFlowManager.
         /// </summary>
-        public static GameFlowManager TheGameFlowManager { get { return new GameFlowManager(memory.ReadInt32(Address)); } }
+        public static GameFlowManager TheGameFlowManager => new GameFlowManager(Memory.ReadInt32(Address));
 
         /// <summary>
         /// Instantiate a GameFlowManager class.

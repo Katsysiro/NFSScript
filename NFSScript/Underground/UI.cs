@@ -1,7 +1,7 @@
 ﻿using System;
+using NFSScript.Math;
 using static NFSScript.Core.GameMemory;
 using Addrs = NFSScript.Core.UGAddresses;
-using NFSScript.Math;
 
 namespace NFSScript.Underground
 {
@@ -18,8 +18,8 @@ namespace NFSScript.Underground
         {
             get
             {
-                ushort x = memory.ReadUShort((IntPtr)Addrs.UIAddrs.STATIC_CURSOR_POS_X);
-                ushort y = memory.ReadUShort((IntPtr)Addrs.UIAddrs.STATIC_CURSOR_POS_Y);
+                var x = Memory.ReadUShort((IntPtr)Addrs.UIAddrs.STATIC_CURSOR_POS_X);
+                var y = Memory.ReadUShort((IntPtr)Addrs.UIAddrs.STATIC_CURSOR_POS_Y);
 
                 return new Point(x, y);
             }

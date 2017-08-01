@@ -17,11 +17,6 @@
  * OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-
 using Maths = System.Math;
 
 namespace NFSScript.Math
@@ -55,34 +50,22 @@ namespace NFSScript.Math
         /// <summary>
         /// Returns the length of this <see cref="Vector2"/>.
         /// </summary>
-        public float Length
-        {
-            get
-            {
-                return (float)Maths.Sqrt((X * X) + (Y * Y));
-            }
-        }
+        public float Length => (float)Maths.Sqrt((X * X) + (Y * Y));
 
         /// <summary>
         /// Returns the length of this <see cref="Vector2"/> squared.
         /// </summary>
-        public float LengthSquared
-        {
-            get
-            {
-                return (X * X) + (Y * Y);
-            }
-        }
+        public float LengthSquared => (X * X) + (Y * Y);
 
         /// <summary>
         /// Makes this vector have a magnitude of 1.
         /// </summary>
         public void Normalize()
         {
-            float length = Length;
-            if (length == 0) return;
+            var length = Length;
+            if (Maths.Abs(length) < float.Epsilon) return;
 
-            float num = 1 / length;
+            var num = 1 / length;
             X *= num;
             Y *= num;
         }
@@ -169,11 +152,11 @@ namespace NFSScript.Math
         /// <returns></returns>
         public Vector2 Clamp(Vector2 value, Vector2 min, Vector2 max)
         {
-            float x = value.X;
+            var x = value.X;
             x = (x > max.X) ? max.X : x;
             x = (x < min.X) ? min.X : x;
 
-            float y = value.Y;
+            var y = value.Y;
             y = (y > max.Y) ? max.Y : y;
             y = (y < min.Y) ? min.Y : y;
 
@@ -189,10 +172,12 @@ namespace NFSScript.Math
         /// <returns></returns>
         public Vector2 Lerp(Vector2 start, Vector2 end, float factor)
         {
-            Vector2 vector = new Vector2();
+            var vector = new Vector2
+            {
+                X = start.X + ((end.X - start.X) * factor),
+                Y = start.Y + ((end.Y - start.Y) * factor)
+            };
 
-            vector.X = start.X + ((end.X - start.X) * factor);
-            vector.Y = start.Y + ((end.Y - start.Y) * factor);
 
             return vector;
         }
@@ -216,8 +201,8 @@ namespace NFSScript.Math
         /// <returns></returns>
         public static Vector2 Reflect(Vector2 vector, Vector2 normal)
         {
-            Vector2 result = new Vector2();
-            float dot = ((vector.X * normal.X) + (vector.Y * normal.Y));
+            var result = new Vector2();
+            var dot = ((vector.X * normal.X) + (vector.Y * normal.Y));
 
             result.X = vector.X - ((2.0f * dot) * normal.X);
             result.Y = vector.Y - ((2.0f * dot) * normal.Y);
@@ -233,9 +218,11 @@ namespace NFSScript.Math
         /// <returns></returns>
         public static Vector2 Minimize(Vector2 left, Vector2 right)
         {
-            Vector2 vector = new Vector2();
-            vector.X = (left.X < right.X) ? left.X : right.X;
-            vector.Y = (left.Y < right.Y) ? left.Y : right.Y;
+            var vector = new Vector2
+            {
+                X = (left.X < right.X) ? left.X : right.X,
+                Y = (left.Y < right.Y) ? left.Y : right.Y
+            };
 
             return vector;
         }
@@ -248,9 +235,11 @@ namespace NFSScript.Math
         /// <returns></returns>
         public static Vector2 Maximize(Vector2 left, Vector2 right)
         {
-            Vector2 vector = new Vector2();
-            vector.X = (left.X > right.X) ? left.X : right.X;
-            vector.Y = (left.Y > right.Y) ? left.Y : right.Y;
+            var vector = new Vector2
+            {
+                X = (left.X > right.X) ? left.X : right.X,
+                Y = (left.Y > right.Y) ? left.Y : right.Y
+            };
             return vector;
         }
 
@@ -336,6 +325,7 @@ namespace NFSScript.Math
         /// <returns></returns>
         public override int GetHashCode()
         {
+            // TODO: See note in Point.cs
             return X.GetHashCode() ^ Y.GetHashCode() << 2;
         }
 
@@ -345,7 +335,7 @@ namespace NFSScript.Math
         /// <returns></returns>
         public override string ToString()
         {
-            return string.Format("X = {0} Y = {1}", X, Y);
+            return $"X = {X} Y = {Y}";
         }
 
         /// <summary>
@@ -354,7 +344,7 @@ namespace NFSScript.Math
         /// <returns></returns>
         public string ToString(string numberFormat)
         {
-            return string.Format("X = {0} Y = {1} Z = {2}", X.ToString(numberFormat), Y.ToString(numberFormat));
+            return $"X = {X.ToString(numberFormat)} Y = {Y.ToString(numberFormat)}";
         }
 
         /// <summary>
@@ -365,7 +355,7 @@ namespace NFSScript.Math
         /// <returns></returns>
         public static bool Equals(Vector2 position1, Vector2 position2)
         {
-            return (position1.X == position2.X && position1.Y == position2.Y);
+            return (Maths.Abs(position1.X - position2.X) < float.Epsilon && Maths.Abs(position1.Y - position2.Y) < float.Epsilon);
         }
 
         /// <summary>
@@ -375,7 +365,7 @@ namespace NFSScript.Math
         /// <returns></returns>
         public bool Equals(float value)
         {
-            return (X == value && Y == value);
+            return (Maths.Abs(X - value) < float.Epsilon && Maths.Abs(Y - value) < float.Epsilon);
         }
 
         /// <summary>
@@ -385,9 +375,7 @@ namespace NFSScript.Math
         /// <returns></returns>
         public override bool Equals(object obj)
         {
-            if (obj.GetType() != typeof(Vector2) || obj == null)
-                return false;
-            else return Equals(this, (Vector2)obj);
+            return obj is Vector2 && Equals(this, (Vector2) obj);
         }
     }
 }

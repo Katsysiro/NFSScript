@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Threading;
 using System.Threading.Tasks;
 using NFSScript.Types;
 
@@ -10,8 +11,8 @@ namespace NFSScript
     /// </summary>
     public class Mod
     {
-        static List<InvokedClass> invokedClasses = new List<InvokedClass>();
-
+        private static readonly List<InvokedClass> InvokedClasses = new List<InvokedClass>();
+        
         /// <summary>
         /// The initialize method name.
         /// </summary>
@@ -141,13 +142,11 @@ namespace NFSScript
         /// <param name="action"></param>
         public static void InvokeRepeating(string name, double interval, Action action)
         {
-            InvokedClass c = new InvokedClass(name, (uint)invokedClasses.Count, interval, action);
-            InvokedClass obj = invokedClasses.Find((item => item.Name == name));
-            if (obj == null)
-            {
-                invokedClasses.Add(c);
-                c.InvokeRepeat();
-            }
+            var c = new InvokedClass(name, (uint)InvokedClasses.Count, interval, action);
+            var obj = InvokedClasses.Find((item => item.Name == name));
+            if (obj != null) return;
+            InvokedClasses.Add(c);
+            c.InvokeRepeat();
         }
 
         /// <summary>
@@ -156,12 +155,10 @@ namespace NFSScript
         /// <param name="name"></param>
         public static void StopRepeating(string name)
         {
-            InvokedClass obj = invokedClasses.Find((item => item.Name == name));
-            if (obj != null)
-            {
-                obj.Stop();
-                invokedClasses.Remove(obj);
-            }
+            var obj = InvokedClasses.Find((item => item.Name == name));
+            if (obj == null) return;
+            obj.Stop();
+            InvokedClasses.Remove(obj);
         }
 
 
@@ -180,7 +177,7 @@ namespace NFSScript
         /// <param name="action"></param>
         public static void DoAsyncTask(Action action)
         {
-            var task = new Task(() => { action(); });
+            var task = new Task(action);
             task.Start();
         }
 
@@ -193,7 +190,7 @@ namespace NFSScript
         {
             var task = new Task(() =>
             {
-                System.Threading.Thread.Sleep(millisecondsBeforeExecuting);
+                Thread.Sleep(millisecondsBeforeExecuting);
                 action();
             });
             task.Start();

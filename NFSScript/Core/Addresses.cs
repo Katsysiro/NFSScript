@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace NFSScript.Core
+﻿namespace NFSScript.Core
 {
     /// <summary>
     /// 
@@ -2990,6 +2988,20 @@ namespace NFSScript.Core
             /// </summary>
             public const int PSTATIC_GEMS_COLLECTED_1 = 0xC, PSTATIC_GEMS_COLLECTED_2 = 0x4, PSTATIC_GEMS_COLLECTED_3 = 0x10,
                 PSTATIC_GEMS_COLLECTED_4 = 0x0, PSTATIC_GEMS_COLLECTED_5 = 0x58;
+
+            /// <summary>
+            /// Alias for:
+            /// <see cref="PSTATIC_GEMS_COLLECTED_1"/>,
+            /// <see cref="PSTATIC_GEMS_COLLECTED_2"/>,
+            /// <see cref="PSTATIC_GEMS_COLLECTED_3"/>,
+            /// <see cref="PSTATIC_GEMS_COLLECTED_4"/>, and
+            /// <see cref="PSTATIC_GEMS_COLLECTED_5"/>
+            /// </summary>
+            public static readonly int[] PSTATIC_GEMS_COLLECTED =
+            {
+                0xC, 0x4, 0x10,
+                0x0, 0x58
+            };
 
             /// <summary>
             /// 

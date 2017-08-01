@@ -36,7 +36,7 @@ namespace NFSScriptLoader
             IsInActivity = false;
 
             File = dllFile;
-            string path = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, File);
+            var path = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, File);
             t = NReflec.GetTypesFromDLL(path);
             methods = NReflec.GetMethodsFromDLL(path);
             CheckMethods();
@@ -55,7 +55,7 @@ namespace NFSScriptLoader
 
         private void CheckMethods()
         {
-            for (int i = 0; i < methods.Length; i++)
+            for (var i = 0; i < methods.Length; i++)
             {
                 if (methods[i].Name.Equals(Mod.PRE_METHOD))
                     HasPre = true;
@@ -94,7 +94,7 @@ namespace NFSScriptLoader
 
         public void CallModFunction(ModMethod modMethod, params object[] o)
         {
-            string method = string.Empty;
+            var method = string.Empty;
             switch (modMethod)
             {
                 case ModMethod.None:
@@ -145,7 +145,7 @@ namespace NFSScriptLoader
                     method = Mod.ONEXIT_METHOD;
                     break;
             }
-            for (int i = 0; i < t.Length; i++)
+            for (var i = 0; i < t.Length; i++)
             {
                 if (t[i].IsSubclassOf(typeof(Mod)))
                 {
@@ -161,15 +161,15 @@ namespace NFSScriptLoader
         }
         public override string ToString()
         {
-            StringBuilder sb = new StringBuilder();
+            var sb = new StringBuilder();
             sb.Append("ModScript: File = ");
             sb.Append(File);
             sb.Append(" Types: ");
             sb.Append(t.Length);
             sb.Append(" Methods: ");
-            for (int i = 0; i < methods.Length; i++)
+            for (var i = 0; i < methods.Length; i++)
             {
-                sb.AppendLine(string.Format("{0} {1}: {2} ", "Method", i, methods[i].Name));
+                sb.AppendLine($"Method {i}: {methods[i].Name} ");
             }
             return sb.ToString();
         }

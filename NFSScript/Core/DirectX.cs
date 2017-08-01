@@ -8,7 +8,7 @@ namespace NFSScript
     /// </summary>
     public struct DirectXInput
     {
-        private static Dictionary<DirectXKeys, Keys> inputDictonary = new Dictionary<DirectXKeys, Keys>()
+        private static readonly Dictionary<DirectXKeys, Keys> InputDictonary = new Dictionary<DirectXKeys, Keys>
         {
             { DirectXKeys.None, Keys.None },
             { DirectXKeys.Escape, Keys.Escape },
@@ -108,7 +108,7 @@ namespace NFSScript
             { DirectXKeys.LeftMouseButton, Keys.LButton },
             { DirectXKeys.RightMouseButton, Keys.RButton },
             { DirectXKeys.MiddleMouseButton, Keys.MButton },
-            { DirectXKeys.MouseButton3, Keys.XButton1},
+            { DirectXKeys.MouseButton3, Keys.XButton1 },
             { DirectXKeys.MouseButton4, Keys.XButton2 },
         };
 
@@ -119,7 +119,7 @@ namespace NFSScript
         /// <returns></returns>
         public static Keys DirectXKeyToKeys(DirectXKeys dKey)
         {
-            inputDictonary.TryGetValue(dKey, out Keys key);
+            InputDictonary.TryGetValue(dKey, out Keys key);
 
             return key;
         }
@@ -131,7 +131,7 @@ namespace NFSScript
         /// <returns></returns>
         public static DirectXKeys KeysToDirectXKey(Keys fKey)
         {
-            return inputDictonary.FirstOrDefault(x => x.Value == fKey).Key;
+            return InputDictonary.FirstOrDefault(x => x.Value == fKey).Key;
         }
     }
 

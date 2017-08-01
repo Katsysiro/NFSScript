@@ -34,7 +34,7 @@ namespace NFSScript
         /// </summary>
         public Color32(byte r, byte g, byte b)
         {
-            this.a = byte.MaxValue;
+            a = byte.MaxValue;
             this.b = b;
             this.g = g;
             this.r = r;
@@ -68,7 +68,7 @@ namespace NFSScript
         {
             try
             {
-                int argb = int.Parse(hex.Replace("#", "").Replace("0x", ""), NumberStyles.HexNumber);
+                var argb = int.Parse(hex.Replace("#", "").Replace("0x", ""), NumberStyles.HexNumber);
                 return new Color32((byte)((argb & -16777216) >> 0x18),
                                       (byte)((argb & 0xff0000) >> 0x10),
                                       (byte)((argb & 0xff00) >> 8),
@@ -76,7 +76,7 @@ namespace NFSScript
             }
             catch
             {
-                throw new Exception(string.Format("{0} {1}", hex, "is not a valid color."));
+                throw new Exception($"{hex} is not a valid color.");
             }
         }
     }

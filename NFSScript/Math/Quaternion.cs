@@ -33,55 +33,37 @@ namespace NFSScript.Math
         /// <summary>
         /// Returns a <see cref="Quaternion"/> representing no rotation.
         /// </summary>
-        public static Quaternion Identity
-        {
-            get
-            {
-                return new Quaternion(0, 0, 0, 1);
-            }
-        }
+        public static Quaternion Identity => new Quaternion(0, 0, 0, 1);
 
         /// <summary>
         /// W component of the <see cref="Quaternion"/>.
         /// </summary>
-        public float w { get; private set; }
+        public float W { get; private set; }
 
         /// <summary>
         /// X component of the <see cref="Quaternion"/>.
         /// </summary>
-        public float x { get; private set; }
+        public float X { get; private set; }
 
         /// <summary>
         /// Y component of the <see cref="Quaternion"/>.
         /// </summary>
-        public float y { get; private set; }
+        public float Y { get; private set; }
 
         /// <summary>
         /// Z component of the <see cref="Quaternion"/>.
         /// </summary>
-        public float z { get; private set; }
+        public float Z { get; private set; }
 
         /// <summary>
         /// Returns the length of this <see cref="Quaternion"/>.
         /// </summary>
-        public float magnitude
-        {
-            get
-            {
-                return (float)Maths.Sqrt((x * x) + (y * y) + (z * z) + (w * w));
-            }
-        }
+        public float Magnitude => (float)Maths.Sqrt((X * X) + (Y * Y) + (Z * Z) + (W * W));
 
         /// <summary>
         /// Returns the squared length of this <see cref="Quaternion"/>.
         /// </summary>
-        public float magnitudeSquared
-        {
-            get
-            {
-                return ((x * x) + (y * y) + (z * z) + (w * w));
-            }
-        }
+        public float MagnitudeSquared => ((X * X) + (Y * Y) + (Z * Z) + (W * W));
 
         /// <summary>
         /// Axis of this <see cref="Quaternion"/>.
@@ -91,12 +73,12 @@ namespace NFSScript.Math
             get
             {
                 float x, y, z;
-                if (magnitude != 0.0f)
+                if (Maths.Abs(Magnitude) > float.Epsilon)
                 {
-                    float inverseLength = 1.0f / magnitude;
-                    x = this.x * inverseLength;
-                    y = this.y * inverseLength;
-                    z = this.z * inverseLength;
+                    var inverseLength = 1.0f / Magnitude;
+                    x = X * inverseLength;
+                    y = Y * inverseLength;
+                    z = Z * inverseLength;
                 }
                 else
                 {
@@ -118,10 +100,10 @@ namespace NFSScript.Math
         /// <param name="w"></param>
         public Quaternion(float x, float y, float z, float w)
         {
-            this.x = x;
-            this.y = y;
-            this.z = z;
-            this.w = w;
+            X = x;
+            Y = y;
+            Z = z;
+            W = w;
         }
 
         /// <summary>
@@ -131,10 +113,10 @@ namespace NFSScript.Math
         /// <param name="w"></param>
         public Quaternion(Vector3 value, float w)
         {
-            x = value.X;
-            y = value.Y;
-            z = value.Z;
-            this.w = w;
+            X = value.X;
+            Y = value.Y;
+            Z = value.Z;
+            W = w;
         }
 
         /// <summary>
@@ -146,10 +128,10 @@ namespace NFSScript.Math
         /// <param name="w"></param>
         public void Set(float x, float y, float z, float w)
         {
-            this.x = x;
-            this.y = y;
-            this.z = z;
-            this.w = w;
+            X = x;
+            Y = y;
+            Z = z;
+            W = w;
         }
 
         /// <summary>
@@ -159,11 +141,11 @@ namespace NFSScript.Math
         /// <returns></returns>
         public static Quaternion Normalize(Quaternion quat)
         {
-            float length = 1.0f / quat.magnitude;
-            float x = quat.x * length;
-            float y = quat.y * length;
-            float z = quat.z * length;
-            float w = quat.w * length;
+            var length = 1.0f / quat.Magnitude;
+            var x = quat.X * length;
+            var y = quat.Y * length;
+            var z = quat.Z * length;
+            var w = quat.W * length;
 
             return new Quaternion(x, y, z, w);
         }
@@ -176,7 +158,7 @@ namespace NFSScript.Math
         /// <returns></returns>
         public static float Dot(Quaternion left, Quaternion right)
         {
-            return (left.x * right.x) + (left.y * right.y) + (left.z * right.z) + (left.w * right.w);
+            return (left.X * right.X) + (left.Y * right.Y) + (left.Z * right.Z) + (left.W * right.W);
         }
 
         /// <summary>
@@ -187,7 +169,7 @@ namespace NFSScript.Math
         /// <returns></returns>
         public static float AngleBetween(Quaternion a, Quaternion b)
         {
-            float dot = Dot(a, b);
+            var dot = Dot(a, b);
             return (float)((Maths.Acos(Maths.Min(Maths.Abs(dot), 1.0f)) * 2.0 * (180.0f / Mathf.PI)));
         }
 
@@ -202,25 +184,25 @@ namespace NFSScript.Math
         {
             float x, y, z, w;
 
-            float inverse = 1.0f - factor;
-            float dot = Dot(a, b);
+            var inverse = 1.0f - factor;
+            var dot = Dot(a, b);
 
             if (dot >= 0.0f)
             {
-                x = (inverse * a.x) + (factor * b.x);
-                y = (inverse * a.y) + (factor * b.y);
-                z = (inverse * a.z) + (factor * b.z);
-                w = (inverse * a.w) + (factor * b.w);
+                x = (inverse * a.X) + (factor * b.X);
+                y = (inverse * a.Y) + (factor * b.Y);
+                z = (inverse * a.Z) + (factor * b.Z);
+                w = (inverse * a.W) + (factor * b.W);
             }
             else
             {
-                x = (inverse * a.x) - (factor * b.x);
-                y = (inverse * a.y) - (factor * b.y);
-                z = (inverse * a.z) - (factor * b.z);
-                w = (inverse * a.w) - (factor * b.w);
+                x = (inverse * a.X) - (factor * b.X);
+                y = (inverse * a.Y) - (factor * b.Y);
+                z = (inverse * a.Z) - (factor * b.Z);
+                w = (inverse * a.W) - (factor * b.W);
             }
 
-            float inverseLength = 1.0f / new Quaternion(x, y, z, w).magnitude;
+            var inverseLength = 1.0f / new Quaternion(x, y, z, w).Magnitude;
 
             x *= inverseLength;
             y *= inverseLength;
@@ -241,7 +223,7 @@ namespace NFSScript.Math
         {
             float x, y, z, w;
             float opposite, inverse;
-            float dot = Dot(a, b);
+            var dot = Dot(a, b);
 
             if (Maths.Abs(dot) > (1.0 - Mathf.Epsilon))
             {
@@ -250,17 +232,17 @@ namespace NFSScript.Math
             }
             else
             {
-                float acos = (float)Maths.Acos(Maths.Abs(dot));
-                float inverseSin = (float)(1.0 / Maths.Sin(acos));
+                var acos = (float)Maths.Acos(Maths.Abs(dot));
+                var inverseSin = (float)(1.0 / Maths.Sin(acos));
 
                 inverse = (float)(Maths.Sin((1.0f - factor) * acos) * inverseSin);
                 opposite = (float)(Maths.Sin(factor * acos) * inverseSin * Maths.Sign(dot));
             }
 
-            x = (inverse * a.x) + (opposite * b.x);
-            y = (inverse * a.y) + (opposite * b.y);
-            z = (inverse * a.z) + (opposite * b.z);
-            w = (inverse * a.w) + (opposite * b.w);
+            x = (inverse * a.X) + (opposite * b.X);
+            y = (inverse * a.Y) + (opposite * b.Y);
+            z = (inverse * a.Z) + (opposite * b.Z);
+            w = (inverse * a.W) + (opposite * b.W);
 
             return new Quaternion(x, y, z, w);
         }
@@ -274,31 +256,20 @@ namespace NFSScript.Math
         /// <returns></returns>
         public static Quaternion SlerpUnclamped(Quaternion a, Quaternion b, float factor)
         {
-            if (a.magnitudeSquared == 0.0f)
+            if (Maths.Abs(a.MagnitudeSquared) < float.Epsilon)
             {
-                if (b.magnitudeSquared == 0.0f)
-                {
-                    return Identity;
-                }
-                return b;
+                return Maths.Abs(b.MagnitudeSquared) < float.Epsilon ? Identity : b;
             }
-            else if (b.magnitudeSquared == 0.0)
+            if (Maths.Abs(b.MagnitudeSquared) < float.Epsilon)
             {
                 return a;
             }
 
-            float invX, invY, invZ, invW;
-
-            float cosHalfAngle = a.w * b.w + Vector3.Dot(a.Axis, b.Axis);
+            var cosHalfAngle = a.W * b.W + Vector3.Dot(a.Axis, b.Axis);
             if (cosHalfAngle >= 1.0f || cosHalfAngle <= -1.0f)
                 return a;
-            else if (cosHalfAngle < 0.0f)
+            if (cosHalfAngle < 0.0f)
             {
-                invX = -b.x;
-                invY = -b.y;
-                invZ = -b.z;
-                invW = -b.w;
-
                 cosHalfAngle = -cosHalfAngle;
             }
 
@@ -306,9 +277,9 @@ namespace NFSScript.Math
 
             if (cosHalfAngle < 0.99f)
             {
-                float halfAngle = (float)Maths.Acos(cosHalfAngle);
-                float sinHalfAngle = (float)Maths.Sin(halfAngle);
-                float oneOverSinHalfAngle = 1.0f / sinHalfAngle;
+                var halfAngle = (float)Maths.Acos(cosHalfAngle);
+                var sinHalfAngle = (float)Maths.Sin(halfAngle);
+                var oneOverSinHalfAngle = 1.0f / sinHalfAngle;
                 blendA = (float)Maths.Sin(halfAngle * (1.0f - factor)) * oneOverSinHalfAngle;
                 blendB = (float)Maths.Sin(halfAngle * factor) * oneOverSinHalfAngle;
             }
@@ -318,11 +289,11 @@ namespace NFSScript.Math
                 blendB = factor;
             }
 
-            Quaternion result = new Quaternion(blendA * a.Axis + blendB, blendA * a.w + blendB + b.w);
+            var result = new Quaternion(blendA * a.Axis + blendB, blendA * a.W + blendB + b.W);
 
-            if (result.magnitudeSquared > 0.0f)
+            if (result.MagnitudeSquared > 0.0f)
                 return Normalize(result);
-            else return Identity;
+            return Identity;
         }
 
         /// <summary>
@@ -333,12 +304,12 @@ namespace NFSScript.Math
         public static Quaternion Inverse(Quaternion quat)
         {
             float x, y, z, w;
-            float lengthSqr = quat.magnitudeSquared;
+            var lengthSqr = quat.MagnitudeSquared;
 
-            x = -quat.x * lengthSqr;
-            y = -quat.y * lengthSqr;
-            z = -quat.z * lengthSqr;
-            w = -quat.w * lengthSqr;
+            x = -quat.X * lengthSqr;
+            y = -quat.Y * lengthSqr;
+            z = -quat.Z * lengthSqr;
+            w = -quat.W * lengthSqr;
 
             return new Quaternion(x, y, z, w);
         }
@@ -352,11 +323,11 @@ namespace NFSScript.Math
         /// <returns></returns>
         public static Quaternion RotateTowards(Quaternion from, Quaternion to, float maxDegressDelta)
         {
-            float angle = AngleBetween(from, to);
-            if (angle == 0.0F)
+            var angle = AngleBetween(from, to);
+            if (Maths.Abs(angle) < float.Epsilon)
                 return to;
 
-            float t = Maths.Min(1.0f, maxDegressDelta / angle);
+            var t = Maths.Min(1.0f, maxDegressDelta / angle);
             return SlerpUnclamped(from, to, t);
         }
 
@@ -369,20 +340,20 @@ namespace NFSScript.Math
         /// <returns></returns>
         public static Quaternion RotationYawPitchRoll(float yaw, float pitch, float roll)
         {
-            float halfRoll = roll * 0.5f;
-            float sinRoll = (float)Maths.Sin(halfRoll);
-            float cosRoll = (float)Maths.Cos(halfRoll);
-            float halfPitch = pitch * 0.5f;
-            float sinPitch = (float)Maths.Sin(halfPitch);
-            float cosPitch = (float)Maths.Cos(halfPitch);
-            float halfYaw = yaw * 0.5f;
-            float sinYaw = (float)Maths.Sin(halfYaw);
-            float cosYaw = (float)Maths.Cos(halfYaw);
+            var halfRoll = roll * 0.5f;
+            var sinRoll = (float)Maths.Sin(halfRoll);
+            var cosRoll = (float)Maths.Cos(halfRoll);
+            var halfPitch = pitch * 0.5f;
+            var sinPitch = (float)Maths.Sin(halfPitch);
+            var cosPitch = (float)Maths.Cos(halfPitch);
+            var halfYaw = yaw * 0.5f;
+            var sinYaw = (float)Maths.Sin(halfYaw);
+            var cosYaw = (float)Maths.Cos(halfYaw);
 
-            float x = (cosYaw * sinPitch * cosRoll) + (sinYaw * cosPitch * sinRoll);
-            float y = (sinYaw * cosPitch * cosRoll) - (cosYaw * sinPitch * sinRoll);
-            float z = (cosYaw * cosPitch * sinRoll) - (sinYaw * sinPitch * cosRoll);
-            float w = (cosYaw * cosPitch * cosRoll) + (sinYaw * sinPitch * sinRoll);
+            var x = (cosYaw * sinPitch * cosRoll) + (sinYaw * cosPitch * sinRoll);
+            var y = (sinYaw * cosPitch * cosRoll) - (cosYaw * sinPitch * sinRoll);
+            var z = (cosYaw * cosPitch * sinRoll) - (sinYaw * sinPitch * cosRoll);
+            var w = (cosYaw * cosPitch * cosRoll) + (sinYaw * sinPitch * sinRoll);
 
             return new Quaternion(x, y, z, w);
         }
@@ -406,7 +377,7 @@ namespace NFSScript.Math
         /// <returns></returns>
         public static Quaternion Euler(Vector3 euler)
         {
-            Vector3 eulerRad = euler * Mathf.Deg2Rad;
+            var eulerRad = euler * Mathf.Deg2Rad;
             return RotationYawPitchRoll(eulerRad.X, eulerRad.Y, eulerRad.Z);
         }
 
@@ -418,11 +389,11 @@ namespace NFSScript.Math
         /// <returns></returns>
         public static Quaternion FromToRotation(Vector3 fromDir, Vector3 toDir)
         {
-            float normAB = (float)Maths.Sqrt(fromDir.MagnitudeSquared * fromDir.MagnitudeSquared);
-            float w = normAB + Vector3.Dot(fromDir, toDir);
+            var abNorm = (float)Maths.Sqrt(fromDir.MagnitudeSquared * fromDir.MagnitudeSquared);
+            var w = abNorm + Vector3.Dot(fromDir, toDir);
 
             Quaternion result;
-            if (w >= 1e-6f * normAB)
+            if (w >= 1e-6f * abNorm)
                 result = new Quaternion(Vector3.Cross(fromDir, toDir), w);
             else
             {
@@ -439,7 +410,7 @@ namespace NFSScript.Math
         /// <returns></returns>
         public override string ToString()
         {
-            return string.Format("W = {0} X = {1} Y = {2} Z = {3}", w, x, y, z);
+            return $"W = {W} X = {X} Y = {Y} Z = {Z}";
         }
 
         /// <summary>
@@ -448,7 +419,8 @@ namespace NFSScript.Math
         /// <returns></returns>
         public string ToString(string numberFormat)
         {
-            return string.Format("W = {0} X = {1} Y = {2} Z = {3}", w.ToString(numberFormat), x.ToString(numberFormat), y.ToString(numberFormat), z.ToString(numberFormat));
+            return
+                $"W = {W.ToString(numberFormat)} X = {X.ToString(numberFormat)} Y = {Y.ToString(numberFormat)} Z = {Z.ToString(numberFormat)}";
         }
     }
 }

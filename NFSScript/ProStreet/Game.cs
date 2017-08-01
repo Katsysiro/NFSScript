@@ -21,15 +21,12 @@ namespace NFSScript.ProStreet
         /// <summary>
         /// Returns the currently playing song ID.
         /// </summary>
-        public static int CurrentlyPlayingSongID
-        {
-            get { return memory.ReadInt32((IntPtr)Addrs.GameAddrs.STATIC_SONG_ID); }
-        }
+        public static int CurrentlyPlayingSongID => Memory.ReadInt32((IntPtr)Addrs.GameAddrs.STATIC_SONG_ID);
 
         /// <summary>
         /// Returns the save game directory path.
         /// </summary>
-        public static string SaveDirectory { get { return Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "NFS ProStreet"); } }
+        public static string SaveDirectory => Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "NFS ProStreet");
 
         /// <summary>
         /// Returns true is the gameplay is active.
@@ -37,10 +34,10 @@ namespace NFSScript.ProStreet
         public static bool IsGameplayActive
         {
             get
-            {         
-                if (memory.ReadByte((IntPtr)Addrs.GenericAddrs.STATIC_IS_GAMEPLAY_ACTIVE) == 1)
+            {
+                if (Memory.ReadByte((IntPtr)Addrs.GenericAddrs.STATIC_IS_GAMEPLAY_ACTIVE) == 1)
                     return true;
-                else return false;
+                return false;
             }
         }
 
@@ -51,9 +48,9 @@ namespace NFSScript.ProStreet
         {
             get
             {
-                if (memory.ReadByte((IntPtr)Addrs.GenericAddrs.STATIC_IS_CAREER_LOADED) == 1)
+                if (Memory.ReadByte((IntPtr)Addrs.GenericAddrs.STATIC_IS_CAREER_LOADED) == 1)
                     return true;
-                else return false;
+                return false;
             }
         }
 
@@ -62,8 +59,8 @@ namespace NFSScript.ProStreet
         /// </summary>
         public static bool IsSoundEnabled
         {
-            get { return _readAudioIDValue(SOUND_ID); }
-            set { _setAudioIDValue(SOUND_ID, value); }
+            get => _readAudioIDValue(SOUND_ID);
+            set => _setAudioIDValue(SOUND_ID, value);
         }
 
         /// <summary>
@@ -71,8 +68,8 @@ namespace NFSScript.ProStreet
         /// </summary>
         public static bool IsAudioStreamingEnabled
         {
-            get { return _readAudioIDValue(AUDIO_STREAMING_ID); }
-            set { _setAudioIDValue(AUDIO_STREAMING_ID, value); }
+            get => _readAudioIDValue(AUDIO_STREAMING_ID);
+            set => _setAudioIDValue(AUDIO_STREAMING_ID, value);
         }
 
         /// <summary>
@@ -80,8 +77,8 @@ namespace NFSScript.ProStreet
         /// </summary>
         public static bool IsSpeechEnabled
         {
-            get { return _readAudioIDValue(SPEECH_ID); }
-            set { _setAudioIDValue(SPEECH_ID, value); }
+            get => _readAudioIDValue(SPEECH_ID);
+            set => _setAudioIDValue(SPEECH_ID, value);
         }
 
         /// <summary>
@@ -89,8 +86,8 @@ namespace NFSScript.ProStreet
         /// </summary>
         public static bool IsNISAudioEnabled
         {
-            get { return _readAudioIDValue(NIS_AUDIO_ID); }
-            set { _setAudioIDValue(NIS_AUDIO_ID, value); }
+            get => _readAudioIDValue(NIS_AUDIO_ID);
+            set => _setAudioIDValue(NIS_AUDIO_ID, value);
         }
 
         /// <summary>
@@ -98,17 +95,14 @@ namespace NFSScript.ProStreet
         /// </summary>
         public static bool SkipMovies
         {
-            get
-            {
-                return (memory.ReadByte((IntPtr)Addrs.GameAddrs.STATIC_SKIP_MOVIES) == 1);
-            }
+            get => (Memory.ReadByte((IntPtr)Addrs.GameAddrs.STATIC_SKIP_MOVIES) == 1);
             set
             {
                 byte b = 0;
                 if (value)
                     b = 1;
 
-                memory.WriteByte((IntPtr)Addrs.GameAddrs.STATIC_SKIP_MOVIES, b);
+                Memory.WriteByte((IntPtr)Addrs.GameAddrs.STATIC_SKIP_MOVIES, b);
             }
         }
 
@@ -133,7 +127,7 @@ namespace NFSScript.ProStreet
         /// </summary>
         public static void UnlockAllThings()
         {
-            memory.WriteByte((IntPtr)Addrs.GameAddrs.STATIC_UNLOCK_ALL_THINGS, 1);
+            Memory.WriteByte((IntPtr)Addrs.GameAddrs.STATIC_UNLOCK_ALL_THINGS, 1);
         }
 
         /// <summary>
@@ -141,7 +135,7 @@ namespace NFSScript.ProStreet
         /// </summary>
         public static void SkipCareerIntro()
         {
-            memory.WriteByte((IntPtr)Addrs.GameAddrs.STATIC_SKIP_CAREER_INTRO, 1);
+            Memory.WriteByte((IntPtr)Addrs.GameAddrs.STATIC_SKIP_CAREER_INTRO, 1);
         }
 
         /// <summary>
@@ -154,7 +148,7 @@ namespace NFSScript.ProStreet
             if (enabled)
                 value = 1;
 
-            memory.WriteByte((IntPtr)Addrs.GameAddrs.STATIC_SKIP_FE, value);
+            Memory.WriteByte((IntPtr)Addrs.GameAddrs.STATIC_SKIP_FE, value);
         }
 
         /// <summary>
@@ -163,14 +157,14 @@ namespace NFSScript.ProStreet
         /// <returns></returns>
         public static string GetEnteredCode()
         {
-            return memory.ReadStringASCII((IntPtr)Addrs.GameAddrs.STATIC_ENTERED_CODE, 26);
+            return Memory.ReadStringASCII((IntPtr)Addrs.GameAddrs.STATIC_ENTERED_CODE, 26);
         }
 
         internal static void _setAudioIDValue(int id, bool value)
         {
             byte b = 0;
             if (value) b = 1;
-            IntPtr address = IntPtr.Zero;
+            var address = IntPtr.Zero;
             switch (id)
             {
                 case SOUND_ID:
@@ -193,7 +187,7 @@ namespace NFSScript.ProStreet
                     return;
             }
 
-            memory.WriteByte(address, b);
+            Memory.WriteByte(address, b);
         }
 
         internal static bool _readAudioIDValue(int id)
@@ -202,19 +196,19 @@ namespace NFSScript.ProStreet
             switch (id)
             {
                 case SOUND_ID:
-                    b = memory.ReadByte((IntPtr)Addrs.GenericAddrs.STATIC_IS_SOUND_ENABLED);
+                    b = Memory.ReadByte((IntPtr)Addrs.GenericAddrs.STATIC_IS_SOUND_ENABLED);
                     break;
 
                 case AUDIO_STREAMING_ID:
-                    b = memory.ReadByte((IntPtr)Addrs.GenericAddrs.STATIC_IS_AUDIO_STREAMING_ENABLED);
+                    b = Memory.ReadByte((IntPtr)Addrs.GenericAddrs.STATIC_IS_AUDIO_STREAMING_ENABLED);
                     break;
 
                 case SPEECH_ID:
-                    b = memory.ReadByte((IntPtr)Addrs.GenericAddrs.STATIC_IS_SPEECH_ENABLED);
+                    b = Memory.ReadByte((IntPtr)Addrs.GenericAddrs.STATIC_IS_SPEECH_ENABLED);
                     break;
 
                 case NIS_AUDIO_ID:
-                    b = memory.ReadByte((IntPtr)Addrs.GenericAddrs.STATIC_IS_NISAUDIO_ENABLED);
+                    b = Memory.ReadByte((IntPtr)Addrs.GenericAddrs.STATIC_IS_NISAUDIO_ENABLED);
                     break;
 
                 default:
@@ -235,14 +229,14 @@ namespace NFSScript.ProStreet
         /// <summary>
         /// The address where the main GameFlowManager is located at.
         /// </summary>
-        public static IntPtr Address { get { return (IntPtr)Addrs.GenericAddrs.STATIC_GAME_STATE; } }
+        public static IntPtr Address => (IntPtr)Addrs.GenericAddrs.STATIC_GAME_STATE;
 
         private int gameStateValue;
 
         /// <summary>
         /// The main GameFlowManager.
         /// </summary>
-        public static GameFlowManager TheGameFlowManager { get { return new GameFlowManager(memory.ReadInt32(Address)); } }
+        public static GameFlowManager TheGameFlowManager => new GameFlowManager(Memory.ReadInt32(Address));
 
         /// <summary>
         /// Instantiate a GameFlowManager class.

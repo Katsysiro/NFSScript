@@ -1,7 +1,7 @@
 ﻿using System;
+using NFSScript.Math;
 using static NFSScript.Core.GameMemory;
 using static NFSScript.Core.WorldAddresses;
-using NFSScript.Math;
 
 namespace NFSScript.World
 {
@@ -17,8 +17,8 @@ namespace NFSScript.World
         {
             get
             {
-                ushort x = memory.ReadUShort((IntPtr)memory.getBaseAddress + UIAddrs.NON_STATIC_CURSOR_POS_X);
-                ushort y = memory.ReadUShort((IntPtr)memory.getBaseAddress + UIAddrs.NON_STATIC_CURSOR_POS_Y);
+                var x = Memory.ReadUShort((IntPtr)Memory.getBaseAddress + UIAddrs.NON_STATIC_CURSOR_POS_X);
+                var y = Memory.ReadUShort((IntPtr)Memory.getBaseAddress + UIAddrs.NON_STATIC_CURSOR_POS_Y);
 
                 return new Point(x, y);
             }

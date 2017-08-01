@@ -1,6 +1,6 @@
 ﻿using System;
-using Microsoft.Win32.SafeHandles;
 using System.Runtime.InteropServices;
+using Microsoft.Win32.SafeHandles;
 
 namespace NFSScript.Core
 {
@@ -12,20 +12,24 @@ namespace NFSScript.Core
         /// <summary>
         /// 
         /// </summary>
-        public IntPtr storedAddress { get; private set; }
+        public IntPtr StoredAddress { get; private set; }
 
         /// <summary>
         /// 
         /// </summary>
-        public uint calledAddress { get; private set; }
+        public uint CalledAddress { get; private set; }
 
         /// <summary>
         /// Returns the amount of usages.
         /// </summary>
-        public int usages { get; private set; }
-        bool disposed = false;
+        public int Usages { get; private set; }
 
-        SafeHandle handle = new SafeFileHandle(IntPtr.Zero, true);
+        /// <summary>
+        /// Whether this map has been disposed or not.
+        /// </summary>
+        public bool Disposed;
+
+        private readonly SafeHandle _handle = new SafeFileHandle(IntPtr.Zero, true);
 
         /// <summary>
         /// 
@@ -34,14 +38,15 @@ namespace NFSScript.Core
         /// <param name="calledAddress"></param>
         public MemoryAllocMap(IntPtr storedAddress, uint calledAddress)
         {
-            this.storedAddress = storedAddress;
-            this.calledAddress = calledAddress;
-            usages = 0;
+            StoredAddress = storedAddress;
+            CalledAddress = calledAddress;
+            Usages = 0;
         }
 
-        void Use()
+        // TODO: This method is never used.
+        private void Use()
         {
-            usages++;
+            Usages++;
         }
        
         /// <summary>
@@ -59,15 +64,15 @@ namespace NFSScript.Core
         /// <param name="disposing"></param>
         protected virtual void Dispose(bool disposing)
         {
-            if (disposed)
+            if (Disposed)
                 return;
 
             if (disposing)
             {
-                handle.Dispose();
+                _handle.Dispose();
             }
 
-            disposed = true;
+            Disposed = true;
         }
 
         /// <summary>
@@ -77,7 +82,7 @@ namespace NFSScript.Core
         /// <returns></returns>
         public static bool ExistsInMemoryReturnAlloc(uint calledAddressValue)
         {
-            return ASM.memoryReturnAllocation.Find(x => x.calledAddress == calledAddressValue) != null;
+            return ASM.memoryReturnAllocation.Find(x => x.CalledAddress == calledAddressValue) != null;
         }
 
         /// <summary>
@@ -87,7 +92,7 @@ namespace NFSScript.Core
         /// <returns></returns>
         public static MemoryAllocMap GetMemoryAllocMapByCalledAddress(uint calledAddressValue)
         {
-            return ASM.memoryReturnAllocation.Find(x => x.calledAddress == calledAddressValue);
+            return ASM.memoryReturnAllocation.Find(x => x.CalledAddress == calledAddressValue);
         }
     }
 

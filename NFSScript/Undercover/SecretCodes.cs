@@ -98,7 +98,7 @@ namespace NFSScript.Undercover
         /// <returns></returns>
         public static bool IsSecretCodeValid(string secretCode)
         {
-            int count = cheatsArray.Select((s, i) => new { i, s }).Count(t => t.s == secretCode);
+            var count = cheatsArray.Select((s, i) => new { i, s }).Count(t => t.s == secretCode);
             return (count != 0);
         }
     }

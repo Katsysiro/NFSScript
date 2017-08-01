@@ -9,81 +9,84 @@ namespace NFSScript
     /// <summary>
     /// A class for reading and writing INI files
     /// </summary>
-    public class INIFile
+    public class IniFile
     {
         /// <summary>
         /// Returns the path of the INIFile
         /// </summary>
         public string Path { get; private set; }
-        string EXE = Assembly.GetExecutingAssembly().GetName().Name;
+
+        private readonly string _exe = Assembly.GetExecutingAssembly().GetName().Name;
 
         [DllImport("kernel32", CharSet = CharSet.Unicode)]
-        static extern long WritePrivateProfileString(string Section, string Key, string Value, string FilePath);
+        private static extern long WritePrivateProfileString(string section, string key, string value, string filePath);
 
         [DllImport("kernel32", CharSet = CharSet.Unicode)]
-        static extern int GetPrivateProfileString(string Section, string Key, string Default, StringBuilder RetVal, int Size, string FilePath);
+#pragma warning disable 1591
+        public static extern int GetPrivateProfileString(string section, string key, string Default, StringBuilder retVal, int size, string filePath);
+#pragma warning restore 1591
 
         /// <summary>
         /// Instantiate an INIFile class
         /// </summary>
-        /// <param name="IniPath"></param>
-        public INIFile(string IniPath = null)
+        /// <param name="iniPath"></param>
+        public IniFile(string iniPath = null)
         {
-            Path = new FileInfo(IniPath ?? EXE + ".ini").FullName.ToString();
+            Path = new FileInfo(iniPath ?? _exe + ".ini").FullName;
         }
 
         /// <summary>
         /// Read a key from the INI file
         /// </summary>
-        /// <param name="Key"></param>
-        /// <param name="Section"></param>
+        /// <param name="key"></param>
+        /// <param name="section"></param>
         /// <returns></returns>
-        public string Read(string Key, string Section = null)
+        public string Read(string key, string section = null)
         {
-            var RetVal = new StringBuilder(255);
-            GetPrivateProfileString(Section ?? EXE, Key, "", RetVal, 255, Path);
-            return RetVal.ToString();
+            var retVal = new StringBuilder(255);
+            GetPrivateProfileString(section ?? _exe, key, "", retVal, 255, Path);
+            return retVal.ToString();
         }
 
         /// <summary>
         /// Write a key to the ini file
         /// </summary>
-        /// <param name="Key"></param>
-        /// <param name="Value"></param>
-        /// <param name="Section"></param>
-        public void Write(string Key, string Value, string Section = null)
+        /// <param name="key"></param>
+        /// <param name="value"></param>
+        /// <param name="section"></param>
+        public void Write(string key, string value, string section = null)
         {
-            WritePrivateProfileString(Section ?? EXE, Key, Value, Path);
+            WritePrivateProfileString(section ?? _exe, key, value, Path);
         }
 
         /// <summary>
         /// Delete a key from the ini file
         /// </summary>
-        /// <param name="Key"></param>
-        /// <param name="Section"></param>
-        public void DeleteKey(string Key, string Section = null)
+        /// <param name="key"></param>
+        /// <param name="section"></param>
+        public void DeleteKey(string key, string section = null)
         {
-            Write(Key, null, Section ?? EXE);
+            Write(key, null, section ?? _exe);
         }
 
         /// <summary>
         /// Delete a section
         /// </summary>
-        /// <param name="Section"></param>
-        public void DeleteSection(string Section = null)
+        /// <param name="section"></param>
+        public void DeleteSection(string section = null)
         {
-            Write(null, null, Section ?? EXE);
+            Write(null, null, section ?? _exe);
         }
 
         /// <summary>
         /// Returns true if the key exists
         /// </summary>
-        /// <param name="Key"></param>
-        /// <param name="Section"></param>
+        /// <param name="key"></param>
+        /// <param name="section"></param>
         /// <returns></returns>
-        public bool KeyExists(string Key, string Section = null)
+        public bool KeyExists(string key, string section = null)
         {
-            return Read(Key, Section).Length > 0;
+            return Read(key, section).Length > 0;
         }
     }
 }

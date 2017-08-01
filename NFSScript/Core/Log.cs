@@ -1,6 +1,6 @@
 ﻿using System;
-using System.Text;
 using System.IO;
+using System.Text;
 
 namespace NFSScript
 {
@@ -9,9 +9,9 @@ namespace NFSScript
     /// </summary>
     public static class Log
     {
-        private const string fileName = "NFSScriptLog";
-        private const string fileExtension = "log";
-        private const string dateFormat = "MM-dd-yyyy";
+        private const string FileName = "NFSScriptLog";
+        private const string FileExtension = "log";
+        private const string DateFormat = "MM-dd-yyyy";
 
         /// <summary>
         /// Gets the log file name
@@ -19,12 +19,12 @@ namespace NFSScript
         /// <returns></returns>
         public static string GetFileName()
         {
-            StringBuilder sb = new StringBuilder();
-            sb.Append(fileName);
+            var sb = new StringBuilder();
+            sb.Append(FileName);
             sb.Append(" ");
-            sb.Append(DateTime.Now.ToString(dateFormat));
+            sb.Append(DateTime.Now.ToString(DateFormat));
             sb.Append(".");
-            sb.Append(fileExtension);
+            sb.Append(FileExtension);
 
             return sb.ToString();
         }
@@ -37,10 +37,10 @@ namespace NFSScript
         public static void Print(string tag, string message)
         {
 
-            string output = string.Format("({0}) {1}: {2}", DateTime.Now.ToString("u").Replace("Z", string.Empty), tag, message);
+            var output = $"({DateTime.Now.ToString("u").Replace("Z", string.Empty)}) {tag}: {message}";
             Console.WriteLine(output);
 
-            using (StreamWriter file = new StreamWriter(GetFileName(), true))
+            using (var file = new StreamWriter(GetFileName(), true))
             {
                 file.WriteLine(output);
             }
@@ -54,10 +54,10 @@ namespace NFSScript
         {
             if (NFSScript.DEBUG)
             {
-                string output = string.Format("({0}) DEBUG: {1}", DateTime.Now.ToString("u").Replace("Z", string.Empty), message);
+                var output = $"({DateTime.Now.ToString("u").Replace("Z", string.Empty)}) DEBUG: {message}";
                 Console.WriteLine(output);
 
-                using (StreamWriter file = new StreamWriter(GetFileName(), true))
+                using (var file = new StreamWriter(GetFileName(), true))
                 {
                     file.WriteLine(output);
                 }

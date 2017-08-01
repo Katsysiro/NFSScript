@@ -10,12 +10,17 @@ namespace NFSScript.Core
         /// <summary>
         /// Where the magic happens.
         /// </summary>
-        public static VAMemory memory;
+        public static VAMemory Memory;
 
         /// <summary>
-        /// A generic memory.
+        /// A generic memory class.
         /// </summary>
-        public static GMemory genericMemory;
+        public static GMemory GenericMemory;
+
+        /// <summary>
+        /// Alias for <see cref="GenericMemory"/>
+        /// </summary>
+        public static GMemory Generic => GenericMemory;
 
         /// <summary>
         /// 
@@ -24,11 +29,11 @@ namespace NFSScript.Core
         /// <returns></returns>
         public static IntPtr WriteData(byte[] data)
         {
-            uint size = (uint)data.Length;
+            var size = (uint)data.Length;
 
-            IntPtr hAlloc = NativeMethods.VirtualAllocEx(memory.ProcessHandle, IntPtr.Zero, size, AllocationType.Commit, MemoryProtection.ExecuteReadWrite);
+            var hAlloc = NativeMethods.VirtualAllocEx(Memory.ProcessHandle, IntPtr.Zero, size, AllocationType.Commit, MemoryProtection.ExecuteReadWrite);
 
-            memory.WriteByteArray(hAlloc, data);
+            Memory.WriteByteArray(hAlloc, data);
 
             return hAlloc;
         }

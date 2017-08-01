@@ -12,7 +12,7 @@ namespace NFSScript
         /// <summary>
         /// The length of this variable.
         /// </summary>
-        public int Length { get { return value.Length; } }
+        public int Length => value.Length;
 
         private Any(byte[] value) : base(value)
         { }

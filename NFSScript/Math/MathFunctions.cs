@@ -13,6 +13,11 @@ namespace NFSScript.Math
         public const float PI = 3.14159265358979323846f;
 
         /// <summary>
+        /// Not to be confused with 'pie'
+        /// </summary>
+        public const float Pi = PI;
+
+        /// <summary>
         /// Degrees-to-radians conversion constant (Read only).
         /// </summary>
         public const float Deg2Rad = (PI * 2) / 360;
@@ -28,9 +33,9 @@ namespace NFSScript.Math
         public const float Epsilon = 1.192093E-07F;
 
         /// <summary>
-        /// 
+        /// 1 mile, in kilometers.
         /// </summary>
-        public const float SingleMileToKM = 1.609344f;
+        public const float SingleMileToKm = 1.609344f;
 
         /// <summary>
         /// Converts the given <paramref name="speed"/> using the given <paramref name="speedMeasurementConversionType"/>
@@ -119,7 +124,7 @@ namespace NFSScript.Math
         }
 
         /// <summary>
-        /// Converts RPS to RPM.
+        /// Converts rotations per second to rotations per minute.
         /// </summary>
         /// <param name="rps"></param>
         /// <returns></returns>
@@ -129,12 +134,13 @@ namespace NFSScript.Math
         }
 
         /// <summary>
-        /// Converts RPM to RPS.
+        /// Converts rotations per minute to rotations per second.
         /// </summary>
         /// <param name="rpm"></param>
         /// <returns></returns>
         public static float RPM2RPS(float rpm)
         {
+            // TODO: Mr. CPU Cycle could you replace this division with a multiply which uses less cycles
             return (float)(rpm * 6.28318548202515 / 60.0);
         }
 
@@ -143,6 +149,7 @@ namespace NFSScript.Math
         /// </summary>
         public static float ByteToFloat(byte b)
         {
+            // FIXME: IMPORTANT: The result will never be a proper float, need to cast to float for the division to be floating point!!!!
             return b / byte.MaxValue;
         }
 
@@ -151,7 +158,7 @@ namespace NFSScript.Math
         /// </summary>
         public static byte FloatToByte(float f)
         {
-            float b = f * byte.MaxValue;
+            var b = f * byte.MaxValue;
             if (b > byte.MaxValue)
                 b = byte.MaxValue;
             else if (b < byte.MinValue)
@@ -181,7 +188,7 @@ namespace NFSScript.Math
         /// <returns></returns>
         public static T Clamp<T>(T value, T min, T max) where T : IComparable<T>
         {
-            T obj = value;
+            var obj = value;
             if (obj.CompareTo(min) < 0)
                 obj = min;
             if (obj.CompareTo(max) > 0)
@@ -227,6 +234,8 @@ namespace NFSScript.Math
         /// </summary>
         MilesPerHour
     }
+    
+    // ReSharper disable InconsistentNaming
 
     /// <summary>
     /// 
@@ -296,4 +305,5 @@ namespace NFSScript.Math
         /// </summary>
         public static readonly float SingleMPHToKPH = 1.609344f;
     }
+    // ReSharper restore InconsistentNaming
 }
