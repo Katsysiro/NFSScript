@@ -11,6 +11,7 @@ using System.Text;
 using System.Threading;
 using System.Timers;
 using System.Windows.Forms;
+using System.Threading.Tasks;
 using Microsoft.CSharp;
 using Microsoft.JScript;
 using Microsoft.VisualBasic;
@@ -19,6 +20,9 @@ using NFSScript.Core;
 using Tick = System.Timers.Timer;
 using RunningMemory = NFSScript.Core.VAMemory;
 using NFSSKeys = NFSScript.Keys;
+
+using static NFSScript.Core.GameMemory;
+using Addrs = NFSScript.Core.UG2Addresses;
 
 namespace NFSScriptLoader
 {
@@ -42,7 +46,7 @@ namespace NFSScriptLoader
         private static bool _inGameplay;
         private static bool _inRace;
 
-        private const int UpdateTick = 1;
+        private const int UpdateTick = 40;
         private const int WaitBeforeLoad = 5000;
 
         private static List<ModScript> _scripts;
@@ -74,18 +78,18 @@ namespace NFSScriptLoader
 
         public static Process GameProcess { get; private set; }
 
-        private static void EntryPoint(string pwzArgument)
+        private static async Task EntryPoint(string pwzArgument)
         {
             Log.Print(NFSScriptLoader.INFO_TAG, $"{pwzArgument} by Dennis Stanistan");
 
             InitIni();
             GetNFSGame();
-            Start();
+            await Start();
         }
 
-        private static void Main()
+        private static async Task Main()
         {
-            EntryPoint("NFSScript");
+            await EntryPoint("NFSScript");
         }
 
         /// <summary>
@@ -111,6 +115,9 @@ namespace NFSScriptLoader
             var ini = new IniFile(IniFileName);
             if (File.Exists(ini.Path))
             {
+                ini.Write("ShowConsole", "1", "NFSScript");
+                ini.Write("Debug", "1", "NFSScript");
+
                 if (ini.KeyExists("ShowConsole", "NFSScript"))
                 {
                     Settings.ShowConsole = FlexiableParse(ini.Read("ShowConsole", "NFSScript")) == 1;                    
@@ -132,6 +139,7 @@ namespace NFSScriptLoader
         {
             Log.Print(NFSScriptLoader.INFO_TAG, "Getting executeable in directory.");
             _currentNFSGame = NFS.DetectGameExecutableInDirectory;
+
             var wrldTick = 0;
             // ReSharper disable once SwitchStatementMissingSomeCases
             switch (_currentNFSGame)
@@ -210,12 +218,56 @@ namespace NFSScriptLoader
                 RunningMemory.debugMode = true;
         }
 
+        public static NativeWebSocket.WebSocket socket = new NativeWebSocket.WebSocket("ws://localhost:52302");
+
         /// <summary>
         /// Start loading scripts and applying keys & scripts events.
         /// </summary>
-        private static void Start()
+        private static async Task Start()
         {
             LoadScripts();
+
+            //AsynchronousClient.StartClient();
+
+            socket.OnOpen += () =>
+            {
+                Log.Print("socket", "Connection open!");
+            };
+
+            socket.OnError += (e) =>
+            {
+                Log.Print("socket", "Error! " + e);
+            };
+
+            socket.OnClose += (e) =>
+            {
+                Log.Print("socket", "Connection closed! " + e.ToString());
+            };
+
+
+            socket.OnMessage += (bytes) =>
+            {
+                // Reading a plain text message
+                var message = System.Text.Encoding.UTF8.GetString(bytes);
+
+                if (message.Contains(@"e"":""update"))
+                {
+                    Log.Print("socket", "update");
+                }
+            };
+
+            try
+            {
+                //await socket.Connect();
+                Task.Run(async () => await socket.Connect());
+
+            }
+            catch (Exception e)
+            {
+                Log.Print("socket", "Connect error: " + e.Message);
+            }
+
+            Log.Print("socket", "Connect");
 
             GetGameMemory(_gameProcessName);
             CallPreScriptMethod();
@@ -385,6 +437,17 @@ namespace NFSScriptLoader
 
         private static void CallPreScriptMethod()
         {
+            Log.Print("MyMod", "Pre");
+
+            var WindowedModeGet = Memory.ReadInt32((IntPtr)0x87098C);
+            Log.Print("MyMod", $"Pre WindowedModeGet: {WindowedModeGet}");
+
+            var WindowedMode = Memory.WriteInt32((IntPtr)0x87098C, 2);
+            Log.Print("MyMod", $"WindowedMode: {WindowedMode}");
+
+            WindowedModeGet = Memory.ReadInt32((IntPtr)0x87098C);
+            Log.Print("MyMod", $"Pre WindowedModeGet: {WindowedModeGet}");
+
             for (var i = 0; i < _scripts.Count; i++)
             {
                 if (_scripts[i].HasPre)
@@ -508,6 +571,37 @@ namespace NFSScriptLoader
             }
 
             CallScriptsEvents();
+
+            if (socket != null)
+            {
+                if (socket.State == NativeWebSocket.WebSocketState.Open)
+                {
+                    var s = NFSScript.Underground2.Player.Car.Speed;
+
+                    var mA = NFSScript.Underground2.Player.Car.ModelA;
+                    var mU = NFSScript.Underground2.Player.Car.ModelU;
+
+                    var m1 = NFSScript.Underground2.Player.Car.Model1;
+                    var m2 = NFSScript.Underground2.Player.Car.Model2;
+                    var m3 = NFSScript.Underground2.Player.Car.Model3;
+                    var m4 = NFSScript.Underground2.Player.Car.Model4;
+                    var m5 = NFSScript.Underground2.Player.Car.Model5;
+                    var m6 = NFSScript.Underground2.Player.Car.Model6;
+                    var m7 = NFSScript.Underground2.Player.Car.Model7;
+
+                    Log.Print(NFSScriptLoader.INFO_TAG, $"ModelA: {mA} | ModelU: {mU} | Model1: {m1} | Model2: {m2} | Model3: {m3} | Model4: {m4} | Model5: {m5} | Model6: {m6} | Model7: {m7}");
+
+                    var x = NFSScript.Underground2.Player.Car.Position.X;
+                    var y = NFSScript.Underground2.Player.Car.Position.Y;
+                    var z = NFSScript.Underground2.Player.Car.Position.Z;
+
+                    socket.SendText(@"{""e"": ""update"", ""d"":{ ""x"": "+x.ToString("0.00", new CultureInfo("en-US", false)) + ", " +
+                            "\"y\":" + y.ToString("0.00", new CultureInfo("en-US", false)) + ", " +
+                            "\"z\":" + z.ToString("0.00", new CultureInfo("en-US", false)) + ", " +
+                            "\"s\":" + s.ToString("0.00", new CultureInfo("en-US", false)) + "  } }").Wait();
+                }
+            }
+
             for (var i = 0; i < _scripts.Count; i++)
             {
                 if (_scripts[i].HasUpdate)

@@ -255,7 +255,7 @@
 
         /// <summary>
         /// 
-        /// </summary>xxxxx
+        /// </summary>
         public struct PlayerAddrs
         {
             /// <summary>
@@ -267,6 +267,23 @@
             /// 
             /// </summary>
             public const int STATIC_PLAYER_CAR_SPEED_MPH = 0x7F0A04;
+
+            // 0AC51D3D
+            // 505C5A30
+
+            /*
+             * 0043DC1C
+             * 0x0043DC15
+            0043DC19 - 41 - inc ecx
+            0043DC1A - 84 D2  - test dl,dl
+            0043DC1C - 88 11  - mov [ecx],dl <<
+            0043DC1E - 75 F5 - jne speed2.exe+3DC15
+            0043DC20 - 5E - pop esi
+            */
+            /// <summary>
+            /// Моделька машины
+            /// </summary>
+            public const int STATIC_PLAYER_CAR_MODEL = 0x43DC1C;
 
             /// <summary>
             /// 

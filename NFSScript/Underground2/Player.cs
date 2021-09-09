@@ -55,6 +55,18 @@ namespace NFSScript.Underground2
             /// </summary>
             /// <returns></returns>
             public static float Speed => Memory.ReadFloat((IntPtr)Addrs.PlayerAddrs.STATIC_PLAYER_CAR_SPEED_MPH);
+
+            public static string ModelU => Memory.ReadStringUnicode((IntPtr) Addrs.PlayerAddrs.STATIC_PLAYER_CAR_MODEL, 4);
+            public static string ModelA => Memory.ReadStringASCII((IntPtr) Addrs.PlayerAddrs.STATIC_PLAYER_CAR_MODEL, 4);
+
+            public static byte Model1 => Memory.ReadByte((IntPtr)0x43DC15);
+            public static byte Model2 => Memory.ReadByte((IntPtr)0x43DC1C);
+            public static byte Model3 => Memory.ReadByte((IntPtr)0x43DC19);
+            public static byte Model4 => Memory.ReadByte((IntPtr)0x43DC1A);
+            public static byte Model5 => Memory.ReadByte((IntPtr)0x43DC1C);
+            public static byte Model6 => Memory.ReadByte((IntPtr)0x43DC1E);
+            public static byte Model7 => Memory.ReadByte((IntPtr)0x43DC20);
+
         }
     }
 }

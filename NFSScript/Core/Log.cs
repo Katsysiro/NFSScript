@@ -40,10 +40,10 @@ namespace NFSScript
             var output = $"({DateTime.Now.ToString("u").Replace("Z", string.Empty)}) {tag}: {message}";
             Console.WriteLine(output);
 
-            using (var file = new StreamWriter(GetFileName(), true))
+            /*using (var file = new StreamWriter(GetFileName(), true))
             {
                 file.WriteLine(output);
-            }
+            }*/
         }
 
         /// <summary>

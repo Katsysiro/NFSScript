@@ -9,20 +9,22 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>NFSScriptLoader</RootNamespace>
     <AssemblyName>NFSScriptLoader</AssemblyName>
-    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
-    <TargetFrameworkProfile>Client</TargetFrameworkProfile>
+    <TargetFrameworkProfile>
+    </TargetFrameworkProfile>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <PlatformTarget>AnyCPU</PlatformTarget>
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
-    <OutputPath>bin\Debug\</OutputPath>
+    <OutputPath>..\..\..\..\..\Need for Speed Underground 2\</OutputPath>
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -33,6 +35,7 @@
     </DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <PropertyGroup>
     <ApplicationIcon>nfsscripticon.ico</ApplicationIcon>
@@ -52,6 +55,10 @@
       <Project>{55a95250-696d-4c73-8e96-593d211a5974}</Project>
       <Name>NFSScript</Name>
     </ProjectReference>
+    <ProjectReference Include="..\WebSocket\WebSocket.csproj">
+      <Project>{23e69373-6941-4f89-a317-909dd2d4e27b}</Project>
+      <Name>WebSocket</Name>
+    </ProjectReference>
     <Reference Include="Microsoft.JScript" />
     <Reference Include="System" />
     <Reference Include="System.Core" />
@@ -63,6 +70,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AsynchronousClient .cs" />
     <Compile Include="ModScript.cs" />
     <Compile Include="NReflec.cs" />
     <Compile Include="Program.cs" />
