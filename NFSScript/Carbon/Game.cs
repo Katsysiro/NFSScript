@@ -663,8 +663,13 @@ namespace NFSScript.Carbon
                 set
                 {
                     if (value)
+                    {
                         Memory.WriteByte((IntPtr)WorldAddrs.STATIC_ALWAYS_RAIN, 1);
-                    else Memory.WriteByte((IntPtr)WorldAddrs.STATIC_ALWAYS_RAIN, 0);
+                    }
+                    else
+                    {
+                        Memory.WriteByte((IntPtr)WorldAddrs.STATIC_ALWAYS_RAIN, 0);
+                    }
                 }
             }
 

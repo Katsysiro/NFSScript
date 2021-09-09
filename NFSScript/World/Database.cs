@@ -308,7 +308,10 @@
         /// <summary>
         ///
         /// </summary>
-        public const string CAR1054 = "CAR1054";
+        public static string CAR1054
+        {
+            get { return "CAR1054"; }
+        }
 
         /// <summary>
         ///
@@ -998,7 +1001,10 @@
         /// <summary>
         ///
         /// </summary>
-        public const string TRAILERB = "TRAILERB";
+        public static string TRAILERB
+        {
+            get { return "TRAILERB"; }
+        }
 
         /// <summary>
         ///
@@ -1103,7 +1109,10 @@
         /// <summary>
         ///
         /// </summary>
-        public const string ZONDA = "ZONDA";
+        public static string ZONDA
+        {
+            get { return "ZONDA"; }
+        }
 
         /// <summary>
         ///

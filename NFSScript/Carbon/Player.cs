@@ -161,14 +161,21 @@ namespace NFSScript.Carbon
             var aiControl = Memory.ReadByte((IntPtr)u + PlayerAddrs.POINTER_PLAYER_AI_CONTROL_POINTER);
 
             if (aiControl == 1)
+            {
                 return true;
+            }
 
             if (skipFEEnabled == 1)
             {
                 if (skipFEAI == 1)
+                {
                     return true;
+                }
+
                 if (skipFEAI == 0)
+                {
                     return false;
+                }
             }
 
             return false;
@@ -345,15 +352,24 @@ namespace NFSScript.Carbon
                 get
                 {
                     var b = Memory.ReadByte((IntPtr)PlayerAddrs.STATIC_AUGMENTED_DRIFT_WITH_EBRAKE);
+                    
                     if (b == 1)
+                    {
                         return true;
+                    }
+
                     return false;
                 }
                 set
                 {
                     if (value)
+                    {
                         Memory.WriteByte((IntPtr)PlayerAddrs.STATIC_AUGMENTED_DRIFT_WITH_EBRAKE, 1);
-                    else Memory.WriteByte((IntPtr)PlayerAddrs.STATIC_AUGMENTED_DRIFT_WITH_EBRAKE, 0);
+                    }
+                    else
+                    {
+                        Memory.WriteByte((IntPtr)PlayerAddrs.STATIC_AUGMENTED_DRIFT_WITH_EBRAKE, 0);
+                    }
                 }
             }
 
