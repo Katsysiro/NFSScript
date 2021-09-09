@@ -1,6 +1,6 @@
 # NFSScript
 
-[![Codacy Badge](https://api.codacy.com/project/badge/Grade/f2d6423a6a4349408fcde231750b6862)](https://www.codacy.com/app/DennisStanistan/NFSScript?utm_source=github.com&utm_medium=referral&utm_content=DennisStanistan/NFSScript&utm_campaign=badger)
+[![Codacy Badge](https://app.codacy.com/project/badge/Grade/e114ae1447b74e22ad9d33f52590ad5d)](https://www.codacy.com/gh/Katsysiro/NFSScript/dashboard?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=Katsysiro/NFSScript&amp;utm_campaign=Badge_Grade)
 
 A 'plug-in' for supported NFS games that allows scripting and further modding NFS games by using .NET.
 
